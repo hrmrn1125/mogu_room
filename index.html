@@ -72,6 +72,40 @@ body{font-family:'Noto Sans JP',sans-serif}
 .activity-choice.selected{border-color:#68a77b;background:#e0f1db}.activity-choice svg{height:24px;width:24px;display:block;margin:0 auto 5px}
 @media(min-width:750px){.app{max-width:520px;display:block;padding:0}.bottom-nav{left:0;right:0;top:auto}.game{height:100%;max-height:none}.page{padding:35px 22px 110px}.room-card{position:absolute}.feed-area{position:absolute}.action-grid{position:absolute}}
 @media(max-width:359px){.feed-area{left:8px;right:8px}.action-grid{left:8px;right:8px}.pet{min-width:155px}}
+
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+html,body{height:100%;overflow:hidden}
+.app{height:100dvh;min-height:560px;max-width:520px;display:block;padding:0;overflow:hidden;background:#80cc72;position:relative;box-shadow:0 0 40px #365d3f44}
+.header{position:absolute;top:calc(11px + env(safe-area-inset-top));left:13px;right:13px;margin:0;z-index:9;pointer-events:none}.header>*{pointer-events:auto}.brand{color:white;text-shadow:2px 3px #397e4c;font:23px 'DotGothic16';letter-spacing:-1px}.brand svg{display:none}.header-side{font:10px 'DotGothic16';color:#416a4b;background:#fffdece8;border:2px solid white;border-radius:9px;padding:6px 10px}.header-side b{font-size:10px}
+.intro{display:none!important}.home-left,.home-right{display:contents}
+.room-card{position:absolute;inset:0;border:0;border-radius:0;overflow:visible;box-shadow:none;pointer-events:none;background:transparent;z-index:1}
+.room-head{position:absolute;top:calc(68px + env(safe-area-inset-top));right:12px;z-index:5;max-width:42%;padding:8px 11px;background:#fffef2e8;border:2px solid white;border-radius:10px;box-shadow:0 4px #48875166}.pet-title{font:12px 'DotGothic16';white-space:nowrap;max-width:130px}.pet-sub{display:none}.level{padding:3px 0;background:none;border-radius:0;font:12px 'DotGothic16'}
+.scene{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#82d778;pointer-events:auto;isolation:isolate}
+.scene:before,.scene:after{display:none}
+.scene>.window,.scene>.shelf,.scene>.plant,.scene>.lamp,.scene>.rug,.scene>.stars,.scene>.tidy{display:none}
+.pixel-world{width:100%;height:100%;position:absolute;inset:0;image-rendering:pixelated;display:block}
+.pet{width:clamp(165px,50vw,260px);height:clamp(165px,50vw,260px);position:absolute;left:50%;top:33%;bottom:auto;transform:translateX(-50%);max-width:none;max-height:none;z-index:4;filter:drop-shadow(5px 8px 0 #317e4a44);animation:pixbob 2.5s steps(4,end) infinite;pointer-events:auto}
+.pet svg{image-rendering:pixelated;shape-rendering:crispEdges}
+.pet.chew{animation:pixchew .2s steps(2,end) 5}.pet.celebrate{animation:pixjump .5s steps(3,end) 3}
+@keyframes pixbob{0%,100%{transform:translateX(-50%)}50%{transform:translateX(-50%) translateY(-8px)}}@keyframes pixchew{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06,.94)}}@keyframes pixjump{0%,100%{transform:translateX(-50%)}50%{transform:translateX(-50%) translateY(-23px)}}
+.room-speech,.speech{position:absolute;left:52%;top:26%;z-index:6;max-width:145px;min-height:auto;background:#fffdf2;border:3px solid #4b8d57;border-radius:9px 9px 9px 0;box-shadow:4px 4px #356b4655;padding:8px 10px;color:#507458;font:11px/1.7 'DotGothic16';opacity:0;pointer-events:none;transition:opacity .2s}.room-speech.visible,.speech.visible{opacity:1}
+.room-card:after{display:none}
+.room-footer{position:absolute;z-index:6;top:calc(121px + env(safe-area-inset-top));right:13px;width:41%;padding:0;background:transparent}.room-level{display:none}.room-footer .progress{height:8px;margin:0;border:2px solid #fffbea;border-radius:3px;background:#cfdfcb}.room-footer .progress span{background:#6db77a}.level-dots,.room-footer .hint{display:none}
+.feed-area{position:absolute;bottom:calc(159px + env(safe-area-inset-bottom));left:12px;right:12px;z-index:8;padding:9px 11px;margin:0;border:3px solid #fff6db;border-radius:13px;background:#fff8e7f4;box-shadow:0 5px #467b4d7c;pointer-events:auto}
+.feed-top h2{font:13px 'DotGothic16';margin:0}.feed-top small{font:10px 'DotGothic16'}.feed-help{display:none}
+.tray{min-height:54px;padding:6px 0 0;background:transparent;border:0;border-radius:0;gap:8px}.food-item{width:55px;height:55px;flex:0 0 55px;min-width:55px;border-radius:8px;background:#fffdfa;border:2px solid #d9e6d2;touch-action:none}.food-item svg{height:47px;width:47px;image-rendering:pixelated}.food-item span:last-child{display:none}.tray-empty{font:11px 'DotGothic16';padding:12px 5px}.feed-bottom{margin:0}.tip-mini{display:none}.feed-bottom button:not([hidden]){font:11px 'DotGothic16';padding:6px;background:#eaf7e1;border:1px solid #91b897;border-radius:7px}
+.drag-ghost{background:transparent;border:0;box-shadow:none;border-radius:0;width:80px;height:80px}.drag-ghost svg{width:80px;height:80px;image-rendering:pixelated}
+.target{bottom:auto;top:53%;left:50%;width:110px;height:105px;transform:translate(-50%,-50%);z-index:5}.scene.drag-over .target{border:3px dashed #ffeeb1;background:#fff5ae44}
+.action-grid{position:absolute;bottom:calc(84px + env(safe-area-inset-bottom));left:12px;right:12px;z-index:8;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0;pointer-events:auto}
+.action{min-height:54px;border:3px solid #f8f5e9;border-radius:11px;box-shadow:0 5px #51865588;background:#fffdf2;color:#4d7758;font:14px 'DotGothic16';gap:7px}.action.primary{background:#ffd778;color:#745724;border-color:#fff1b9}.action.full{display:none}.action svg{height:23px;width:23px}
+#homeRight>.section{display:none}.bottom-nav{position:absolute;top:auto;bottom:0;left:0;right:0;width:100%;z-index:30;padding:7px 3px max(7px,env(safe-area-inset-bottom));background:#fffef4f9;border-top:3px solid #e0efdc}.bottom-nav button{font:11px 'DotGothic16';gap:4px}.bottom-nav button svg{height:24px;width:24px}
+.page{position:absolute;inset:0;z-index:15;background:#f5f5e9;overflow:auto;padding:calc(28px + env(safe-area-inset-top)) 17px calc(100px + env(safe-area-inset-bottom))}.page-heading h1{font:24px 'DotGothic16'}.form-card,.panel{border:2px solid #e4e9da;border-radius:12px;box-shadow:0 4px #dee9d5}.form-card h2{font:16px 'DotGothic16'}.submit,.primary{font-family:'DotGothic16';border-radius:9px}
+.overlay{z-index:50}.sheet{background:#fffdf4;border:3px solid #eaf0dd;border-radius:22px 22px 0 0}.sheet-title h2{font:19px 'DotGothic16'}
+.calories-only{display:flex;justify-content:center;align-items:center;gap:10px;margin:18px 0}.calories-only input{font:38px 'DotGothic16';width:190px;min-width:0;text-align:right;border:0;border-bottom:3px solid #86b992;background:#f5f9ed;color:#315a41;padding:9px}.calories-only span{font:17px 'DotGothic16';color:#6a8c74}
+.feed-preview{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;background:#edf4e8;border-radius:11px;min-height:85px;padding:10px}.feed-preview svg{width:51px;height:51px;image-rendering:pixelated}.feed-preview small{font:11px 'DotGothic16';color:#7e9580}
+.activity-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:15px 0}.activity-choice{border:2px solid #dae8d4;background:#f7fbf2;border-radius:10px;padding:12px;font:12px 'DotGothic16';color:#5b8367}.activity-choice.selected{background:#e1f3e0;border-color:#6ba578}
+@media(min-width:750px){.app{max-width:520px;display:block;padding:0}.header{position:absolute;padding:0}.bottom-nav{position:absolute;bottom:0;top:auto}.page{max-width:none}.feed-area{position:absolute}.room-card{position:absolute}.action-grid{position:absolute}}
+@media(max-height:670px){.pet{top:28%;width:170px;height:170px}.room-speech{top:22%}.feed-area{bottom:calc(146px + env(safe-area-inset-bottom))}.action-grid{bottom:calc(77px + env(safe-area-inset-bottom))}.action{min-height:47px}.tray{min-height:45px}.food-item{width:44px;height:44px;flex-basis:44px;min-width:44px}.food-item svg{height:38px;width:38px}}
 </style></head>
 <body>
 <div class="app">
@@ -80,7 +114,7 @@ body{font-family:'Noto Sans JP',sans-serif}
 <div class="home-left" id="homeLeft">
 <section class="card room-card">
 <div class="room-head"><div style="min-width:0"><div class="pet-title" id="petTitle">ケーキいぬのおへや</div><div class="pet-sub" id="petSubtitle">ケーキいぬ・のんびり屋</div></div><span class="level" id="levelLabel">LEVEL 1 / 10</span></div>
-<div class="scene" id="scene">
+<div class="scene" id="scene"><canvas id="pixelWorld" class="pixel-world" aria-label="ドット絵のおへや"></canvas>
 <svg class="window" viewBox="0 0 100 125" aria-hidden="true"><path d="M9 115V54a41 41 0 0 1 82 0v61Z" fill="#b7d8ce" stroke="#fffdf0" stroke-width="9"/><path d="M50 14v103M10 71h81" stroke="#fffdf0" stroke-width="6"/><circle cx="69" cy="42" r="14" fill="#f7dfa2"/></svg>
 <svg class="shelf" id="shelf" viewBox="0 0 110 85" aria-hidden="true"><path d="M3 72h104" stroke="#aa8968" stroke-width="10" stroke-linecap="round"/><rect x="13" y="32" width="24" height="39" rx="4" fill="#d9b99a"/><rect x="45" y="23" width="19" height="48" rx="4" fill="#a4bba2"/><rect x="73" y="39" width="24" height="32" rx="4" fill="#edc8a7"/></svg>
 <div class="plant" id="plant"></div><div class="lamp" id="lamp"></div><div class="rug"></div><div class="stars" id="stars"></div><div class="tidy" id="tidy"></div><div class="speech" id="speech">おへやへようこそ。</div><div class="pet" id="pet" role="button" tabindex="0" aria-label="キャラに話しかける"></div><div class="target" id="mouthTarget"></div>
@@ -105,11 +139,11 @@ body{font-family:'Noto Sans JP',sans-serif}
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
-const D=today(), KEY='mogu-room-v3';
+const D=today(), KEY='mogu-room-v5';
 const species=[{name:'ケーキいぬ',desc:'甘い夢をみる、のんびり屋',a:'#f4d0b7',b:'#e2a28e'},{name:'おにぎりうさ',desc:'お散歩大好き、好奇心旺盛',a:'#fff9e9',b:'#94ab94'},{name:'プリンひよこ',desc:'ちょっぴり甘えん坊',a:'#f5d487',b:'#dba56e'},{name:'メロンくま',desc:'気まぐれな、ひなたぼっこ好き',a:'#c8dda7',b:'#8eb991'},{name:'だんごねこ',desc:'おしゃれ好きな芸術家',a:'#e9b8c3',b:'#ac8eab'}];
-const base={species:0,petName:'ケーキいぬ',mode:'maintain',min:1800,max:2200,meals:[],activities:[],weights:[],xp:0};
+const base={species:0,petName:'ケーキいぬ',mode:'maintain',min:1800,max:2200,meals:[],activities:[],weights:[],xp:0,scene:'garden'};
 let db;try{db={...base,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){db={...base}};
-if(!localStorage.getItem(KEY)){try{const old=JSON.parse(localStorage.getItem('mogu-room-v2')||'null');if(old){db.meals=(old.meals||[]).map(m=>({...m,fed:true}));db.activities=old.activities||[];db.weights=old.weights||[];db.min=old.min||1800;db.max=old.max||2200;db.mode=old.mode||'maintain';db.xp=0}}catch(e){}}
+if(!localStorage.getItem(KEY)){try{const old=JSON.parse(localStorage.getItem('mogu-room-v3')||'null');if(old){db.meals=(old.meals||[]).map(m=>({...m,fed:true}));db.activities=old.activities||[];db.weights=old.weights||[];db.min=old.min||1800;db.max=old.max||2200;db.mode=old.mode||'maintain';db.xp=0}}catch(e){}}
 db.meals=Array.isArray(db.meals)?db.meals:[];db.activities=Array.isArray(db.activities)?db.activities:[];db.weights=Array.isArray(db.weights)?db.weights:[];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('保存に失敗したよ。ブラウザの空き容量を確認してね。')}}
 function safe(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -133,18 +167,60 @@ fruit:'<path d="M45 26C8 7 6 54 25 72Q45 87 64 71C91 39 79 11 45 26Z" fill="#d99
 veg:'<path d="M23 39q-19-20 3-28Q36-6 48 18q19-22 31-4Q96 32 73 43Z" fill="#91bb8d"/><path d="M45 39v37M45 56 21 43M46 50l28-12" stroke="#6a9974" stroke-width="7" stroke-linecap="round"/>',
 noodle:'<path d="M10 40h70L72 78H19Z" fill="#e5b5a1" stroke="#bc867e" stroke-width="3"/><path d="M20 39q8-19 18-8 9-14 18 0 12-11 17 8" fill="none" stroke="#eecb7e" stroke-width="7" stroke-linecap="round"/><path d="M24 22 81 8M28 14 75 2" stroke="#a78968" stroke-width="4" stroke-linecap="round"/>'
 };return '<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+(shapes[kind]||shapes.rice)+'</svg>'}
-function petSvg(idx,lv){
-let acc=lv>=8?'<path d="M105 60 120 38 135 60 146 58 140 76 99 76 94 58Z" fill="#f3d581" stroke="#b99c62" stroke-width="2"/>':lv>=5?'<path d="M86 180q34 21 68 0" fill="none" stroke="#dbb974" stroke-width="10" stroke-linecap="round"/><circle cx="120" cy="193" r="7" fill="#f5e6a4"/>':lv>=3?'<path d="M108 61q-14-13-22 0 8 12 22 1M132 61q14-13 22 0-8 12-22 1" fill="#f5ddad" stroke="#d6b58b" stroke-width="2"/>':'';
-let eye='<ellipse cx="99" cy="135" rx="5.7" ry="7.4" fill="#55584d"/><ellipse cx="141" cy="135" rx="5.7" ry="7.4" fill="#55584d"/><circle cx="101" cy="133" r="1.8" fill="white"/><circle cx="143" cy="133" r="1.8" fill="white"/><ellipse cx="77" cy="150" rx="12" ry="7" fill="#eaa9a3" opacity=".65"/><ellipse cx="163" cy="150" rx="12" ry="7" fill="#eaa9a3" opacity=".65"/><path d="M112 153q8 8 16 0" stroke="#78645e" stroke-width="3.2" stroke-linecap="round" fill="none"/><circle id="pet-mouth" cx="120" cy="155" r="11" fill="transparent"/>';
-let t='';
-switch(idx){
-case 0: t='<path d="M74 87Q35 48 42 91Q44 119 67 127M166 87q39-39 32 4-2 28-25 36" fill="#e9b5a2" stroke="#bb8b7e" stroke-width="4"/><rect x="46" y="78" width="148" height="109" rx="58" fill="#f2c6af" stroke="#cb9986" stroke-width="4"/><path d="M45 113q10-18 21-12 12-20 29-6 13-16 27-4 17-16 31 2 21-12 41 21" fill="#fff5ea" stroke="#e4d4bf" stroke-width="4"/><path d="M72 180h96" stroke="#fff5e8" stroke-width="18"/><path d="M75 84q-18-34-23-24M168 84q18-34 23-24" stroke="#e2a28e" stroke-width="7" stroke-linecap="round"/><circle cx="121" cy="87" r="10" fill="#db8d89"/>'+eye;break;
-case 1:t='<path d="M85 99Q52 2 76 10q25 0 23 86M143 99q-3-86 22-86 24 8-10 86" fill="#fff9ec" stroke="#aab8a2" stroke-width="4"/><path d="M79 22q10 9 13 47M158 22q-10 9-13 47" stroke="#e8b7b2" stroke-width="12" stroke-linecap="round"/><path d="M119 74q-43 0-79 107 80 36 160 0-36-107-81-107Z" fill="#fff9e9" stroke="#bac3af" stroke-width="4" stroke-linejoin="round"/><path d="M90 169h60v30H90Z" fill="#547665"/>'+eye;break;
-case 2:t='<path d="M67 99q-26-37-39-3 0 27 39 42M173 99q26-37 39-3 0 27-39 42" fill="#e9b879" stroke="#c99c6d" stroke-width="4"/><path d="M48 121q-2-43 72-52 74 9 72 52v40q-7 41-72 41t-72-41Z" fill="#f4d684" stroke="#c5a56c" stroke-width="4"/><path d="M49 119q2-39 71-48 70 8 71 48Z" fill="#b77c54"/><ellipse cx="120" cy="88" rx="30" ry="6" fill="#eac18b"/><path d="M106 70q-14-19 2-25 12 6 12 23M136 70q15-18-2-25-12 6-12 23" fill="#f6db9a"/>'+eye;break;
-case 3:t='<circle cx="68" cy="85" r="30" fill="#bcd1a2" stroke="#89af86" stroke-width="4"/><circle cx="172" cy="85" r="30" fill="#bcd1a2" stroke="#89af86" stroke-width="4"/><circle cx="120" cy="134" r="73" fill="#c5dda8" stroke="#8bab89" stroke-width="4"/><path d="M74 84Q120 111 166 84M51 119Q120 154 189 119M58 165Q120 120 182 165M86 68Q119 131 86 200M154 68Q121 131 154 200" stroke="#a6c68c" stroke-width="3" opacity=".8" fill="none"/>'+eye;break;
-default:t='<path d="M58 110 51 54l50 29M182 110l7-56-50 29" fill="#c8a9c7" stroke="#a78ca8" stroke-width="4"/><path d="m63 88-5-24 25 21M177 88l5-24-25 21" fill="#f0cbd0"/><circle cx="120" cy="147" r="62" fill="#d5b2ca" stroke="#b291ad" stroke-width="4"/><circle cx="120" cy="100" r="42" fill="#f3e2c4" stroke="#d1b79c" stroke-width="3"/><circle cx="120" cy="177" r="40" fill="#b6cda9" stroke="#8fad94" stroke-width="3"/>'+eye;
+
+const foodList=[
+['rice',200],['noodle',700],['bread',160],['fruit',100],['veg',80],['cake',350],
+['egg',75],['milk',130],['soup',120],['sandwich',300],['curry',650],['pasta',550],
+['fish',180],['chicken',250],['yogurt',110],['cookie',50],['stew',420],
+['dumpling',280],['strawberry',35],['donut',230],['nuts',60],['bento',500],['small',20]
+];
+const foodNames={rice:'おにぎり',noodle:'ラーメン',bread:'トースト',fruit:'りんご',veg:'サラダ',cake:'ケーキ',egg:'たまご',milk:'ミルク',soup:'スープ',sandwich:'サンドイッチ',curry:'カレー',pasta:'パスタ',fish:'焼き魚',chicken:'チキン',yogurt:'ヨーグルト',cookie:'クッキー',stew:'シチュー',dumpling:'ぎょうざ',strawberry:'いちご',donut:'ドーナツ',nuts:'ナッツ',bento:'おべんとう',small:'ひとくち'};
+function chooseFood(cal){
+cal=Math.round(Number(cal));if(!(cal>0))return [];
+if(cal===200)return ['rice'];if(cal===700)return ['noodle'];if(cal===900)return ['rice','noodle'];
+if(cal<35)return ['small'];
+let best={score:Infinity,items:['rice']};
+function check(list,sum){const diff=Math.abs(sum-cal),duplicate=list.length-new Set(list).size;const score=diff*1.7+list.length*12+duplicate*22;if(score<best.score)best={score,items:[...list]}}
+for(let i=0;i<foodList.length;i++){const a=foodList[i];check([a[0]],a[1]);for(let j=i;j<foodList.length;j++){const b=foodList[j];let sum=a[1]+b[1];if(sum>cal+130)continue;check([a[0],b[0]],sum);for(let k=j;k<foodList.length;k++){const d=foodList[k],sum3=sum+d[1];if(sum3>cal+100)continue;check([a[0],b[0],d[0]],sum3)}}}
+if(cal>2100){let remaining=cal,arr=[];while(remaining>1800&&arr.length<10){arr.push('noodle');remaining-=700}return [...arr,...chooseFood(remaining)]}
+return best.items;
 }
-const scale=lv>=9?1.08:lv>=6?1.02:lv>=3?.98:.9;return '<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-label="'+species[idx].name+'"><g transform="translate(120 131) scale('+scale+') translate(-120 -131)">'+t+acc+'<ellipse cx="78" cy="195" rx="18" ry="12" fill="'+species[idx].b+'"/><ellipse cx="162" cy="195" rx="18" ry="12" fill="'+species[idx].b+'"/></g></svg>'}
+const originalFoodSvg=foodSvg;
+function foodArt(key){
+const extra={
+egg:'<ellipse cx="45" cy="45" rx="28" ry="31" fill="#fff9e7"/><circle cx="45" cy="45" r="14" fill="#e8bc69"/>',
+milk:'<path d="M24 19h43v61H24Z" fill="#fff9ed" stroke="#abc8ca" stroke-width="4"/><path d="M24 19 34 7h23l10 12" fill="#b8d8d9"/><rect x="25" y="49" width="41" height="25" fill="#b0d4d7"/>',
+soup:'<path d="M12 43h66L66 78H24Z" fill="#b6d2be"/><ellipse cx="45" cy="43" rx="33" ry="10" fill="#f4d5a2"/>',
+sandwich:'<path d="M9 28h70L44 76Z" fill="#d9a57e"/><path d="M15 35 44 65l28-30" fill="#93bf8d"/><path d="m18 29 26 25 26-25" fill="#f0ddb5"/>',
+curry:'<path d="M9 42h73L69 76H24Z" fill="#f7f1df"/><path d="M15 43q8-25 31-16 21-7 29 16Z" fill="#b48a66"/><path d="M14 42Q21 19 44 29v31Q19 60 14 42" fill="#fff5d9"/>',
+pasta:'<ellipse cx="45" cy="56" rx="37" ry="23" fill="#f8f1e4"/><path d="M18 55q11-28 23-5 13-28 24-4 12-22 17 8" fill="none" stroke="#e7c477" stroke-width="8"/>',
+fish:'<path d="M10 46q20-35 53-12l17-17v58L63 60Q30 80 10 46Z" fill="#acc8c2"/><circle cx="25" cy="45" r="4" fill="#42675d"/>',
+chicken:'<path d="M15 50q-11-33 29-29 28-3 24 28-6 28-37 23Z" fill="#ce9e77"/><path d="M63 57 82 76" stroke="#f7e9d9" stroke-width="12"/>',
+yogurt:'<path d="M18 27h55l-8 50H26Z" fill="#fff8ef" stroke="#98c5be" stroke-width="4"/><path d="M13 25h65" stroke="#9ac7c2" stroke-width="9"/><circle cx="46" cy="54" r="11" fill="#e4a5ad"/>',
+cookie:'<circle cx="45" cy="45" r="33" fill="#e3b47d"/><circle cx="30" cy="32" r="5" fill="#a88466"/><circle cx="55" cy="37" r="5" fill="#a88466"/><circle cx="46" cy="57" r="6" fill="#a88466"/>',
+stew:'<path d="M10 43h70L69 79H20Z" fill="#bf9f9a"/><ellipse cx="45" cy="41" rx="35" ry="12" fill="#eadcba"/><circle cx="30" cy="41" r="8" fill="#dcb28c"/><circle cx="55" cy="42" r="8" fill="#a0be91"/>',
+dumpling:'<path d="M11 58q12-38 34-34 27-2 36 34Q47 83 11 58Z" fill="#f3dcad" stroke="#c5b489" stroke-width="4"/><path d="M27 36 32 46m10-17 3 15m12-8 3 11" stroke="#d5bb92" stroke-width="4"/>',
+strawberry:'<path d="M44 26Q10 15 17 47q8 36 27 33 20-9 29-38 1-27-29-16Z" fill="#de9292"/><path d="M20 25 40 14 45 25 57 13 72 27" fill="#8ebb87"/>',
+donut:'<circle cx="45" cy="45" r="34" fill="#e6b984"/><circle cx="45" cy="45" r="13" fill="#fffaee"/><path d="M15 33Q25 9 48 13q25 4 28 25Q41 22 15 33Z" fill="#e4a3af"/>',
+nuts:'<ellipse cx="33" cy="47" rx="16" ry="25" fill="#d0a07e" transform="rotate(21 33 47)"/><ellipse cx="61" cy="44" rx="13" ry="23" fill="#e6bc8e" transform="rotate(-20 61 44)"/>',
+bento:'<rect x="10" y="14" width="70" height="67" rx="6" fill="#aa927d"/><path d="M46 15v63M11 46h68" stroke="#f1e4c9" stroke-width="4"/><circle cx="29" cy="32" r="13" fill="#f8f1db"/><circle cx="62" cy="32" r="13" fill="#dbab88"/><circle cx="31" cy="61" r="12" fill="#97b78c"/><circle cx="62" cy="62" r="12" fill="#f2d38c"/>',
+small:'<ellipse cx="45" cy="49" rx="29" ry="24" fill="#f1dfb5"/><circle cx="45" cy="49" r="9" fill="#e4b39a"/>'
+};if(!extra[key])return originalFoodSvg(key);
+return '<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">'+extra[key]+'</svg>';
+}
+
+function petSvg(idx,lv){
+const colors=[['#f4c4ac','#c8887d','#fff4e9'],['#fff8e8','#9eaf98','#f1e9d7'],['#f5d581','#cd9b69','#f8e5b8'],['#bfd99b','#8cae82','#a8cc9d'],['#e8bbca','#b08cae','#f8e4d7']];
+const [a,b,t]=colors[idx];
+const shapes=[
+'<rect x="26" y="42" width="35" height="65" fill="'+a+'"/><rect x="151" y="42" width="35" height="65" fill="'+a+'"/><rect x="31" y="35" width="25" height="38" fill="'+b+'"/><rect x="156" y="35" width="25" height="38" fill="'+b+'"/><rect x="50" y="63" width="116" height="111" fill="'+a+'"/><rect x="45" y="98" width="126" height="70" fill="'+a+'"/><rect x="50" y="63" width="116" height="24" fill="'+t+'"/><rect x="60" y="51" width="22" height="20" fill="'+t+'"/><rect x="109" y="45" width="25" height="22" fill="'+t+'"/><rect x="146" y="52" width="18" height="20" fill="'+t+'"/><rect x="49" y="143" width="120" height="14" fill="'+t+'"/>',
+'<rect x="58" y="11" width="32" height="93" fill="'+a+'"/><rect x="130" y="11" width="32" height="93" fill="'+a+'"/><rect x="64" y="19" width="16" height="67" fill="#edbdb7"/><rect x="139" y="19" width="16" height="67" fill="#edbdb7"/><path d="M110 66H62L29 171h161L158 66Z" fill="'+a+'"/><rect x="85" y="148" width="50" height="33" fill="#3f5c4d"/>',
+'<rect x="49" y="69" width="127" height="115" fill="'+a+'"/><rect x="38" y="103" width="149" height="60" fill="'+a+'"/><rect x="51" y="59" width="121" height="33" fill="'+b+'"/><rect x="65" y="44" width="93" height="24" fill="'+t+'"/><rect x="95" y="27" width="26" height="19" fill="'+a+'"/>',
+'<rect x="57" y="52" width="110" height="125" fill="'+a+'"/><rect x="35" y="47" width="51" height="53" fill="'+b+'"/><rect x="140" y="47" width="51" height="53" fill="'+b+'"/><rect x="47" y="56" width="33" height="32" fill="'+a+'"/><rect x="146" y="56" width="33" height="32" fill="'+a+'"/><rect x="50" y="97" width="127" height="77" fill="'+a+'"/><path d="M55 110h118M80 58v116m48-116v116M55 145h118" stroke="'+b+'" stroke-width="5" opacity=".55"/>',
+'<rect x="55" y="66" width="113" height="108" fill="'+a+'"/><rect x="46" y="32" width="48" height="58" fill="'+b+'"/><rect x="130" y="32" width="48" height="58" fill="'+b+'"/><rect x="55" y="43" width="27" height="28" fill="'+t+'"/><rect x="141" y="43" width="27" height="28" fill="'+t+'"/><rect x="68" y="64" width="90" height="40" fill="'+t+'"/><rect x="58" y="160" width="108" height="32" fill="#b8cfaa"/>'
+][idx];
+return '<svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-label="'+species[idx].name+'">'+shapes+'<rect x="56" y="180" width="43" height="22" fill="'+b+'"/><rect x="124" y="180" width="43" height="22" fill="'+b+'"/><rect x="81" y="122" width="14" height="19" fill="#3e4d43"/><rect x="126" y="122" width="14" height="19" fill="#3e4d43"/><rect x="83" y="125" width="5" height="6" fill="#fff8e9"/><rect x="128" y="125" width="5" height="6" fill="#fff8e9"/><rect x="58" y="149" width="21" height="11" fill="#e9a7a1"/><rect x="143" y="149" width="21" height="11" fill="#e9a7a1"/><rect x="103" y="153" width="16" height="7" fill="#766056"/><circle id="pet-mouth" cx="111" cy="156" r="15" fill="transparent"/>'+(lv>=4?'<rect x="84" y="184" width="56" height="9" fill="'+t+'"/>':'')+(lv>=7?'<rect x="91" y="39" width="40" height="13" fill="#f7dd8a"/><rect x="103" y="26" width="15" height="13" fill="#ffe9a1"/>':'')+'</svg>'
+}
 function plantSvg(l){return '<svg viewBox="0 0 75 112" aria-hidden="true"><path d="M35 85V38" stroke="#6a9c73" stroke-width="6"/><path d="M35 71Q4 65 14 43q23-1 21 28ZM35 58q30-10 23-33-25 3-23 33Z" fill="#90b98b"/>'+(l>=6?'<path d="M35 44q-24-14-6-36 18 17 6 36Z" fill="#71a97d"/>':'')+'<path d="M18 81h35l-5 27H23Z" fill="#c38e75"/><path d="M16 79h39" stroke="#a97961" stroke-width="6"/></svg>'}
 const lampSvg='<svg viewBox="0 0 55 80" aria-hidden="true"><path d="M14 28 23 7h13l10 21Z" fill="#f1dcab" stroke="#c8b18a" stroke-width="3"/><path d="M29 30v42M14 74h30" stroke="#9e9782" stroke-width="5" stroke-linecap="round"/></svg>';
 const boxSvg='<svg viewBox="0 0 55 60" aria-hidden="true"><path d="M8 25h39v30H8Z" fill="#ccb18d"/><path d="M5 26 14 13h27l10 13" fill="#e4c7a2"/></svg>';
@@ -154,12 +230,18 @@ function pending(){return db.meals.filter(x=>!x.fed)}
 function refreshRoom(){
 const l=level(),p=species[db.species]||species[0];
 $('#petTitle').textContent=(db.petName||p.name)+'のおへや';$('#petSubtitle').textContent=p.name+'・'+p.desc;$('#levelLabel').textContent='LEVEL '+l+' / 10';
-$('#pet').innerHTML=petSvg(db.species,l);$('#plant').innerHTML=plantSvg(l);
+$('#pet').innerHTML=petSvg(db.species,l);drawPixelWorld();$('#plant').innerHTML=plantSvg(l);
 $('#lamp').innerHTML=l>=5?lampSvg:'';$('#shelf').style.opacity=l>=3?'1':'0';$('#stars').textContent=l>=7?'✦  ✧  ✦':l>=4?'✦':'';$('#tidy').innerHTML=l>=8?boxSvg:'';
 $('#xpLabel').textContent=l===10?'MAX':(xp()%100)+' / 100';$('#xpMeter').style.width=(l===10?100:xp()%100)+'%';
 $('#xpCaption').textContent=l===10?'おへやがすっかり育ったよ。これからもいっしょに暮らそう。':'次の成長まで '+(100-xp()%100)+' ポイント。エサをあげたり運動したりしてみよう。';
 }
-function refreshTray(){const items=pending();$('#pendingCount').textContent=items.length?'('+items.length+')':'';$('#tray').innerHTML=items.length?items.map(x=>'<button type="button" class="food-item" data-id="'+x.id+'" aria-label="'+safe(x.name)+'を指でキャラに運ぶ"><span aria-hidden="true">'+foodSvg(x.kind||foodKind(x.name))+'</span><span>'+safe(x.name)+'</span></button>').join(''):'<div class="tray-empty">エサのおさらは空っぽ。<br>「ごはんを記録」でエサを作ってみよう。</div>';$('#trayTip').textContent=items.length?'エサをドラッグして口に近づけよう':'ごはんを記録するとここに出るよ';$('#feedByTap').hidden=true}
+function refreshTray(){
+const pieces=[];pending().forEach(m=>(m.foods||[m.kind||'rice']).forEach((kind,i)=>{if(!(m.eaten||[]).includes(i))pieces.push({meal:m,kind,i})}));
+$('#pendingCount').textContent=pieces.length?'('+pieces.length+')':'';
+$('#tray').innerHTML=pieces.length?pieces.map(p=>'<button type="button" class="food-item" data-id="'+p.meal.id+'" data-piece="'+p.i+'" aria-label="'+foodNames[p.kind]+'をキャラに運ぶ"><span aria-hidden="true">'+foodArt(p.kind)+'</span></button>').join(''):'<div class="tray-empty">ごはんを記録してエサをつくろう</div>';
+$('#trayTip').textContent=pieces.length?'エサをおくちへ':'エサをつくってみよう';
+$('#feedByTap').hidden=true;
+}
 function refreshStats(){let m=db.meals.filter(x=>x.date===D),a=db.activities.filter(x=>x.date===D),c=m.reduce((s,x)=>s+Number(x.cal||0),0),mins=a.reduce((s,x)=>s+Number(x.min||0),0);
 $('#calories').innerHTML=number(c)+' <em>kcal</em>';$('#duration').innerHTML=number(mins)+' <em>分</em>';
 $('#calAdvice').textContent=m.length?'自分に合う食事量を大切に':'食事を記録してみよう';
@@ -172,36 +254,74 @@ function refreshWeights(){let rows=[...db.weights].sort((a,b)=>a.date.localeComp
 if(!rows.length){$('#weightChart').innerHTML='<p class="empty">記録するとグラフが表示されるよ。</p>';$('#weightNote').textContent='';return}
 let min=Math.min(...rows.map(x=>x.value))-1,max=Math.max(...rows.map(x=>x.value))+1;let points=rows.map((x,i)=>[25+(rows.length===1?275:i*550/(rows.length-1)),162-(x.value-min)/(max-min)*130]);$('#weightChart').innerHTML='<svg viewBox="0 0 600 190" aria-label="体重の変化"><path d="M25 20H575 M25 90H575 M25 162H575" stroke="#e2eada" stroke-dasharray="5 5"/><path d="'+points.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')+'" stroke="#6a9e7c" stroke-width="4" fill="none"/>'+points.map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5" fill="#6a9e7c"/>').join('')+'</svg>';$('#weightNote').textContent='最新 '+rows[rows.length-1].value.toFixed(1)+' kg。日々の増減は水分などでも変わるよ。'
 }
-function refresh(){refreshRoom();refreshTray();refreshStats();if($('#records').classList.contains('active'))refreshRecords();if($('#weights').classList.contains('active'))refreshWeights()}
+function refresh(){drawPixelWorld();refreshRoom();refreshTray();refreshStats();if($('#records').classList.contains('active'))refreshRecords();if($('#weights').classList.contains('active'))refreshWeights()}
 function toast(message){let node=$('#toast');node.textContent=message;node.classList.add('visible');clearTimeout(toast.timer);toast.timer=setTimeout(()=>node.classList.remove('visible'),2600)}
-let spokenTimer;function speak(s){$('#speech').textContent=s;clearTimeout(spokenTimer);spokenTimer=setTimeout(()=>$('#speech').textContent='おへやでのんびり。',4600)}
-function feed(id){const item=db.meals.find(x=>String(x.id)===String(id));if(!item||item.fed)return;item.fed=true;save();$('#pet').classList.remove('chew');void $('#pet').offsetWidth;$('#pet').classList.add('chew');speak(['おいしい！ ありがとう。','もぐもぐ、しあわせ。','ごちそうさま！'][Math.floor(Math.random()*3)]);refresh();toast('もぐもぐ！ お世話ができたよ。')}
+let spokenTimer;function speak(s){$('#speech').classList.add('visible');$('#speech').textContent=s;setTimeout(()=>$('#speech').classList.remove('visible'),2200);clearTimeout(spokenTimer);spokenTimer=setTimeout(()=>$('#speech').textContent='おへやでのんびり。',4600)}
+function feed(id,piece=0){
+const item=db.meals.find(x=>String(x.id)===String(id));if(!item||item.fed)return;
+const foods=item.foods||[item.kind||'rice'];item.eaten=Array.isArray(item.eaten)?item.eaten:[];if(item.eaten.includes(piece))return;item.eaten.push(piece);
+if(item.eaten.length>=foods.length)item.fed=true;
+save();$('#pet').classList.remove('chew');void $('#pet').offsetWidth;$('#pet').classList.add('chew');speak('もぐもぐ！ おいしい！');refresh();toast('ごちそうさま！');
+}
 function show(page){const home=page==='home';$('#homeLeft').hidden=!home;$('#homeRight').hidden=!home;$('#intro').hidden=!home;$$('.page').forEach(el=>el.classList.toggle('active',el.id===page));$$('[data-nav]').forEach(b=>b.setAttribute('aria-current',b.dataset.nav===page?'page':'false'));if(page==='records')refreshRecords();if(page==='weights')refreshWeights();if(page==='settings')renderSettings();window.scrollTo(0,0)}
 const presets=[['おにぎり',180],['トースト',160],['サラダ',80],['バナナ',90],['ごはん',235],['ラーメン',450],['ケーキ',300],['ゆで卵',75]];
 function modal(type){$('#overlay').classList.add('open');$('#overlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';let html='';
-if(type==='food'){html='<div class="smallprint" style="margin-top:11px">食べたものを記録すると、エサに変身するよ。カロリーは参考値なので商品・量に合わせて変更してね。</div><div class="presets">'+presets.map((x,i)=>'<button type="button" class="preset" data-preset="'+i+'">'+foodSvg(foodKind(x[0]))+safe(x[0])+'</button>').join('')+'</div><form id="modalForm"><div class="field"><label for="mealName">食べたもの</label><input id="mealName" required maxlength="60" placeholder="例：おにぎり"></div><div class="columns"><div class="field"><label for="mealCal">カロリー kcal</label><input id="mealCal" type="number" min="0" max="10000" required placeholder="180"></div><div class="field"><label for="mealType">タイミング</label><select id="mealType"><option>朝ごはん</option><option>昼ごはん</option><option>夜ごはん</option><option>おやつ</option></select></div></div><div class="form-actions"><button class="submit" type="submit">エサを作る</button></div></form>'}
-else if(type==='exercise'){html='<p class="smallprint" style="margin-top:12px">運動の記録でもおへやが育つよ。休む日も大切。</p><form id="modalForm"><div class="field"><label for="exerciseType">運動の種類</label><select id="exerciseType"><option>ウォーキング</option><option>ダンス</option><option>筋トレ</option><option>ヨガ・ストレッチ</option><option>ランニング</option><option>その他</option></select></div><div class="field"><label for="exerciseMin">時間（分）</label><input id="exerciseMin" required type="number" min="1" max="600" value="20"></div><div class="form-actions"><button class="submit" type="submit">運動を記録する</button></div></form>'}
+if(type==='food'){html='<form id="modalForm"><div class="calories-only"><input id="mealCal" type="number" min="1" max="10000" inputmode="numeric" value="200" required aria-label="カロリー"><span>kcal</span></div><div class="feed-preview" id="previewFood"></div><p class="smallprint">カロリーからエサが自動でできるよ。エサは食べた料理そのものではなく、一般的な食品のカロリーを使ったゲーム上の表現だよ。</p><button type="submit" class="submit" style="width:100%">エサをつくる</button></form>'}
+else if(type==='exercise'){html='<p class="smallprint" style="margin-top:12px">運動の記録でもおへやが育つよ。休む日も大切。</p><form id="modalForm"><div class="field"><label for="exerciseType">運動の種類</label><select id="exerciseType"><option>ウォーキング</option><option>筋トレ</option><option>水泳</option><option>ダンス</option><option>ヨガ・ストレッチ</option><option>ランニング</option></select></div><div class="field"><label for="exerciseMin">時間（分）</label><input id="exerciseMin" required type="number" min="1" max="600" value="20"></div><div class="form-actions"><button class="submit" type="submit">運動を記録する</button></div></form>'}
 else{html='<p class="smallprint" style="margin-top:12px">体重は日々変わるもの。ゆっくり長い目で見守ろう。</p><form id="modalForm"><div class="columns"><div class="field"><label for="weightDate">日付</label><input id="weightDate" type="date" required value="'+D+'"></div><div class="field"><label for="weightValue">体重（kg）</label><input id="weightValue" type="number" required min="20" max="400" step=".1"></div></div><div class="form-actions"><button class="submit" type="submit">体重を記録する</button></div></form>'}
 $('#modalHeading').textContent=({food:'ごはんを記録',exercise:'運動を記録',weight:'体重を記録'})[type];$('#modalContents').innerHTML=html;
-$('#modalContents').dataset.type=type;
+$('#modalContents').dataset.type=type;if(type==='food')renderFoodPreview();
 }
 function closeModal(){$('#overlay').classList.remove('open');$('#overlay').setAttribute('aria-hidden','true');document.body.style.overflow=''}
+function renderFoodPreview(){const el=$('#previewFood');if(!el)return;let amount=Number($('#mealCal').value);el.innerHTML=chooseFood(amount).slice(0,12).map(foodArt).join('')||'<small>カロリーを入力してね</small>'}
+$('#modalContents').addEventListener('input',e=>{if(e.target.id==='mealCal')renderFoodPreview()});
 $('#modalContents').addEventListener('click',e=>{let b=e.target.closest('[data-preset]');if(b){let [name,cal]=presets[Number(b.dataset.preset)];$('#mealName').value=name;$('#mealCal').value=cal}});
-$('#modalContents').addEventListener('submit',e=>{e.preventDefault();let type=$('#modalContents').dataset.type,id=Date.now()+Math.floor(Math.random()*1000);if(type==='food'){let name=$('#mealName').value.trim(),cal=Number($('#mealCal').value);if(!name||!Number.isFinite(cal)||cal<0)return;db.meals.push({id,name,cal,kind:foodKind(name),type:$('#mealType').value,date:D,at:Date.now(),fed:false});closeModal();show('home');refresh();speak('エサが届いた！ おくちまで運んでね。');toast('エサがおさらに登場したよ。')}
-else if(type==='exercise'){let min=Number($('#exerciseMin').value);if(!Number.isFinite(min)||min<=0)return;db.activities.push({id,type:$('#exerciseType').value,min,date:D,at:Date.now()});closeModal();show('home');refresh();$('#pet').classList.remove('celebrate');void $('#pet').offsetWidth;$('#pet').classList.add('celebrate');speak('からだを動かすの、気持ちいいね。');toast('運動を記録したよ。')}
+$('#modalContents').addEventListener('submit',e=>{e.preventDefault();let type=$('#modalContents').dataset.type,id=Date.now()+Math.floor(Math.random()*1000);if(type==='food'){let cal=Number($('#mealCal').value);if(!Number.isInteger(cal)||cal<1||cal>10000)return;const foods=chooseFood(cal);db.meals.push({id,name:'ごはん',cal,foods,eaten:[],kind:foods[0]||'rice',type:'食事',date:D,at:Date.now(),fed:false});closeModal();show('home');refresh();speak('エサが届いた！ おくちまで運んでね。');toast('エサがおさらに登場したよ。')}
+else if(type==='exercise'){let min=Number($('#exerciseMin').value);if(!Number.isFinite(min)||min<=0)return;db.activities.push({id,type:$('#exerciseType').value,min,date:D,at:Date.now()});window.moguActivity={type:$('#exerciseType').value,until:Date.now()+9000,start:Date.now()};closeModal();show('home');refresh();$('#pet').classList.remove('celebrate');void $('#pet').offsetWidth;$('#pet').classList.add('celebrate');speak('からだを動かすの、気持ちいいね。');toast('運動を記録したよ。')}
 else{let value=Number($('#weightValue').value),date=$('#weightDate').value;if(!value||!date)return;db.weights=db.weights.filter(x=>x.date!==date);db.weights.push({id,date,value});closeModal();refreshWeights();toast('体重を記録したよ。')}save()});
 const drag={item:null,ghost:null,id:null,moved:false,over:false};
 function mouthPosition(){const anchor=$('#pet-mouth');if(!anchor)return null;const r=anchor.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}}
-function updateDrag(e){if(!drag.item)return;drag.moved=true;drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';const mouth=mouthPosition();drag.over=!!mouth&&Math.hypot(e.clientX-mouth.x,e.clientY-mouth.y)<88;$('#scene').classList.toggle('drag-over',drag.over)}
-function endDrag(e){if(!drag.item)return;const id=drag.id,valid=drag.over,moved=drag.moved;if(drag.ghost)drag.ghost.remove();$('#scene').classList.remove('drag-over');drag.item=null;drag.ghost=null;drag.id=null;drag.over=false;drag.moved=false;if(moved&&valid){feed(id)}else if(!moved){selectedFeed=id;$('#feedByTap').hidden=false;$('#feedByTap').textContent='「'+(db.meals.find(x=>String(x.id)===String(id))?.name||'エサ')+'」を食べさせる';toast('タップでも食べさせられるよ。下のボタンを押してね。')}else{toast('キャラのお口の近くまで運んでね。')}}
+function updateDrag(e){if(!drag.item)return;drag.moved=true;drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';const mouth=mouthPosition();drag.over=!!mouth&&Math.hypot(e.clientX-mouth.x,e.clientY-mouth.y)<105;$('#scene').classList.toggle('drag-over',drag.over)}
+function endDrag(e){if(!drag.item)return;const id=drag.id,piece=Number(drag.item.dataset.piece||0),valid=drag.over,moved=drag.moved;if(drag.ghost)drag.ghost.remove();$('#scene').classList.remove('drag-over');drag.item=null;drag.ghost=null;drag.id=null;drag.over=false;drag.moved=false;if(moved&&valid){feed(id,piece)}else if(!moved){selectedFeed=[id,piece];$('#feedByTap').hidden=false;$('#feedByTap').textContent='「'+(db.meals.find(x=>String(x.id)===String(id))?.name||'エサ')+'」を食べさせる';toast('タップでも食べさせられるよ。下のボタンを押してね。')}else{toast('キャラのお口の近くまで運んでね。')}}
 let selectedFeed=null;
-$('#tray').addEventListener('pointerdown',e=>{const b=e.target.closest('.food-item');if(!b)return;e.preventDefault();drag.item=b;drag.id=b.dataset.id;drag.moved=false;drag.over=false;drag.ghost=document.createElement('div');drag.ghost.className='drag-ghost';const m=db.meals.find(x=>String(x.id)===String(drag.id));drag.ghost.innerHTML=foodSvg(m.kind||foodKind(m.name));document.body.appendChild(drag.ghost);drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';b.setPointerCapture(e.pointerId)});
+$('#tray').addEventListener('pointerdown',e=>{const b=e.target.closest('.food-item');if(!b)return;e.preventDefault();drag.item=b;drag.id=b.dataset.id;drag.moved=false;drag.over=false;drag.ghost=document.createElement('div');drag.ghost.className='drag-ghost';const m=db.meals.find(x=>String(x.id)===String(drag.id));drag.ghost.innerHTML=foodArt((m.foods||[m.kind||'rice'])[Number(b.dataset.piece||0)]);document.body.appendChild(drag.ghost);drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';b.setPointerCapture(e.pointerId)});
 $('#tray').addEventListener('pointermove',e=>{if(drag.item)updateDrag(e)});
 $('#tray').addEventListener('pointerup',endDrag);
 $('#tray').addEventListener('pointercancel',()=>{if(drag.ghost)drag.ghost.remove();$('#scene').classList.remove('drag-over');drag.item=null;drag.ghost=null;drag.over=false;drag.moved=false});
-$('#feedByTap').addEventListener('click',()=>{if(selectedFeed)feed(selectedFeed);selectedFeed=null;$('#feedByTap').hidden=true});
+$('#feedByTap').addEventListener('click',()=>{if(selectedFeed)feed(...selectedFeed);selectedFeed=null;$('#feedByTap').hidden=true});
 $('#pet').addEventListener('click',()=>speak(['きょうも会えてうれしい！','おせわ、ありがとう。','いっしょにのんびりしよう。'][Math.floor(Math.random()*3)]));
 $('#pet').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#pet').click()}});
+
+function drawPixelWorld(){
+const canvas=$('#pixelWorld');if(!canvas)return;const b=canvas.getBoundingClientRect();if(!b.width||!b.height)return;
+const w=320,h=Math.round(b.height/b.width*320);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}
+const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;const rect=(x,y,ww,hh,color)=>{g.fillStyle=color;g.fillRect(Math.floor(x),Math.floor(y),ww,hh)};
+const lv=level(),garden=db.scene!=='room',floor=Math.round(h*.69);
+rect(0,0,w,h,garden?'#82d873':'#f1e1cb');
+if(garden){
+rect(0,0,w,77,'#b0e5ae');rect(0,52,w,18,'#8ed684');rect(0,76,w,h-76,'#7cda71');
+for(let i=0;i<35;i++){const x=(i*67+11)%w,y=85+(i*91)%Math.max(100,h-165);rect(x,y,16,3,i%2?'#67c967':'#9ee188');rect(x+5,y-8,3,11,'#58b75c');if(i%5===0){rect(x-4,y-11,8,8,'#f4d98b');rect(x+3,y-7,7,7,'#fff3b5')}}
+for(let i=0;i<6;i++){let x=i*60+7;rect(x,29,14,56,'#b28862');rect(x+3,32,7,49,'#ccab77');rect(x,29,14,5,'#e3c28b')}
+}else{
+rect(0,0,w,Math.round(h*.7),'#e9dfcc');for(let i=0;i<9;i++)rect(i*43,0,3,Math.round(h*.7),'#f3e7d3');
+rect(0,floor,w,h-floor,'#d2ad8d');rect(0,floor,w,6,'#bb9979');
+rect(19,96,83,100,'#fff4db');rect(29,107,63,77,'#a4cec7');rect(58,107,5,77,'#fff9ed');rect(29,144,63,6,'#fff9ed');rect(68,121,14,14,'#f6d993');
+}
+if(lv>=3){for(let i=0;i<lv+2;i++){let x=(i*67+23)%w,y=175+(i*53)%Math.max(110,h-390);if(garden){rect(x,y,5,22,'#5bb665');rect(x-7,y+6,8,5,'#6bc36a');rect(x+5,y+3,9,6,'#85d27d');if(i%2===0)rect(x-2,y-7,9,9,'#ffe6a1')}else{if(i<4){rect(208,106+i*10,67,3,'#aa876d');rect(214+i*13,89,11,18,i%2?'#acd0a6':'#ecc7a2')}}}}
+rect(70,Math.round(h*.64),180,12,'#4e955b35');
+if(db.scene==='room'&&lv>=5){rect(20,floor-91,8,85,'#aa947b');rect(8,floor-101,32,12,'#f4dcad')}
+const activity=window.moguActivity;if(activity&&Date.now()<activity.until){
+const y=Math.round(h*.47),t=Math.floor((Date.now()-activity.start)/240)%2;
+if(activity.type==='水泳'){for(let i=0;i<6;i++){rect(i*58-7,y+50+(i%2?t*8:0),49,15,'#78c8d9');rect(i*58+3,y+65,33,7,'#b5e8ed')}}
+else if(activity.type==='筋トレ'){rect(43,y,34,12,'#5f6d72');rect(242,y,34,12,'#5f6d72');rect(39,y-11,11,35,'#454f54');rect(271,y-11,11,35,'#454f54')}
+else if(activity.type==='ウォーキング'||activity.type==='ランニング'){rect(88+(t?13:-13),y+80,30,10,'#426b50');rect(204+(t?-13:13),y+80,30,10,'#426b50')}
+else if(activity.type==='ダンス'){rect(64,y-30,11,11,'#ffeba8');rect(252,y-58,11,11,'#ffeba8');rect(238,y-70,6,6,'#fff4b5')}
+else{rect(74,y+92,172,10,'#dca2a6')}
+}
+}
+window.addEventListener('resize',drawPixelWorld);
+setInterval(drawPixelWorld,140);
+const sceneSwitch=document.createElement('button');sceneSwitch.type='button';sceneSwitch.className='scene-btn';sceneSwitch.style.cssText='position:absolute;z-index:8;right:13px;top:calc(160px + env(safe-area-inset-top))';sceneSwitch.textContent='おへや';$('#scene').appendChild(sceneSwitch);sceneSwitch.addEventListener('click',()=>{db.scene=db.scene==='room'?'garden':'room';sceneSwitch.textContent=db.scene==='room'?'おそと':'おへや';save();drawPixelWorld()});
 $('#addFood').addEventListener('click',()=>modal('food'));$('#addExercise').addEventListener('click',()=>modal('exercise'));$('#addWeight').addEventListener('click',()=>modal('weight'));$('#addWeightPage').addEventListener('click',()=>modal('weight'));
 $('#closeModal').addEventListener('click',closeModal);$('#overlay').addEventListener('click',e=>{if(e.target===$('#overlay'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 $('#bottomNav').innerHTML=[['home','おへや'],['records','きろく'],['weights','体重'],['settings','設定']].map(([id,label])=>'<button type="button" data-nav="'+id+'" aria-current="'+(id==='home'?'page':'false')+'">'+icons[id]+'<span>'+label+'</span></button>').join('');
@@ -214,6 +334,6 @@ $('#savePet').addEventListener('click',()=>{db.petName=$('#petNameInput').value.
 $('#saveGoals').addEventListener('click',()=>{let min=Number($('#calMin').value),max=Number($('#calMax').value);if(!Number.isFinite(min)||!Number.isFinite(max)||min<=0||max<=min){toast('目安の下限は上限より小さくしてね。');return}db.min=min;db.max=max;save();$('#modeTop').textContent=({lose:'減量',maintain:'維持',gain:'増量'})[db.mode]+'モード';show('home');toast('目安を設定したよ。')});
 $('#resetAll').addEventListener('click',()=>{if(!confirm('食事・運動・体重の記録と設定をすべて削除する？ 元には戻せないよ。'))return;db={...base,meals:[],activities:[],weights:[]};save();refresh();show('home');toast('初期状態に戻したよ。')});
 $('#addFoodIcon').innerHTML=icons.food;$('#addExerciseIcon').innerHTML=icons.move;$('#addWeightIcon').innerHTML=icons.weights;$('#dateLabel').textContent=new Intl.DateTimeFormat('ja-JP',{month:'long',day:'numeric',weekday:'short'}).format(new Date());$('#modeTop').textContent=({lose:'減量',maintain:'維持',gain:'増量'})[db.mode]+'モード';
-refresh();show('home');
+refresh();show('home');drawPixelWorld();
 })();
 </script></body></html>
