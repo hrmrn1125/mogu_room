@@ -161,6 +161,14 @@ html,body{background:#fff;overflow-x:hidden}
 #petSvg{width:min(70vw,265px);height:min(70vw,265px)}
 .pet-picker .theme svg{image-rendering:pixelated}
 .pet-picker .theme{min-width:0}.pet-picker .theme strong{white-space:normal}
+
+/* Referenced, pixel-perfect mascots: use the supplied artwork, not reconstructed shapes. */
+#petSvg,.pet-picker .theme .pet-canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;filter:none!important}
+#petSvg{width:min(69vw,265px);height:min(69vw,265px);object-fit:contain}
+#petSvg.thin1,#petSvg.thin2,#petSvg.thin3,#petSvg.chubby1,#petSvg.chubby2,#petSvg.chubby3{transform:none}
+#petSvg.is-talking{animation:pet-chat .43s steps(3,end) 2}
+.pet-picker .theme .pet-canvas{width:61px!important;height:61px!important;flex:0 0 61px}
+.pet-picker .theme div{min-width:0}
 </style>
 </head>
 <body>
@@ -451,119 +459,61 @@ function bodyState(){
   return cal<m0 ? {key:'thin1',label:'ややスリム'} : {key:'chubby1',label:'ややふっくら'};
 }
 
+
+const PET_SHEET=new Image();
+PET_SHEET.addEventListener('load',()=>{
+  renderPet();renderPetGrid();
+});
+PET_SHEET.src='assets/pets-sheet.png?v=2';
 function petSvg(index,stateKey,faceState='neutral'){
- // Original pixel sprites: 48x48 logical pixels, stepped outlines, flat pastel fills.
- const N=48,outline='#262728';
- const palettes=[
-  {base:'#88efca',shade:'#67d7ae',light:'#c9ffe9',accent:'#ff9bbb'},
-  {base:'#d4a7fa',shade:'#b58be7',light:'#e9ccff',accent:'#384f9d'},
-  {base:'#ffa99f',shade:'#ef918c',light:'#ffd4c3',accent:'#85cdec'},
-  {base:'#2a92a9',shade:'#19798f',light:'#ffe7bf',accent:'#ab71dc'},
-  {base:'#8b97e8',shade:'#737fd4',light:'#c3c9ff',accent:'#ffda66'}
- ];
- const c=palettes[index],pix=Array.from({length:N},()=>Array(N).fill(null));
- const inGrid=(x,y)=>x>=0&&x<N&&y>=0&&y<N;
- const dot=(x,y,col)=>{x=Math.round(x);y=Math.round(y);if(inGrid(x,y))pix[y][x]=col};
- function oval(cx,cy,rx,ry,col){
-  for(let y=Math.floor(cy-ry);y<=Math.ceil(cy+ry);y++)for(let x=Math.floor(cx-rx);x<=Math.ceil(cx+rx);x++){
-   if(((x-cx)/rx)**2+((y-cy)/ry)**2<=1)dot(x,y,col);
-  }
+ return '<canvas class="pet-canvas" data-pet="'+index+'" data-stage="'+stateKey+'" data-face="'+faceState+'" width="112" height="112" role="img" aria-label="'+pets[index].name+'"></canvas>';
+}
+function drawPixelPet(el){
+ if(!el||!PET_SHEET.complete||!PET_SHEET.naturalWidth)return;
+ const index=Math.max(0,Math.min(4,Number(el.dataset.pet)||0));
+ const stage=el.dataset.stage||'normal';
+ const face=el.dataset.face||'neutral';
+ const steps={thin3:-3,thin2:-2,thin1:-1,normal:0,chubby1:1,chubby2:2,chubby3:3};
+ const step=steps[stage]||0;
+ const cheekY=[65,61,63,64,61][index];
+ const bellyY=[82,81,82,83,79][index];
+ const g=el.getContext('2d');
+ if(!g)return;
+ g.clearRect(0,0,112,112);
+ g.imageSmoothingEnabled=false;
+ // Only the cheek and belly rows swell/shrink; ears, wands, hats and balloons retain their original proportions.
+ const rowScale=y=>1+step*(0.037*Math.exp(-0.5*Math.pow((y-cheekY)/10,2))
+                              +0.065*Math.exp(-0.5*Math.pow((y-bellyY)/12,2)));
+ for(let y=0;y<96;y++){
+  const dw=Math.max(60,Math.round(88*rowScale(y)));
+  const left=Math.round((112-dw)/2);
+  g.drawImage(PET_SHEET,index*88,y,88,1,left,8+y,dw,1);
  }
- function block(x,y,w,h,col){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)dot(xx,yy,col)}
- function poly(points,col){
-  const inside=(x,y)=>{let hit=false;for(let i=0,j=points.length-1;i<points.length;j=i++){
-   let a=points[i],b=points[j];if(((a[1]>y)!==(b[1]>y))&&(x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]))hit=!hit;
-  }return hit};
-  for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(inside(x+.5,y+.5))dot(x,y,col);
+ // Small mouth animation layered on the original reference face without redrawing the character.
+ if(face!=='neutral'){
+  const positions=[[44,67],[43,68],[31,69],[44,68],[42,68]];
+  const [cx,cy]=positions[index];
+  const mx=Math.round(56+(cx-44)*rowScale(cy));
+  const my=cy+8;
+  g.fillStyle='#292a29';
+  if(face==='surprised')g.fillRect(mx-1,my,3,4);
+  else if(face==='happy'||face==='smile')g.fillRect(mx-3,my+1,7,2);
+  else if(face==='wink'||face==='blink')g.fillRect(mx-2,my+1,4,2);
  }
- function spriteShape(draw){
-  const before=pix.map(r=>r.map(v=>v!==null));
-  draw();
-  const after=pix.map(r=>r.map(v=>v!==null));
-  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
-   if(!after[y][x]||before[y][x])continue;
-   if(!inGrid(x-1,y)||!inGrid(x+1,y)||!inGrid(x,y-1)||!inGrid(x,y+1)||
-      !after[y][x-1]||!after[y][x+1]||!after[y-1][x]||!after[y+1][x])pix[y][x]=outline;
-  }
- }
- const widthBoost={thin3:-3.6,thin2:-2.3,thin1:-1.2,normal:0,chubby1:1.2,chubby2:2.3,chubby3:3.6}[stateKey]||0;
- if(index===0){
-  // Mint hamster: compact round cheeks and distinct little paws.
-  spriteShape(()=>{oval(15,17,6,8,c.base);oval(32,17,6,8,c.base);oval(23.5,30,14.7+widthBoost,14,c.base);oval(9,29,6.5+widthBoost*.18,8,c.base);oval(39,29,6.5+widthBoost*.18,8,c.base);oval(16,42,5,3.7,c.base);oval(32,42,5,3.7,c.base)});
-  oval(15,17,3.1,4,c.light);oval(32,17,3.1,4,c.light);
-  oval(14,31,5.5,5,c.light);oval(34,31,5.5,5,c.light);
-  // pink wand rising from one paw
-  block(40,13,2,22,outline);block(41,15,1,19,'#d99aa8');
-  poly([[41,2],[44,6],[48,6],[45,10],[46,14],[41,11],[36,14],[37,9],[34,6],[39,6]],outline);
-  poly([[41,4],[43,8],[46,8],[43,10],[44,12],[41,10],[38,12],[39,9],[37,8],[40,8]],c.accent);
- }else if(index===1){
-  // Lavender rabbit with a bent nightcap, rounded ears.
-  spriteShape(()=>{oval(14,17,5.2,12,c.base);oval(32,16,5.2,12,c.base);oval(23,30,15+widthBoost,13.8,c.base);oval(15,41,5,3.4,c.base);oval(32,41,5,3.4,c.base)});
-  oval(14,15,2.1,7,c.shade);oval(32,14,2.1,7,c.shade);
-  // nightcap wraps head, folded to left
-  poly([[12,12],[19,5],[29,4],[35,11],[28,15],[19,14]],outline);
-  poly([[14,11],[20,6],[29,6],[33,11],[27,13],[19,13]],'#4154a0');
-  poly([[19,6],[14,3],[13,0],[8,2],[10,6],[13,9]],'#4154a0');
-  poly([[8,1],[10,4],[13,4],[11,7],[12,10],[8,8],[5,10],[6,6],[3,4],[7,4]],'#ffdc6d');
- }else if(index===2){
-  // Peach squirrel, broad curled tail on the right and star balloon.
-  spriteShape(()=>{oval(34,30,11+widthBoost*.6,13,c.base);oval(36,27,6,6,c.shade);oval(37,24,4,4,'#fff');oval(37,24,2.1,2.1,null);oval(17,18,5.4,6,c.base);oval(29,18,5.4,6,c.base);oval(23,29,12.4+widthBoost,13.4,c.base);oval(16,41,4,3,c.base);oval(28,41,4,3,c.base)});
-  oval(29,17,2.1,3,c.light);oval(17,17,2.1,3,c.light);oval(20,34,7,6,c.light);
-  // star helium balloon at upper-right
-  block(41,14,1,19,outline);
-  poly([[41,1],[44,7],[48,8],[45,13],[46,18],[41,15],[36,18],[37,12],[34,8],[39,7]],outline);
-  poly([[41,3],[43,8],[46,9],[43,12],[44,15],[41,13],[39,15],[39,11],[37,9],[40,9]],c.accent);
- }else if(index===3){
-  // Teal hedgehog: bumpy stepped spikes, round cream face.
-  spriteShape(()=>{
-   poly([[9,18],[6,16],[10,13],[8,9],[14,10],[15,5],[20,8],[24,3],[28,8],[34,5],[35,11],[41,10],[38,16],[43,19],[39,23],[43,28],[38,31],[39,36],[33,35],[29,42],[20,41],[14,37],[9,35],[9,30],[4,27],[8,23]],c.base);
-   oval(23.5,28,12.5+widthBoost,12.4,c.base);
-  });
-  oval(23,30,10.8,10.3,c.light);oval(17,41,5,3,c.light);oval(29,41,5,3,c.light);
-  // purple shoulder bag with star clasp
-  block(25,36,11,8,outline);block(26,37,9,6,c.accent);
-  block(23,30,2,8,c.accent);block(25,28,8,2,c.accent);block(33,29,2,8,c.accent);
-  dot(30,38,'#ffe2a0');dot(29,39,'#ffe2a0');dot(30,40,'#ffe2a0');dot(31,39,'#ffe2a0');
- }else{
-  // Periwinkle otter: horizontal tail, yellow belly star.
-  spriteShape(()=>{oval(16,14,5,6,c.base);oval(32,14,5,6,c.base);oval(23.5,28,13.3+widthBoost,14.5,c.base);oval(37,34,9,7,c.base);oval(16,41,5,3,c.base);oval(32,41,5,3,c.base)});
-  oval(24,33,8,8,c.light);
-  poly([[24,22],[27,29],[34,29],[29,34],[30,40],[24,37],[18,40],[19,34],[14,29],[21,29]],outline);
-  poly([[24,24],[27,30],[32,30],[28,34],[29,38],[24,35],[19,38],[20,34],[16,30],[22,30]],c.accent);
- }
- // Differentiated faces with five reactions.
- function eyes(y,kind){
-  if(kind==='blink'||kind==='happy'){block(16,y+1,4,1,outline);block(28,y+1,4,1,outline)}
-  else if(kind==='wink'){block(16,y+1,4,1,outline);block(28,y,3,3,outline)}
-  else if(kind==='surprised'){block(17,y,3,4,outline);block(28,y,3,4,outline)}
-  else if(index===1){block(16,y+1,4,1,outline);block(28,y+1,4,1,outline)}
-  else if(index===3){block(15,y,5,2,outline);block(27,y,5,2,outline)}
-  else{block(17,y,3,3,outline);block(28,y,3,3,outline);dot(17,y,'#fff');dot(28,y,'#fff')}
- }
- const ey=index===0?27:index===1?27:index===2?27:index===3?28:23;
- eyes(ey,faceState);
- if(index===0){dot(24,32,outline);block(23,34,3,2,outline);dot(15,33,c.accent);dot(33,33,c.accent)}
- else if(index===1){block(22,32,4,1,outline);block(21,33,1,2,outline);block(26,33,1,2,outline)}
- else if(index===2){dot(23,32,outline);dot(24,32,outline);block(22,34,4,1,outline)}
- else if(index===3){block(21,34,5,2,outline);dot(16,34,c.shade);dot(31,34,c.shade)}
- else{block(21,28,5,2,outline);block(23,30,2,2,outline)}
- if(faceState==='surprised'){block(23,index===4?32:35,3,3,outline)}
- else if(faceState==='happy'||faceState==='smile'){block(22,index===4?32:35,5,1,outline);dot(21,index===4?31:34,outline);dot(27,index===4?31:34,outline)}
- let shapes='';for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(pix[y][x]!==null)shapes+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+pix[y][x]+'"/>';
- return '<svg id="petSvg" class="'+stateKey+'" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" role="img" aria-label="'+pets[index].name+'">'+shapes+'</svg>';
 }
 
 function renderPet(){
- const body=bodyState();
- q('#petHolder').innerHTML=petSvg(state.petIndex,body.key,expression);
+ const stateNow=bodyState();
+ q('#petHolder').innerHTML=petSvg(state.petIndex,stateNow.key,expression);
+ const main=q('#petHolder .pet-canvas');
+ if(main){main.id='petSvg';drawPixelPet(main)}
  q('#petLabel').textContent=pets[state.petIndex].name;
 }
-
 function renderPetGrid(){
  q('#petGrid').innerHTML=pets.map((p,i)=>'<button class="theme '+(i===state.petIndex?'selected':'')+'" data-pet="'+i+'"><div>'+petSvg(i,'normal','neutral')+'</div><strong>'+p.name+'</strong></button>').join('');
- q('#petGrid').querySelectorAll('[data-pet]').forEach(btn=>btn.addEventListener('click',()=>{state.petIndex=Number(btn.dataset.pet);expression='neutral';save();renderAll();toast('キャラを変更したよ');}));
+ q('#petGrid').querySelectorAll('canvas.pet-canvas').forEach(drawPixelPet);
+ q('#petGrid').querySelectorAll('[data-pet]').forEach(btn=>btn.addEventListener('click',()=>{state.petIndex=Number(btn.dataset.pet);expression='neutral';save();renderAll();toast('キャラを変更したよ')}));
 }
-
 function todayMeals(){return state.meals.filter(x=>x.date===today())}
 function todayExercises(){return state.exercises.filter(x=>x.date===today())}
 function todayCalories(){return todayMeals().reduce((a,b)=>a+b.cal,0)}
