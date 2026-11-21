@@ -93,18 +93,83 @@ input,select{border:1px solid var(--line);background:#fff;border-radius:14px;pad
 .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:#232323;color:#fff;padding:11px 14px;border-radius:999px;font-size:13px;display:none;z-index:60}.toast.show{display:block}
 .hidden{display:none !important}
 @media (max-width:370px){.actions{grid-template-columns:1fr 1fr}.summary{grid-template-columns:1fr}.row{display:block}.row>*+*{margin-top:12px}}
+
+/* v2: compact, aligned, quiet game-first UI */
+:root{--text:#2e3430;--sub:#707971;--line:#e9ede8;--panel:#f7f8f5}
+html,body{background:#fff;overflow-x:hidden}
+.app{padding:12px 18px calc(88px + env(safe-area-inset-bottom));max-width:460px}
+.energy-header{margin:0 0 10px;padding:7px 4px 4px}
+.energy-top{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#657369}
+.energy-top span:last-child{font-variant-numeric:tabular-nums}
+.energy-track{position:relative;display:flex;overflow:visible;border-radius:999px;height:11px;margin-top:11px;background:#ecefea}
+.energy-zone{height:100%}.energy-zone.reduce{width:42%;background:#adcbb2;border-radius:999px 0 0 999px}.energy-zone.steady{width:25%;background:#90b8a0}.energy-zone.increase{width:33%;background:#e5c79b;border-radius:0 999px 999px 0}
+.energy-marker{position:absolute;left:0;top:-5px;height:21px;width:5px;background:#333b36;border:2px solid #fff;border-radius:5px;box-shadow:0 0 0 1px #333b36;transition:left .25s}
+.energy-labels{display:flex;justify-content:space-between;font-size:11px;color:#77847b;margin-top:6px}
+.hero{min-height:0;padding:2px 0 0;background:white;border-radius:0}
+.stage{height:clamp(225px,39dvh,315px);background:#fff;border-radius:0}
+.character-wrap{width:min(64vw,250px);height:100%;align-items:end;padding-bottom:7px}
+#petSvg{width:min(64vw,250px);height:min(64vw,250px);transform-origin:center 57%;transition:transform .24s ease}
+#petSvg.thin1{transform:scale(.96,1)}#petSvg.thin2{transform:scale(.93,.98)}#petSvg.thin3{transform:scale(.90,.96)}
+#petSvg.normal{transform:scale(1)}#petSvg.chubby1{transform:scale(1.04,1.02)}#petSvg.chubby2{transform:scale(1.075,1.04)}#petSvg.chubby3{transform:scale(1.115,1.06)}
+#petSvg.is-talking{animation:pet-chat .43s steps(3,end) 2}
+@keyframes pet-chat{50%{translate:0 -7px}}
+.speech{top:5px;z-index:4;max-width:245px;width:max-content;min-width:122px;border:0;background:#f7f8f5;border-radius:14px;padding:8px 12px;font-size:12px;white-space:normal;box-shadow:none}
+.speech:after{border:0;background:#f7f8f5;width:10px;height:10px;bottom:-5px}
+.mouth-target{top:65%;width:95px;height:90px;z-index:3}
+.petname{font-size:15px;margin:1px 0 0;font-weight:800}
+.subrow{display:none}
+.food-panel{margin:10px 0 0;padding:10px 12px;background:#f7f8f5;border-radius:17px}
+.food-head h2{font-size:13px;color:#515b53}.food-head small{font-size:11px}
+.tray{min-height:54px;gap:8px;padding:0}
+.food-item{width:52px;height:52px;flex-basis:52px;border:0;background:#fff;border-radius:12px;padding:4px}
+.food-item svg{width:44px;height:44px;image-rendering:auto;shape-rendering:geometricPrecision;overflow:visible}
+.actions{margin-top:12px;gap:8px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.btn{padding:12px 7px;min-height:46px;border-radius:13px;font-size:13px;background:#f1f3f0}
+.btn.primary{background:#e8efd9}.btn.soft{background:#eff2f1}
+.bottomnav{border-top:1px solid #f0f1ed;padding:6px 12px calc(7px + env(safe-area-inset-bottom))}
+.navbtn{padding:6px 0;font-size:11px}.navbtn.active{color:#438266}
+.page .topbar{margin:8px 0 12px}.page .title{font-size:20px}
+.section{margin-top:17px}.section h2{font-size:15px;font-weight:750;margin-bottom:10px}
+.profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.profile-field{min-width:0;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#58665a;font-weight:700}
+.profile-field span{min-height:19px}.profile-field small{font-size:11px;color:#8b968e;font-weight:500}
+.profile-field input,.profile-field select{width:100%;min-width:0;height:44px;padding:10px 11px;border:1px solid #e2e7e0;border-radius:10px;font-size:14px;background:#fff}
+.profile-field.wide{grid-column:1/-1}
+.profile-field select{appearance:auto}
+.profile-grid+.submit{margin-top:14px}
+.card{background:#f9faf8}.themegrid,.pet-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pet-picker .theme{background:#f8faf7;min-height:75px;display:flex;align-items:center;gap:8px;padding:9px;text-align:left;border:1px solid transparent;cursor:pointer}
+.pet-picker .theme.selected{border-color:#a7c4ad;background:#eff7ef}
+.pet-picker .theme svg{width:57px!important;height:57px!important;flex:0 0 57px}
+.pet-picker .theme strong{font-size:12px;white-space:nowrap}.pet-picker .theme small{display:none}
+.wallpaper-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.wallpaper{display:flex;flex-direction:column;text-align:left;gap:4px;border:0;background:transparent;padding:0;color:#3f4b43}
+.wallpaper-preview{display:block;width:100%;height:92px;border-radius:12px;border:1px solid #e8ebe5;position:relative;overflow:hidden}
+.wall-white{background:#fff}
+.wall-pastel{background:linear-gradient(180deg,#f6ebeb 0 61%,#e6e8d9 61%);}.wall-pastel:after{content:"";position:absolute;bottom:14px;left:17%;width:60px;height:30px;border-radius:30px 30px 6px 6px;background:#e3bdbd;box-shadow:34px -19px 0 -11px #c7d9bb}
+.wall-night{background:radial-gradient(circle at 72% 23%,#f8e3b2 0 12px,transparent 13px),linear-gradient(180deg,#343a65,#62668e 63%,#40435f 63%)}.wall-night:after{content:"· ·  · ·";color:#fff;position:absolute;top:13px;left:13px;letter-spacing:8px}
+.wall-garden{background:linear-gradient(180deg,#e7f0da 0 58%,#b9d9b2 58%)}.wall-garden:after{content:"";position:absolute;bottom:18px;left:15px;width:7px;height:18px;background:#6aa274;box-shadow:19px -8px #7baf7d,68px -5px #7baf7d,89px 0 #6aa274}
+.wallpaper strong{font-size:12px;padding:2px 2px 0}.wallpaper small{font-size:10px;color:#8b988d;padding-left:2px}.wallpaper.selected .wallpaper-preview{outline:2px solid #8cad98;outline-offset:2px}
+.wallpaper.locked .wallpaper-preview{opacity:.9}.wallpaper.locked:focus-visible{outline:2px solid #6a9a73}
+.sheet .preview svg{width:52px;height:52px;image-rendering:auto;shape-rendering:geometricPrecision}
+@media(max-height:740px){.stage{height:clamp(190px,36dvh,260px)}#petSvg{width:min(56vw,215px);height:min(56vw,215px)}.food-panel{margin-top:6px}.actions{margin-top:8px}}
+@media(max-width:350px){.app{padding-left:12px;padding-right:12px}.btn{font-size:11px}.profile-grid{gap:9px}.pet-picker{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <div class="app">
   <div id="homePage" class="page active">
-    <div class="topbar">
-      <div class="title">mogu room</div>
-      <div class="modechip" id="modeChip">未設定</div>
+    <div class="energy-header">
+      <div class="energy-top"><span id="energyStatus">今日のエサ</span><span id="energyAmount">0 kcal</span></div>
+      <div class="energy-track" id="energyTrack">
+        <span class="energy-zone reduce"></span><span class="energy-zone steady"></span><span class="energy-zone increase"></span>
+        <span class="energy-marker" id="energyMarker"></span>
+      </div>
+      <div class="energy-labels"><span>減量</span><span>維持</span><span>増量</span></div>
     </div>
 
     <section class="hero">
-      <div class="speech" id="speech">今日のカロリーを記録して、エサを食べさせよう。</div>
+      <div class="speech" id="speech" aria-live="polite">タップしておしゃべり</div>
       <div class="stage" id="stage">
         <div class="character-wrap">
           <div class="mouth-target" id="mouthTarget"></div>
@@ -112,10 +177,7 @@ input,select{border:1px solid var(--line);background:#fff;border-radius:14px;pad
         </div>
       </div>
       <div class="petname" id="petLabel">ケーキいぬ</div>
-      <div class="subrow">
-        <div class="badge" id="bodyStateLabel">ふつう</div>
-        <div class="badge" id="bgLabel">背景: ホワイト</div>
-      </div>
+
     </section>
 
     <section class="food-panel">
@@ -129,18 +191,8 @@ input,select{border:1px solid var(--line);background:#fff;border-radius:14px;pad
       <button class="btn" id="openWeightBtn">記録</button>
     </div>
 
-    <div class="summary">
-      <div class="card">
-        <h3>今日のカロリー</h3>
-        <div class="value"><span id="todayCalories">0</span><span style="font-size:14px;font-weight:700;color:var(--sub)"> kcal</span></div>
-        <div class="targetset" id="targetSummary">プロフィールを設定すると目標が出るよ。</div>
-      </div>
-      <div class="card">
-        <h3>今日の運動</h3>
-        <div class="value"><span id="todayExercise">0</span><span style="font-size:14px;font-weight:700;color:var(--sub)"> kcal</span></div>
-        <div class="targetset" id="exerciseCaption">運動で消費したカロリーの目安。</div>
-      </div>
-    </div>
+  
+
   </div>
 
   <div id="logsPage" class="page">
@@ -160,36 +212,41 @@ input,select{border:1px solid var(--line);background:#fff;border-radius:14px;pad
     <section class="section">
       <h2>プロフィール</h2>
       <div class="card">
-        <div class="fields">
-          <div class="row">
-            <div><small class="small">身長 (cm)</small><input id="heightInput" type="number" min="120" max="220" step="0.1"></div>
-            <div><small class="small">体重 (kg)</small><input id="weightInput" type="number" min="20" max="300" step="0.1"></div>
-          </div>
-          <div class="row">
-            <div><small class="small">年齢</small><input id="ageInput" type="number" min="10" max="100"></div>
-            <div><small class="small">性別</small><select id="sexInput"><option value="female">女性</option><option value="male">男性</option></select></div>
-          </div>
-          <div><small class="small">1日の運動量</small><select id="activityInput">
-            <option value="1.2">かなり少ない</option>
-            <option value="1.375">少なめ</option>
-            <option value="1.55">ふつう</option>
-            <option value="1.725">多め</option>
-          </select></div>
-          <button class="submit" id="saveProfileBtn" type="button">目標カロリーを計算する</button>
+        <div class="profile-grid">
+          <label class="profile-field"><span>身長 <small>cm</small></span><input id="heightInput" type="number" min="120" max="220" step=".1" inputmode="decimal"></label>
+          <label class="profile-field"><span>体重 <small>kg</small></span><input id="weightInput" type="number" min="20" max="300" step=".1" inputmode="decimal"></label>
+          <label class="profile-field"><span>年齢</span><input id="ageInput" type="number" min="10" max="100" inputmode="numeric"></label>
+          <label class="profile-field"><span>性別（計算用）</span><select id="sexInput"><option value="female">女性</option><option value="male">男性</option></select></label>
+          <label class="profile-field wide"><span>普段の活動量</span><select id="activityInput">
+            <option value="1.2">少ない（座り仕事中心）</option>
+            <option value="1.375">軽め（軽い運動）</option>
+            <option value="1.55">普通（週3〜5日程度の運動）</option>
+            <option value="1.725">多い（ほぼ毎日運動）</option>
+          </select></label>
         </div>
+        <button class="submit" id="saveProfileBtn" type="button">目安を計算する</button>
+        <p class="small">Mifflin–St Jeor式による推定。体調・年齢・健康状態によって必要量は異なるよ。</p>
       </div>
     </section>
     <section class="section">
       <h2>キャラクター</h2>
-      <div class="themegrid" id="petGrid"></div>
+      <div class="pet-picker" id="petGrid"></div>
     </section>
     <section class="section">
       <h2>背景</h2>
-      <div class="themegrid">
-        <div class="theme"><div><strong>ホワイト</strong><small>無料</small></div></div>
-        <div class="theme"><div><strong>パステルルーム</strong><small>設定画面から変更</small></div><div class="lock">課金</div></div>
-        <div class="theme"><div><strong>ナイト</strong><small>設定画面から変更</small></div><div class="lock">課金</div></div>
-        <div class="theme"><div><strong>ガーデン</strong><small>設定画面から変更</small></div><div class="lock">課金</div></div>
+      <div class="wallpaper-grid">
+        <button type="button" class="wallpaper selected" data-wallpaper="white">
+          <span class="wallpaper-preview wall-white"></span><strong>ホワイト</strong><small>使用中</small>
+        </button>
+        <button type="button" class="wallpaper locked" data-wallpaper="pastel">
+          <span class="wallpaper-preview wall-pastel"></span><strong>パステル</strong><small>プレミアム（準備中）</small>
+        </button>
+        <button type="button" class="wallpaper locked" data-wallpaper="night">
+          <span class="wallpaper-preview wall-night"></span><strong>ナイト</strong><small>プレミアム（準備中）</small>
+        </button>
+        <button type="button" class="wallpaper locked" data-wallpaper="garden">
+          <span class="wallpaper-preview wall-garden"></span><strong>ガーデン</strong><small>プレミアム（準備中）</small>
+        </button>
       </div>
     </section>
   </div>
@@ -229,7 +286,8 @@ const foodCatalog=[
 const foodNames={rice:'おにぎり',ramen:'ラーメン',bread:'トースト',apple:'りんご',salad:'サラダ',cake:'ケーキ',egg:'たまご',milk:'ミルク',soup:'スープ',sandwich:'サンドイッチ',curry:'カレー',pasta:'パスタ',fish:'焼き魚',chicken:'チキン',yogurt:'ヨーグルト',cookie:'クッキー',stew:'シチュー',dumpling:'ぎょうざ',strawberry:'いちご',donut:'ドーナツ',nuts:'ナッツ',bento:'おべんとう',bite:'ひとくち'};
 const exerciseKinds={walk:{label:'ウォーキング', icon:'walk', burnPerMin:3.5}, strength:{label:'筋トレ', icon:'strength', burnPerMin:5.5}, swim:{label:'水泳', icon:'swim', burnPerMin:7.5}, dance:{label:'ダンス', icon:'dance', burnPerMin:5}, yoga:{label:'ヨガ', icon:'yoga', burnPerMin:2.5}};
 const state=load();
-let drag=null;
+state.fedEvents=Array.isArray(state.fedEvents)?state.fedEvents:[];
+let drag=null;let expression='neutral';let lastDialogueIndex=-1;let chatTimer=null;
 
 function load(){
   try{
@@ -324,8 +382,59 @@ function calcTargets(profile){
   };
 }
 
+
+const speechByState={
+lose:[
+'今日はゆっくりお世話してくれる？','ひとくちずつ、いただきます。','おなかの声も聞いてみよう。','急がなくても大丈夫だよ。','今日は何して遊ぶ？',
+'お水を飲んでひと休みしよう。','お昼寝も大事な冒険だよ。','エサを持ってきてくれたの？','ちょっとお散歩したいな。','お日さまの下でごろごろしたい。',
+'今日はどんな日だった？','小さな一歩でもうれしいよ。','のんびりした日も好きだよ。','ぼくのこと見てくれてありがとう。','ふかふかの場所を探そう。',
+'今日は静かな気分なんだ。','ゆっくりもぐもぐしたいな。','元気をためる時間も必要だよ。','おしゃべりできてうれしい。','またあとで遊ぼうね。'
+],
+maintain:[
+'今日はごきげんな日だよ。','会いに来てくれたんだね。','おなかいっぱいの夢を見たよ。','ほっぺをつんつんしてみて。','ここがぼくのお気に入り。',
+'いっしょにお昼寝しよう。','なんだか歌いたい気分！','エサの時間、楽しみだな。','今日もよろしくね。','おへやでお話ししよう。',
+'ふわふわの雲を見つけたよ。','ぼくの顔、よく見てみて。','ちょっとくすぐったいよ。','いいことが起きそうな予感！','おさんぽに行きたいな。',
+'何もしない時間も好きなんだ。','今日はにこにこしていたい。','もう一回タップしてみて。','ふたりでのんびりしよう。','お世話してくれてありがとう。'
+],
+gain:[
+'もぐもぐ、幸せな時間！','今日はたくさんおしゃべりしたい。','まんまる気分だよ。','ふかふかのおふとんが恋しい。','ころころ転がってみようかな。',
+'おなかをなでてみる？','今日はほっぺがぷにぷに。','なんだか眠くなっちゃった。','のんびり過ごすのがいちばん。','おやつの夢を見たんだ。',
+'うれしくて跳ねちゃいそう！','ごろりんとひと休み。','いっしょに景色を見ようよ。','ゆっくり動くのも楽しいね。','今日はごきげんでのびのび。',
+'ごちそうさまって言いたいな。','おいしい夢を見ていたよ。','ほっぺに触れたらくすぐったい。','またいっしょに遊ぼうね。','今日も会えてうれしい！'
+]
+};
+const petVoice=[
+ {start:'',end:'〜わん。',alt:'〜だわん。'},
+ {start:'ぴょん、',end:'〜ぴょん。',alt:'〜だぴょん。'},
+ {start:'ぴよっ、',end:'〜ぴよ。',alt:'〜だぴよ。'},
+ {start:'くまっ、',end:'〜くま。',alt:'〜だくま。'},
+ {start:'にゃふ、',end:'〜にゃ。',alt:'〜だにゃ。'}
+];
+function fedToday(){return Math.round(state.fedEvents.filter(x=>x.date===today()).reduce((sum,x)=>sum+(Number(x.cal)||0),0))}
+function fedPieceEnergy(piece){
+ if(Number.isFinite(Number(piece.cal))&&Number(piece.cal)>0)return Number(piece.cal);
+ const item=foodCatalog.find(([kind])=>kind===piece.kind);return item?item[1]:80;
+}
+function conversationRegime(){
+ if(!state.targets||fedToday()===0)return 'maintain';
+ return fedToday()<state.targets.maintain[0]?'lose':fedToday()<=state.targets.maintain[1]?'maintain':'gain';
+}
+function speakToPet(forceText){
+ const mode=conversationRegime(),lines=speechByState[mode];
+ let index=Math.floor(Math.random()*lines.length);if(index===lastDialogueIndex)index=(index+1)%lines.length;lastDialogueIndex=index;
+ const pet=petVoice[state.petIndex]||petVoice[0],str=forceText||lines[index];
+ const base=str.replace(/[。！!]+$/,'');
+ const endings=pet.end;
+ q('#speech').textContent=(pet.start&&Math.random()>.5?pet.start:'')+base+endings;
+ expression=['happy','blink','surprised','wink','smile','neutral'][index%6];
+ renderPet();
+ clearTimeout(chatTimer);
+ const icon=q('#petSvg');if(icon)icon.classList.add('is-talking');
+ chatTimer=setTimeout(()=>{expression='neutral';renderPet()},2500);
+}
+
 function bodyState(){
-  const cal=todayCalories(); const t=state.targets; if(!t) return {key:'normal', label:'ふつう'};
+  const cal=fedToday(); const t=state.targets; if(!t||cal===0) return {key:'normal', label:'ふつう'};
   const [l0,l1]=t.lose, [m0,m1]=t.maintain, [g0,g1]=t.gain;
   if(cal>=m0 && cal<=m1) return {key:'normal',label:'ふつう'};
   if(cal>=l0 && cal<=l1){ const p=(cal-l0)/(l1-l0||1); return p<.34?{key:'thin3',label:'かなりスリム'}:p<.67?{key:'thin2',label:'スリム'}:{key:'thin1',label:'ややスリム'} }
@@ -335,64 +444,66 @@ function bodyState(){
   return cal<m0 ? {key:'thin1',label:'ややスリム'} : {key:'chubby1',label:'ややふっくら'};
 }
 
-function petSvg(index,stateKey){
-  const spec=pets[index];
-  const palettes=[
-    {line:'#252823',main:'#f0c9b5',sub:'#fff5df',cheek:'#d79692'},
-    {line:'#252823',main:'#fff8e8',sub:'#84a985',cheek:'#dfaba7'},
-    {line:'#252823',main:'#f2d37f',sub:'#d0a06d',cheek:'#dfaa9c'},
-    {line:'#252823',main:'#b9d38f',sub:'#7da17f',cheek:'#e4b19e'},
-    {line:'#252823',main:'#dfb5c6',sub:'#f1ddc6',cheek:'#aa8fb0'}
-  ][index];
-  const {line,main,sub,cheek}=palettes;
-  const bodyClass=stateKey;
-
-  function face(type){
-    if(type==='gentle') return `
-      <rect x="8" y="10" width="2" height="2" fill="${line}"/><rect x="14" y="10" width="2" height="2" fill="${line}"/>
-      <rect x="10" y="14" width="4" height="1" fill="${line}"/><rect x="5" y="13" width="2" height="1" fill="${cheek}"/><rect x="17" y="13" width="2" height="1" fill="${cheek}"/>`;
-    if(type==='sleepy') return `
-      <rect x="7" y="10" width="3" height="1" fill="${line}"/><rect x="14" y="10" width="3" height="1" fill="${line}"/>
-      <rect x="10" y="14" width="4" height="2" fill="${line}"/><rect x="11" y="15" width="2" height="1" fill="${sub}"/>`;
-    if(type==='cheer') return `
-      <rect x="8" y="10" width="2" height="2" fill="${line}"/><rect x="14" y="10" width="2" height="2" fill="${line}"/>
-      <rect x="9" y="14" width="6" height="2" fill="${line}"/><rect x="10" y="13" width="4" height="1" fill="${line}"/><rect x="5" y="13" width="2" height="1" fill="${cheek}"/><rect x="17" y="13" width="2" height="1" fill="${cheek}"/>`;
-    if(type==='cool') return `
-      <rect x="7" y="10" width="4" height="2" fill="${line}"/><rect x="13" y="10" width="4" height="2" fill="${line}"/>
-      <rect x="10" y="14" width="4" height="1" fill="${line}"/>`;
-    return `
-      <rect x="8" y="10" width="2" height="2" fill="${line}"/><rect x="14" y="10" width="2" height="2" fill="${line}"/>
-      <rect x="9" y="14" width="6" height="1" fill="${line}"/><rect x="11" y="15" width="2" height="1" fill="${line}"/><rect x="5" y="13" width="2" height="1" fill="${cheek}"/><rect x="17" y="13" width="2" height="1" fill="${cheek}"/>`;
-  }
-
-  const shapes=[
-    // cake inu
-    `<rect x="5" y="9" width="4" height="6" fill="${main}"/><rect x="15" y="9" width="4" height="6" fill="${main}"/><rect x="4" y="13" width="16" height="8" fill="${main}"/><rect x="6" y="7" width="12" height="4" fill="${sub}"/><rect x="7" y="17" width="10" height="1" fill="${sub}"/>`,
-    // onigiri usa rounded
-    `<rect x="7" y="4" width="3" height="8" fill="${main}"/><rect x="14" y="4" width="3" height="8" fill="${main}"/><rect x="5" y="10" width="14" height="10" fill="${main}"/><rect x="8" y="16" width="8" height="3" fill="${sub}"/>`,
-    // pudding hiyoko
-    `<rect x="7" y="7" width="10" height="3" fill="${sub}"/><rect x="5" y="9" width="14" height="10" fill="${main}"/><rect x="10" y="5" width="4" height="2" fill="${main}"/><rect x="6" y="18" width="4" height="2" fill="${sub}"/><rect x="14" y="18" width="4" height="2" fill="${sub}"/>`,
-    // melon kuma
-    `<rect x="4" y="8" width="5" height="5" fill="${main}"/><rect x="15" y="8" width="5" height="5" fill="${main}"/><rect x="5" y="10" width="14" height="10" fill="${main}"/><rect x="7" y="12" width="10" height="1" fill="${sub}"/><rect x="7" y="15" width="10" height="1" fill="${sub}"/>`,
-    // dango neko
-    `<rect x="6" y="6" width="4" height="6" fill="${main}"/><rect x="14" y="6" width="4" height="6" fill="${main}"/><rect x="5" y="10" width="14" height="9" fill="${main}"/><rect x="7" y="8" width="10" height="3" fill="${sub}"/><rect x="7" y="18" width="10" height="2" fill="${sub}"/>`
-  ][index];
-
-  const outline=`<rect x="0" y="0" width="24" height="24" fill="transparent"/>`;
-  return `<svg id="petSvg" class="${bodyClass}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">${outline}${shapes}${face(spec.face)}</svg>`;
+function petSvg(index,stateKey,faceState='neutral'){
+ const colors=[
+ ['#2d332f','#f0c8b0','#fff5df','#d89990'],
+ ['#2d332f','#fff8e8','#89b08a','#e5aaa5'],
+ ['#2d332f','#f2d27f','#d6a174','#e5aa8b'],
+ ['#2d332f','#bed898','#84ac86','#e3b3a0'],
+ ['#2d332f','#e2b7c6','#f0e3d4','#af8ca9']
+ ];
+ const [ink,body,accent,cheek]=colors[index],N=40,g=Array(N*N).fill(null);
+ function ell(x,y,cx,cy,rx,ry){return ((x-cx)/rx)**2+((y-cy)/ry)**2<=1}
+ const widthByState={thin3:9.3,thin2:10.7,thin1:12.3,normal:14.2,chubby1:15.8,chubby2:17.1,chubby3:18.3};
+ const rx=widthByState[stateKey]||14.2;
+ function inside(x,y){
+  let torso=ell(x,y,19.5,24,rx,11.7)||ell(x,y,19.5,17,Math.max(11,rx-1),11.6);
+  if(index===0)return torso||ell(x,y,8,14,5,8)||ell(x,y,31,14,5,8)||ell(x,y,19.5,9,9,5);
+  if(index===1)return torso||ell(x,y,12,7,4.3,7)||ell(x,y,27,7,4.3,7);
+  if(index===2)return torso||ell(x,y,8,24,4.9,5)||ell(x,y,31,24,4.9,5)||ell(x,y,19.5,9,5,5);
+  if(index===3)return torso||ell(x,y,9.5,12,6.2,6)||ell(x,y,29.5,12,6.2,6);
+  return torso||ell(x,y,10,10.3,6,6)||ell(x,y,29,10.3,6,6);
+ }
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+  if(!inside(x,y))continue;
+  let c=body;
+  if(index===0&&(ell(x,y,19.5,10.5,11.3,5.5)||y===28&&x>=10&&x<=29))c=accent;
+  if(index===1&&y>=26&&y<=34&&x>=12&&x<=27)c=accent;
+  if(index===2&&y>=10&&y<=13&&x>=11&&x<=28)c=accent;
+  if(index===3&&y>14&&y<31&&((x-y)%11===0||(x+y)%12===0))c=accent;
+  if(index===4&&(y>8&&y<13&&x>=10&&x<=29||y>27&&y<32&&x>=13&&x<=26))c=accent;
+  if(!inside(x+1,y)||!inside(x-1,y)||!inside(x,y+1)||!inside(x,y-1))c=ink;
+  g[y*N+x]=c;
+ }
+ function px(x,y,c){if(x>=0&&y>=0&&x<N&&y<N&&g[y*N+x]!==null)g[y*N+x]=c}
+ function line(x,y,w,h,c){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)px(xx,yy,c)}
+ // Five independently designed faces; each reacts to conversations.
+ if(index===0){line(13,21,3,3,ink);line(25,21,3,3,ink)}
+ if(index===1){line(12,22,5,1,ink);line(23,22,5,1,ink)}
+ if(index===2){line(13,21,3,4,ink);line(24,21,3,4,ink)}
+ if(index===3){line(12,21,6,2,ink);line(22,21,6,2,ink);line(13,20,3,1,ink);line(24,20,3,1,ink)}
+ if(index===4){line(13,20,3,3,ink);line(24,20,3,3,ink);px(12,19,ink);px(27,19,ink)}
+ if(faceState==='blink'||faceState==='happy'){line(12,20,6,4,body);line(22,20,6,4,body);line(12,22,6,1,ink);line(22,22,6,1,ink)}
+ if(faceState==='wink'){line(12,20,6,4,body);line(12,22,6,1,ink)}
+ line(10,27,4,2,cheek);line(26,27,4,2,cheek);
+ if(faceState==='surprised'){line(18,27,4,5,ink);line(19,28,2,3,cheek)}
+ else if(faceState==='happy'||faceState==='smile'){line(17,29,6,2,ink);line(16,28,1,2,ink);line(23,28,1,2,ink);line(18,30,4,1,cheek)}
+ else if(index===1){line(18,29,4,1,ink)}
+ else if(index===3){line(18,28,5,2,ink)}
+ else{line(18,28,4,2,ink)}
+ let rects='';for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(g[y*N+x]!==null)rects+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+g[y*N+x]+'"/>';
+ return '<svg id="petSvg" class="'+stateKey+'" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" role="img" aria-label="'+pets[index].name+'">'+rects+'</svg>';
 }
 
 function renderPet(){
-  const body=bodyState();
-  q('#petHolder').innerHTML=petSvg(state.petIndex, body.key);
-  q('#petLabel').textContent=pets[state.petIndex].name;
-  q('#bodyStateLabel').textContent=body.label;
+ const body=bodyState();
+ q('#petHolder').innerHTML=petSvg(state.petIndex,body.key,expression);
+ q('#petLabel').textContent=pets[state.petIndex].name;
 }
 
 function renderPetGrid(){
-  q('#petGrid').innerHTML=pets.map((p,i)=>`<button class="theme" data-pet="${i}"><div>${petSvg(i,'normal')}</div><div><strong>${p.name}</strong><small>${['やさしい顔','ねむそうな顔','元気な顔','クールな顔','いたずら顔'][i]}</small></div></button>`).join('');
-  q('#petGrid').querySelectorAll('[data-pet]').forEach(btn=>btn.addEventListener('click',()=>{state.petIndex=Number(btn.dataset.pet);save();renderAll();toast('キャラを変更したよ。')}));
-  q('#petGrid').querySelectorAll('svg').forEach(svg=>{svg.style.width='52px';svg.style.height='52px'});
+ q('#petGrid').innerHTML=pets.map((p,i)=>'<button class="theme '+(i===state.petIndex?'selected':'')+'" data-pet="'+i+'"><div>'+petSvg(i,'normal','neutral')+'</div><strong>'+p.name+'</strong></button>').join('');
+ q('#petGrid').querySelectorAll('[data-pet]').forEach(btn=>btn.addEventListener('click',()=>{state.petIndex=Number(btn.dataset.pet);expression='neutral';save();renderAll();toast('キャラを変更したよ');}));
 }
 
 function todayMeals(){return state.meals.filter(x=>x.date===today())}
@@ -400,29 +511,27 @@ function todayExercises(){return state.exercises.filter(x=>x.date===today())}
 function todayCalories(){return todayMeals().reduce((a,b)=>a+b.cal,0)}
 function todayExerciseBurn(){return Math.round(todayExercises().reduce((a,b)=>a+b.burn,0))}
 function renderSummary(){
-  q('#todayCalories').textContent=todayCalories();
-  q('#todayExercise').textContent=todayExerciseBurn();
-  if(state.targets){
-    const t=state.targets;
-    q('#targetSummary').innerHTML=`減量 ${t.lose[0]}–${t.lose[1]} kcal<br>維持 ${t.maintain[0]}–${t.maintain[1]} kcal<br>増量 ${t.gain[0]}–${t.gain[1]} kcal`;
-    const body=bodyState();
-    q('#modeChip').textContent=body.label;
-  }else{
-    q('#targetSummary').textContent='プロフィールを設定すると目標が出るよ。';
-    q('#modeChip').textContent='未設定';
-  }
+ const energy=fedToday(),t=state.targets;
+ q('#energyAmount').textContent=energy+' kcal';
+ if(!t){q('#energyStatus').textContent='プロフィールを設定';q('#energyMarker').style.left='0%';return}
+ const upper=Math.max(1,t.gain[1]);
+ q('#energyStatus').textContent='今日のエサ';
+ const pct=Math.min(99,energy/upper*100);
+ q('#energyMarker').style.left=pct+'%';
+ const [l0,l1]=t.lose,[m0,m1]=t.maintain,[g0,g1]=t.gain;
+ let a=Math.max(10,l1/upper*100),b=Math.max(10,(m1-l1)/upper*100);
+ const first=q('.energy-zone.reduce'),second=q('.energy-zone.steady'),third=q('.energy-zone.increase');
+ first.style.width=a+'%';second.style.width=b+'%';third.style.width=Math.max(0,100-a-b)+'%';
+ q('#energyTrack').setAttribute('aria-label','エサ '+energy+' kcal、減量目安 '+l0+'〜'+l1+' kcal、維持 '+m0+'〜'+m1+' kcal、増量 '+g0+'〜'+g1+' kcal');
 }
 
 function renderTray(){
-  const tray=q('#tray');
-  if(!state.foodPieces.length){
-    tray.innerHTML='<div class="empty">ごはんを記録するとエサが出るよ。</div>';
-    q('#foodCount').textContent='0個';
-    return;
-  }
-  tray.innerHTML=state.foodPieces.map((p,idx)=>`<button class="food-item" data-food-index="${idx}" aria-label="${foodNames[p.kind]||'エサ'}">${foodSvg(p.kind)}</button>`).join('');
-  q('#foodCount').textContent=`${state.foodPieces.length}個`;
-  qa('.food-item').forEach(btn=>setupFoodDrag(btn));
+ const tray=q('#tray');
+ q('#foodCount').textContent=state.foodPieces.length+'個';
+ tray.innerHTML=state.foodPieces.length
+ ?state.foodPieces.map((p,idx)=>'<button class="food-item" data-food-index="'+idx+'" aria-label="'+(foodNames[p.kind]||'エサ')+'">'+foodSvg(p.kind)+'</button>').join('')
+ :'<div class="empty">ごはんを記録するとエサが出るよ</div>';
+ qa('.food-item').forEach(setupFoodDrag);
 }
 
 function setupFoodDrag(btn){
@@ -445,15 +554,25 @@ function setupFoodDrag(btn){
   btn.addEventListener('pointercancel',()=>cancelDrag());
 }
 function finishDrag(x,y){
-  if(!drag) return;
-  const mouth=q('#mouthTarget').getBoundingClientRect();
-  const inside=x>=mouth.left && x<=mouth.right && y>=mouth.top && y<=mouth.bottom;
-  if(inside){
-    state.foodPieces.splice(drag.idx,1); save(); renderTray();
-    q('#speech').textContent='もぐもぐ。おいしい！'; renderPet(); toast('エサを食べたよ');
+ if(!drag)return;
+ const mouth=q('#mouthTarget').getBoundingClientRect();
+ const stage=q('#petHolder').getBoundingClientRect();
+ const inside=(x>=mouth.left-35&&x<=mouth.right+35&&y>=mouth.top-35&&y<=mouth.bottom+35)
+ ||(x>=stage.left+stage.width*.3&&x<=stage.right-stage.width*.3&&y>=stage.top+stage.height*.3&&y<=stage.bottom-stage.height*.2);
+ if(inside){
+  const item=state.foodPieces[drag.idx];
+  if(item){
+    state.fedEvents.push({date:today(),cal:fedPieceEnergy(item)});
+    state.foodPieces.splice(drag.idx,1);
+    save();renderSummary();renderTray();renderPet();
+    speakToPet('おいしい！ ありがとう');
   }
-  cancelDrag();
+ }else{
+  toast('お口の近くまで運んでね');
+ }
+ cancelDrag();
 }
+
 function cancelDrag(){
   q('#mouthTarget').classList.remove('active');
   if(drag?.ghost) drag.ghost.remove();
@@ -483,7 +602,10 @@ function openFoodSheet(){
     const cal=Math.round(Number(input.value)); if(!(cal>0)) return;
     const foods=chooseFoods(cal);
     state.meals.push({date:today(), cal});
-    foods.forEach(kind=>state.foodPieces.push({kind, createdAt:Date.now()+Math.random()}));
+    const values=foods.map(kind=>foodCatalog.find(([k])=>k===kind)?.[1]||80);
+    const sum=values.reduce((a,b)=>a+b,0)||1;
+    let remaining=cal;
+    foods.forEach((kind,i)=>{const portion=i===foods.length-1?remaining:Math.round(cal*values[i]/sum);remaining-=portion;state.foodPieces.push({kind,cal:portion,createdAt:Date.now()+Math.random()})});
     save(); closeSheet(); renderAll(); q('#speech').textContent='エサができたよ。口まで運んでね。'; toast('エサを追加したよ');
   });
 }
@@ -527,12 +649,21 @@ function bindSettings(){
 }
 
 function switchPage(id){ qa('.page').forEach(p=>p.classList.remove('active')); q('#'+id).classList.add('active'); qa('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.page===id)); if(id==='logsPage') renderLogs(); if(id==='settingsPage'){ bindSettings(); renderPetGrid(); } }
-function renderAll(){ renderPet(); renderSummary(); renderTray(); renderLogs(); bindSettings(); renderPetGrid(); q('#bgLabel').textContent='背景: ホワイト'; }
+function renderAll(){ renderPet();renderSummary();renderTray();renderLogs();bindSettings();renderPetGrid(); }
 
 q('#openFoodBtn').addEventListener('click',openFoodSheet);
 q('#openExerciseBtn').addEventListener('click',openExerciseSheet);
 q('#openWeightBtn').addEventListener('click',openWeightSheet);
 q('#closeSheet').addEventListener('click',closeSheet);
+q('#petHolder').addEventListener('click',()=>speakToPet());
+q('#petHolder').setAttribute('role','button');
+q('#petHolder').setAttribute('tabindex','0');
+q('#petHolder').setAttribute('aria-label','キャラクターと話す');
+q('#petHolder').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();speakToPet()}});
+qa('.wallpaper').forEach(btn=>btn.addEventListener('click',()=>{
+ if(btn.classList.contains('locked'))toast('この背景はプレミアムのプレビューだよ');
+ else toast('ホワイトを使用中');
+}));
 q('#overlay').addEventListener('click',e=>{ if(e.target===q('#overlay')) closeSheet(); });
 qa('.navbtn').forEach(btn=>btn.addEventListener('click',()=>switchPage(btn.dataset.page)));
 
