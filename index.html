@@ -154,6 +154,13 @@ html,body{background:#fff;overflow-x:hidden}
 .sheet .preview svg{width:52px;height:52px;image-rendering:auto;shape-rendering:geometricPrecision}
 @media(max-height:740px){.stage{height:clamp(190px,36dvh,260px)}#petSvg{width:min(56vw,215px);height:min(56vw,215px)}.food-panel{margin-top:6px}.actions{margin-top:8px}}
 @media(max-width:350px){.app{padding-left:12px;padding-right:12px}.btn{font-size:11px}.profile-grid{gap:9px}.pet-picker{grid-template-columns:1fr 1fr}}
+
+/* Pixel-illustration mascots v3: clean pixels, tiny accent highlights, no drop shadows. */
+#petSvg,.pet-picker svg{image-rendering:pixelated;shape-rendering:crispEdges;filter:none!important}
+.character-wrap{cursor:pointer}
+#petSvg{width:min(70vw,265px);height:min(70vw,265px)}
+.pet-picker .theme svg{image-rendering:pixelated}
+.pet-picker .theme{min-width:0}.pet-picker .theme strong{white-space:normal}
 </style>
 </head>
 <body>
@@ -272,11 +279,11 @@ html,body{background:#fff;overflow-x:hidden}
 <script>
 const KEY='mogu-room-revised-proto-v1';
 const pets=[
-  {name:'ケーキいぬ', face:'gentle'},
-  {name:'おにぎりうさ', face:'sleepy'},
-  {name:'プリンひよこ', face:'cheer'},
-  {name:'メロンくま', face:'cool'},
-  {name:'だんごねこ', face:'mischief'}
+  {name:'ミントハムスター', face:'cheer'},
+  {name:'ラベンダーうさぎ', face:'sleepy'},
+  {name:'ピーチりす', face:'gentle'},
+  {name:'ほしのハリネズミ', face:'cool'},
+  {name:'ペリウィンクルカワウソ', face:'mischief'}
 ];
 const foodCatalog=[
   ['rice',200],['ramen',700],['bread',160],['apple',100],['salad',80],['cake',350],['egg',75],['milk',130],
@@ -404,11 +411,11 @@ gain:[
 ]
 };
 const petVoice=[
- {start:'',end:'〜わん。',alt:'〜だわん。'},
- {start:'ぴょん、',end:'〜ぴょん。',alt:'〜だぴょん。'},
- {start:'ぴよっ、',end:'〜ぴよ。',alt:'〜だぴよ。'},
- {start:'くまっ、',end:'〜くま。',alt:'〜だくま。'},
- {start:'にゃふ、',end:'〜にゃ。',alt:'〜だにゃ。'}
+ {start:'ちゅっ、',end:'だちゅ。',alt:'ちゅ〜。'},
+ {start:'ふぁぁ、',end:'ぴょん。',alt:'だぴょん。'},
+ {start:'るるっ、',end:'りす。',alt:'なのりす。'},
+ {start:'きらっ、',end:'なのさ。',alt:'だよ、きら。'},
+ {start:'ぷかっ、',end:'だぷか。',alt:'ぷかぷか。'}
 ];
 function fedToday(){return Math.round(state.fedEvents.filter(x=>x.date===today()).reduce((sum,x)=>sum+(Number(x.cal)||0),0))}
 function fedPieceEnergy(piece){
@@ -445,54 +452,105 @@ function bodyState(){
 }
 
 function petSvg(index,stateKey,faceState='neutral'){
- const colors=[
- ['#2d332f','#f0c8b0','#fff5df','#d89990'],
- ['#2d332f','#fff8e8','#89b08a','#e5aaa5'],
- ['#2d332f','#f2d27f','#d6a174','#e5aa8b'],
- ['#2d332f','#bed898','#84ac86','#e3b3a0'],
- ['#2d332f','#e2b7c6','#f0e3d4','#af8ca9']
+ // Original pixel sprites: 48x48 logical pixels, stepped outlines, flat pastel fills.
+ const N=48,outline='#262728';
+ const palettes=[
+  {base:'#88efca',shade:'#67d7ae',light:'#c9ffe9',accent:'#ff9bbb'},
+  {base:'#d4a7fa',shade:'#b58be7',light:'#e9ccff',accent:'#384f9d'},
+  {base:'#ffa99f',shade:'#ef918c',light:'#ffd4c3',accent:'#85cdec'},
+  {base:'#2a92a9',shade:'#19798f',light:'#ffe7bf',accent:'#ab71dc'},
+  {base:'#8b97e8',shade:'#737fd4',light:'#c3c9ff',accent:'#ffda66'}
  ];
- const [ink,body,accent,cheek]=colors[index],N=40,g=Array(N*N).fill(null);
- function ell(x,y,cx,cy,rx,ry){return ((x-cx)/rx)**2+((y-cy)/ry)**2<=1}
- const widthByState={thin3:9.3,thin2:10.7,thin1:12.3,normal:14.2,chubby1:15.8,chubby2:17.1,chubby3:18.3};
- const rx=widthByState[stateKey]||14.2;
- function inside(x,y){
-  let torso=ell(x,y,19.5,24,rx,11.7)||ell(x,y,19.5,17,Math.max(11,rx-1),11.6);
-  if(index===0)return torso||ell(x,y,8,14,5,8)||ell(x,y,31,14,5,8)||ell(x,y,19.5,9,9,5);
-  if(index===1)return torso||ell(x,y,12,7,4.3,7)||ell(x,y,27,7,4.3,7);
-  if(index===2)return torso||ell(x,y,8,24,4.9,5)||ell(x,y,31,24,4.9,5)||ell(x,y,19.5,9,5,5);
-  if(index===3)return torso||ell(x,y,9.5,12,6.2,6)||ell(x,y,29.5,12,6.2,6);
-  return torso||ell(x,y,10,10.3,6,6)||ell(x,y,29,10.3,6,6);
+ const c=palettes[index],pix=Array.from({length:N},()=>Array(N).fill(null));
+ const inGrid=(x,y)=>x>=0&&x<N&&y>=0&&y<N;
+ const dot=(x,y,col)=>{x=Math.round(x);y=Math.round(y);if(inGrid(x,y))pix[y][x]=col};
+ function oval(cx,cy,rx,ry,col){
+  for(let y=Math.floor(cy-ry);y<=Math.ceil(cy+ry);y++)for(let x=Math.floor(cx-rx);x<=Math.ceil(cx+rx);x++){
+   if(((x-cx)/rx)**2+((y-cy)/ry)**2<=1)dot(x,y,col);
+  }
  }
- for(let y=0;y<N;y++)for(let x=0;x<N;x++){
-  if(!inside(x,y))continue;
-  let c=body;
-  if(index===0&&(ell(x,y,19.5,10.5,11.3,5.5)||y===28&&x>=10&&x<=29))c=accent;
-  if(index===1&&y>=26&&y<=34&&x>=12&&x<=27)c=accent;
-  if(index===2&&y>=10&&y<=13&&x>=11&&x<=28)c=accent;
-  if(index===3&&y>14&&y<31&&((x-y)%11===0||(x+y)%12===0))c=accent;
-  if(index===4&&(y>8&&y<13&&x>=10&&x<=29||y>27&&y<32&&x>=13&&x<=26))c=accent;
-  if(!inside(x+1,y)||!inside(x-1,y)||!inside(x,y+1)||!inside(x,y-1))c=ink;
-  g[y*N+x]=c;
+ function block(x,y,w,h,col){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)dot(xx,yy,col)}
+ function poly(points,col){
+  const inside=(x,y)=>{let hit=false;for(let i=0,j=points.length-1;i<points.length;j=i++){
+   let a=points[i],b=points[j];if(((a[1]>y)!==(b[1]>y))&&(x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]))hit=!hit;
+  }return hit};
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(inside(x+.5,y+.5))dot(x,y,col);
  }
- function px(x,y,c){if(x>=0&&y>=0&&x<N&&y<N&&g[y*N+x]!==null)g[y*N+x]=c}
- function line(x,y,w,h,c){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)px(xx,yy,c)}
- // Five independently designed faces; each reacts to conversations.
- if(index===0){line(13,21,3,3,ink);line(25,21,3,3,ink)}
- if(index===1){line(12,22,5,1,ink);line(23,22,5,1,ink)}
- if(index===2){line(13,21,3,4,ink);line(24,21,3,4,ink)}
- if(index===3){line(12,21,6,2,ink);line(22,21,6,2,ink);line(13,20,3,1,ink);line(24,20,3,1,ink)}
- if(index===4){line(13,20,3,3,ink);line(24,20,3,3,ink);px(12,19,ink);px(27,19,ink)}
- if(faceState==='blink'||faceState==='happy'){line(12,20,6,4,body);line(22,20,6,4,body);line(12,22,6,1,ink);line(22,22,6,1,ink)}
- if(faceState==='wink'){line(12,20,6,4,body);line(12,22,6,1,ink)}
- line(10,27,4,2,cheek);line(26,27,4,2,cheek);
- if(faceState==='surprised'){line(18,27,4,5,ink);line(19,28,2,3,cheek)}
- else if(faceState==='happy'||faceState==='smile'){line(17,29,6,2,ink);line(16,28,1,2,ink);line(23,28,1,2,ink);line(18,30,4,1,cheek)}
- else if(index===1){line(18,29,4,1,ink)}
- else if(index===3){line(18,28,5,2,ink)}
- else{line(18,28,4,2,ink)}
- let rects='';for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(g[y*N+x]!==null)rects+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+g[y*N+x]+'"/>';
- return '<svg id="petSvg" class="'+stateKey+'" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" role="img" aria-label="'+pets[index].name+'">'+rects+'</svg>';
+ function spriteShape(draw){
+  const before=pix.map(r=>r.map(v=>v!==null));
+  draw();
+  const after=pix.map(r=>r.map(v=>v!==null));
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+   if(!after[y][x]||before[y][x])continue;
+   if(!inGrid(x-1,y)||!inGrid(x+1,y)||!inGrid(x,y-1)||!inGrid(x,y+1)||
+      !after[y][x-1]||!after[y][x+1]||!after[y-1][x]||!after[y+1][x])pix[y][x]=outline;
+  }
+ }
+ const widthBoost={thin3:-3.6,thin2:-2.3,thin1:-1.2,normal:0,chubby1:1.2,chubby2:2.3,chubby3:3.6}[stateKey]||0;
+ if(index===0){
+  // Mint hamster: compact round cheeks and distinct little paws.
+  spriteShape(()=>{oval(15,17,6,8,c.base);oval(32,17,6,8,c.base);oval(23.5,30,14.7+widthBoost,14,c.base);oval(9,29,6.5+widthBoost*.18,8,c.base);oval(39,29,6.5+widthBoost*.18,8,c.base);oval(16,42,5,3.7,c.base);oval(32,42,5,3.7,c.base)});
+  oval(15,17,3.1,4,c.light);oval(32,17,3.1,4,c.light);
+  oval(14,31,5.5,5,c.light);oval(34,31,5.5,5,c.light);
+  // pink wand rising from one paw
+  block(40,13,2,22,outline);block(41,15,1,19,'#d99aa8');
+  poly([[41,2],[44,6],[48,6],[45,10],[46,14],[41,11],[36,14],[37,9],[34,6],[39,6]],outline);
+  poly([[41,4],[43,8],[46,8],[43,10],[44,12],[41,10],[38,12],[39,9],[37,8],[40,8]],c.accent);
+ }else if(index===1){
+  // Lavender rabbit with a bent nightcap, rounded ears.
+  spriteShape(()=>{oval(14,17,5.2,12,c.base);oval(32,16,5.2,12,c.base);oval(23,30,15+widthBoost,13.8,c.base);oval(15,41,5,3.4,c.base);oval(32,41,5,3.4,c.base)});
+  oval(14,15,2.1,7,c.shade);oval(32,14,2.1,7,c.shade);
+  // nightcap wraps head, folded to left
+  poly([[12,12],[19,5],[29,4],[35,11],[28,15],[19,14]],outline);
+  poly([[14,11],[20,6],[29,6],[33,11],[27,13],[19,13]],'#4154a0');
+  poly([[19,6],[14,3],[13,0],[8,2],[10,6],[13,9]],'#4154a0');
+  poly([[8,1],[10,4],[13,4],[11,7],[12,10],[8,8],[5,10],[6,6],[3,4],[7,4]],'#ffdc6d');
+ }else if(index===2){
+  // Peach squirrel, broad curled tail on the right and star balloon.
+  spriteShape(()=>{oval(34,30,11+widthBoost*.6,13,c.base);oval(36,27,6,6,c.shade);oval(37,24,4,4,'#fff');oval(37,24,2.1,2.1,null);oval(17,18,5.4,6,c.base);oval(29,18,5.4,6,c.base);oval(23,29,12.4+widthBoost,13.4,c.base);oval(16,41,4,3,c.base);oval(28,41,4,3,c.base)});
+  oval(29,17,2.1,3,c.light);oval(17,17,2.1,3,c.light);oval(20,34,7,6,c.light);
+  // star helium balloon at upper-right
+  block(41,14,1,19,outline);
+  poly([[41,1],[44,7],[48,8],[45,13],[46,18],[41,15],[36,18],[37,12],[34,8],[39,7]],outline);
+  poly([[41,3],[43,8],[46,9],[43,12],[44,15],[41,13],[39,15],[39,11],[37,9],[40,9]],c.accent);
+ }else if(index===3){
+  // Teal hedgehog: bumpy stepped spikes, round cream face.
+  spriteShape(()=>{
+   poly([[9,18],[6,16],[10,13],[8,9],[14,10],[15,5],[20,8],[24,3],[28,8],[34,5],[35,11],[41,10],[38,16],[43,19],[39,23],[43,28],[38,31],[39,36],[33,35],[29,42],[20,41],[14,37],[9,35],[9,30],[4,27],[8,23]],c.base);
+   oval(23.5,28,12.5+widthBoost,12.4,c.base);
+  });
+  oval(23,30,10.8,10.3,c.light);oval(17,41,5,3,c.light);oval(29,41,5,3,c.light);
+  // purple shoulder bag with star clasp
+  block(25,36,11,8,outline);block(26,37,9,6,c.accent);
+  block(23,30,2,8,c.accent);block(25,28,8,2,c.accent);block(33,29,2,8,c.accent);
+  dot(30,38,'#ffe2a0');dot(29,39,'#ffe2a0');dot(30,40,'#ffe2a0');dot(31,39,'#ffe2a0');
+ }else{
+  // Periwinkle otter: horizontal tail, yellow belly star.
+  spriteShape(()=>{oval(16,14,5,6,c.base);oval(32,14,5,6,c.base);oval(23.5,28,13.3+widthBoost,14.5,c.base);oval(37,34,9,7,c.base);oval(16,41,5,3,c.base);oval(32,41,5,3,c.base)});
+  oval(24,33,8,8,c.light);
+  poly([[24,22],[27,29],[34,29],[29,34],[30,40],[24,37],[18,40],[19,34],[14,29],[21,29]],outline);
+  poly([[24,24],[27,30],[32,30],[28,34],[29,38],[24,35],[19,38],[20,34],[16,30],[22,30]],c.accent);
+ }
+ // Differentiated faces with five reactions.
+ function eyes(y,kind){
+  if(kind==='blink'||kind==='happy'){block(16,y+1,4,1,outline);block(28,y+1,4,1,outline)}
+  else if(kind==='wink'){block(16,y+1,4,1,outline);block(28,y,3,3,outline)}
+  else if(kind==='surprised'){block(17,y,3,4,outline);block(28,y,3,4,outline)}
+  else if(index===1){block(16,y+1,4,1,outline);block(28,y+1,4,1,outline)}
+  else if(index===3){block(15,y,5,2,outline);block(27,y,5,2,outline)}
+  else{block(17,y,3,3,outline);block(28,y,3,3,outline);dot(17,y,'#fff');dot(28,y,'#fff')}
+ }
+ const ey=index===0?27:index===1?27:index===2?27:index===3?28:23;
+ eyes(ey,faceState);
+ if(index===0){dot(24,32,outline);block(23,34,3,2,outline);dot(15,33,c.accent);dot(33,33,c.accent)}
+ else if(index===1){block(22,32,4,1,outline);block(21,33,1,2,outline);block(26,33,1,2,outline)}
+ else if(index===2){dot(23,32,outline);dot(24,32,outline);block(22,34,4,1,outline)}
+ else if(index===3){block(21,34,5,2,outline);dot(16,34,c.shade);dot(31,34,c.shade)}
+ else{block(21,28,5,2,outline);block(23,30,2,2,outline)}
+ if(faceState==='surprised'){block(23,index===4?32:35,3,3,outline)}
+ else if(faceState==='happy'||faceState==='smile'){block(22,index===4?32:35,5,1,outline);dot(21,index===4?31:34,outline);dot(27,index===4?31:34,outline)}
+ let shapes='';for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(pix[y][x]!==null)shapes+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+pix[y][x]+'"/>';
+ return '<svg id="petSvg" class="'+stateKey+'" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" role="img" aria-label="'+pets[index].name+'">'+shapes+'</svg>';
 }
 
 function renderPet(){
