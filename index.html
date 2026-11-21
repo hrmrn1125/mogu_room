@@ -169,13 +169,35 @@ html,body{background:#fff;overflow-x:hidden}
 #petSvg.is-talking{animation:pet-chat .43s steps(3,end) 2}
 .pet-picker .theme .pet-canvas{width:61px!important;height:61px!important;flex:0 0 61px}
 .pet-picker .theme div{min-width:0}
+
+/* Clean hand-authored pixel sprites, activity poses and reset */
+.pet-canvas{display:none!important}
+#petSvg.pixel-pet{display:block;width:min(70vw,270px);height:min(70vw,270px);image-rendering:pixelated;shape-rendering:crispEdges;filter:none!important;transform:none!important;overflow:visible}
+.pet-picker .theme svg{width:62px!important;height:62px!important;filter:none;image-rendering:pixelated}
+.character-wrap #petHolder{position:relative;z-index:3}
+.energy-actions{display:flex;align-items:center;gap:10px}
+.reset-calories{padding:5px 8px;color:#707d73;background:#f2f4ef;border:0;border-radius:8px;font-size:11px;font-weight:700}
+.exercise-fx{position:absolute;z-index:4;inset:0;pointer-events:none}
+.exercise-fx svg{position:absolute;inset:0;width:100%;height:100%}
+.stage.act-walk #petHolder{animation:pet-walk .38s steps(2,end) infinite}
+.stage.act-strength #petHolder{animation:pet-lift .7s ease-in-out infinite}
+.stage.act-swim #petHolder{animation:pet-swim .9s ease-in-out infinite}
+.stage.act-dance #petHolder{animation:pet-dance .6s steps(3,end) infinite}
+.stage.act-yoga #petHolder{animation:pet-yoga 1.8s ease-in-out infinite}
+.stage.act-swim .exercise-fx svg{animation:water-waves .9s ease-in-out infinite}
+@keyframes pet-walk{0%,100%{transform:translateX(-8px) translateY(0)}50%{transform:translateX(9px) translateY(-5px)}}
+@keyframes pet-lift{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes pet-swim{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-10px) rotate(5deg)}}
+@keyframes pet-dance{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(8deg) translateY(-8px)}}
+@keyframes pet-yoga{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.91)}}
+@keyframes water-waves{50%{translate:0 8px}}
 </style>
 </head>
 <body>
 <div class="app">
   <div id="homePage" class="page active">
     <div class="energy-header">
-      <div class="energy-top"><span id="energyStatus">今日のエサ</span><span id="energyAmount">0 kcal</span></div>
+      <div class="energy-top"><span id="energyStatus">今日のエサ</span><span class="energy-actions"><span id="energyAmount">0 kcal</span><button id="resetCalories" class="reset-calories" type="button" aria-label="今日のカロリーとエサと運動をリセット">リセット</button></span></div>
       <div class="energy-track" id="energyTrack">
         <span class="energy-zone reduce"></span><span class="energy-zone steady"></span><span class="energy-zone increase"></span>
         <span class="energy-marker" id="energyMarker"></span>
@@ -187,7 +209,7 @@ html,body{background:#fff;overflow-x:hidden}
       <div class="speech" id="speech" aria-live="polite">タップしておしゃべり</div>
       <div class="stage" id="stage">
         <div class="character-wrap">
-          <div class="mouth-target" id="mouthTarget"></div>
+          <div class="mouth-target" id="mouthTarget"></div><div class="exercise-fx" id="exerciseFx" aria-hidden="true"></div>
           <div id="petHolder"></div>
         </div>
       </div>
@@ -302,6 +324,8 @@ const foodNames={rice:'おにぎり',ramen:'ラーメン',bread:'トースト',a
 const exerciseKinds={walk:{label:'ウォーキング', icon:'walk', burnPerMin:3.5}, strength:{label:'筋トレ', icon:'strength', burnPerMin:5.5}, swim:{label:'水泳', icon:'swim', burnPerMin:7.5}, dance:{label:'ダンス', icon:'dance', burnPerMin:5}, yoga:{label:'ヨガ', icon:'yoga', burnPerMin:2.5}};
 const state=load();
 state.fedEvents=Array.isArray(state.fedEvents)?state.fedEvents:[];
+state.activeDay=state.activeDay||today();
+state.foodPieces=(state.foodPieces||[]).filter(x=>!x.createdAt||localDateOf(x.createdAt)===state.activeDay);
 let drag=null;let expression='neutral';let lastDialogueIndex=-1;let chatTimer=null;
 
 function load(){
@@ -316,7 +340,38 @@ function load(){
   }catch{ return {petIndex:0,bg:'white',profile:{height:'',weight:'',age:'',sex:'female',activity:'1.375'},targets:null,meals:[],exercises:[],weights:[],foodPieces:[]} }
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
-function today(){return new Date().toISOString().slice(0,10)}
+function today(){
+ const d=new Date();
+ return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+}
+function clearDaily(date){
+ const day=date||today();
+ state.meals=state.meals.filter(x=>x.date!==day);
+ state.fedEvents=state.fedEvents.filter(x=>x.date!==day);
+ state.exercises=state.exercises.filter(x=>x.date!==day);
+ state.foodPieces=[];
+}
+function ensureDay(){
+ const now=today();
+ if(state.activeDay===now)return false;
+ // Pending snacks should never carry across calendar days.
+ state.foodPieces=(state.foodPieces||[]).filter(x=>!x.createdAt||localDateOf(x.createdAt)===now);
+ state.activeDay=now;
+ save();
+ if(document.getElementById('petHolder')){expression='neutral';renderAll();}
+ return true;
+}
+function localDateOf(ts){
+ const d=new Date(ts);
+ return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+}
+function resetToday(message){
+ clearDaily(today());
+ expression='neutral';
+ save();renderAll();
+ q('#speech').textContent='また新しい一日を始めよう。';
+ if(message)toast(message);
+}
 function q(s){return document.querySelector(s)}
 function qa(s){return [...document.querySelectorAll(s)]}
 function toast(msg){const t=q('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._);toast._=setTimeout(()=>t.classList.remove('show'),2200)}
@@ -426,13 +481,14 @@ const petVoice=[
  {start:'ぷかっ、',end:'だぷか。',alt:'ぷかぷか。'}
 ];
 function fedToday(){return Math.round(state.fedEvents.filter(x=>x.date===today()).reduce((sum,x)=>sum+(Number(x.cal)||0),0))}
+function netToday(){return Math.max(0,fedToday()-todayExerciseBurn())}
 function fedPieceEnergy(piece){
  if(Number.isFinite(Number(piece.cal))&&Number(piece.cal)>0)return Number(piece.cal);
  const item=foodCatalog.find(([kind])=>kind===piece.kind);return item?item[1]:80;
 }
 function conversationRegime(){
- if(!state.targets||fedToday()===0)return 'maintain';
- return fedToday()<state.targets.maintain[0]?'lose':fedToday()<=state.targets.maintain[1]?'maintain':'gain';
+ if(!state.targets||netToday()===0)return 'maintain';
+ return netToday()<state.targets.maintain[0]?'lose':netToday()<=state.targets.maintain[1]?'maintain':'gain';
 }
 function speakToPet(forceText){
  const mode=conversationRegime(),lines=speechByState[mode];
@@ -449,7 +505,7 @@ function speakToPet(forceText){
 }
 
 function bodyState(){
-  const cal=fedToday(); const t=state.targets; if(!t||cal===0) return {key:'normal', label:'ふつう'};
+  const cal=netToday(); const t=state.targets; if(!t||cal===0) return {key:'normal', label:'ふつう'};
   const [l0,l1]=t.lose, [m0,m1]=t.maintain, [g0,g1]=t.gain;
   if(cal>=m0 && cal<=m1) return {key:'normal',label:'ふつう'};
   if(cal>=l0 && cal<=l1){ const p=(cal-l0)/(l1-l0||1); return p<.34?{key:'thin3',label:'かなりスリム'}:p<.67?{key:'thin2',label:'スリム'}:{key:'thin1',label:'ややスリム'} }
@@ -460,58 +516,100 @@ function bodyState(){
 }
 
 
-const PET_SHEET=new Image();
-PET_SHEET.addEventListener('load',()=>{
-  renderPet();renderPetGrid();
-});
-PET_SHEET.src='assets/pets-sheet.png?v=2';
+
+const PIX_BLACK='#242527';
+const PET_COLORS=[
+ ['#8df0c9','#68d9ad','#d6ffee','#f6a0bd'],
+ ['#d2a7f8','#b289e4','#efd8ff','#3f57af'],
+ ['#ffa9a3','#ed928e','#ffe1cc','#8bd1f4'],
+ ['#3096ab','#197a90','#ffe2bc','#ad73dc'],
+ ['#8a97e6','#7181d1','#c8d1ff','#ffe079']
+];
 function petSvg(index,stateKey,faceState='neutral'){
- return '<canvas class="pet-canvas" data-pet="'+index+'" data-stage="'+stateKey+'" data-face="'+faceState+'" width="112" height="112" role="img" aria-label="'+pets[index].name+'"></canvas>';
-}
-function drawPixelPet(el){
- if(!el||!PET_SHEET.complete||!PET_SHEET.naturalWidth)return;
- const index=Math.max(0,Math.min(4,Number(el.dataset.pet)||0));
- const stage=el.dataset.stage||'normal';
- const face=el.dataset.face||'neutral';
- const steps={thin3:-3,thin2:-2,thin1:-1,normal:0,chubby1:1,chubby2:2,chubby3:3};
- const step=steps[stage]||0;
- const cheekY=[65,61,63,64,61][index];
- const bellyY=[82,81,82,83,79][index];
- const g=el.getContext('2d');
- if(!g)return;
- g.clearRect(0,0,112,112);
- g.imageSmoothingEnabled=false;
- // Only the cheek and belly rows swell/shrink; ears, wands, hats and balloons retain their original proportions.
- const rowScale=y=>1+step*(0.037*Math.exp(-0.5*Math.pow((y-cheekY)/10,2))
-                              +0.065*Math.exp(-0.5*Math.pow((y-bellyY)/12,2)));
- for(let y=0;y<96;y++){
-  const dw=Math.max(60,Math.round(88*rowScale(y)));
-  const left=Math.round((112-dw)/2);
-  g.drawImage(PET_SHEET,index*88,y,88,1,left,8+y,dw,1);
+ const [base,shade,light,accessory]=PET_COLORS[index]||PET_COLORS[0];
+ const xstage={thin3:-5,thin2:-3,thin1:-1.5,normal:0,chubby1:2,chubby2:4,chubby3:6}[stateKey]||0;
+ const c=50,ink=PIX_BLACK;
+ const path=(d,fill,sw=2.1)=>'<path d="'+d+'" fill="'+fill+'" stroke="'+ink+'" stroke-width="'+sw+'" stroke-linejoin="miter" stroke-linecap="square"/>';
+ const rect=(x,y,w,h,color)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+color+'"/>';
+ const ellipse=(cx,cy,rx,ry,fill,sw=2)=>'<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" fill="'+fill+'" stroke="'+ink+'" stroke-width="'+sw+'"/>';
+ const cheeks= xstage>0?'<g fill="'+base+'" stroke="'+ink+'" stroke-width="2">'+ellipse(32-xstage*.2,55,10+xstage*.55,11,base)+ellipse(68+xstage*.2,55,10+xstage*.55,11,base)+'</g>':'';
+ const jawScale=Math.max(.86,1+xstage*.014);
+ let ears='',body='',face='',acc='',feet='';
+ const mainGroupStart='<g transform="translate(50 62) scale('+jawScale+' 1) translate(-50 -62)">';
+ const mainGroupEnd='</g>';
+ if(index===0){
+  ears=path('M27 34V22H32V18H39V20H43V35Z',base)+path('M57 35V20H62V18H70V23H75V34Z',base);
+  body=path('M32 31H68V35H76V41H81V52H85V66H80V75H74V82H66V88H34V84H25V77H20V67H16V53H20V42H26V36H32Z',base);
+  body+=path('M19 50H27V44H34V62H28V67H20Z',base,1.6)+path('M66 44H73V51H81V67H72V62H66Z',base,1.6);
+  body+=rect(24,71,11,4,shade)+rect(64,71,11,4,shade);
+  feet=path('M30 84H43V90H30Z',base)+path('M57 84H70V90H57Z',base);
+  acc=rect(8,26,3,35,ink)+rect(9,28,1.5,30,'#f9a9b9')+
+  path('M9 9H13V15H19V19H14V25H6V20H0V15H6V9Z',accessory,2.4);
+ }else if(index===1){
+  ears=path('M26 39V9H31V5H36V8H40V38Z',base)+path('M58 39V8H63V5H69V9H73V37Z',base);
+  ears+=rect(31,12,4,23,shade)+rect(63,12,4,23,shade);
+  body=path('M28 34H69V39H77V46H82V65H78V74H72V82H66V88H33V83H26V75H21V64H17V47H22V40H28Z',base);
+  feet=path('M30 85H43V91H27V88Z',base)+path('M57 85H70V91H57Z',base);
+  acc=path('M29 34L36 23L50 13L66 14L74 25L65 35Z',accessory,2.5)+
+   path('M34 32L41 25L50 18L63 19L68 25L65 30Z','#536ac6',1)+
+   path('M49 15L41 11L34 12L31 17L38 20Z','#536ac6',1.4)+
+   path('M35 8H38V12H42V16H38V20H33V16H29V12H33V8Z','#ffe077',2);
+ }else if(index===2){
+  ears=path('M27 38V22H32V17H38V22H41V37Z',base)+path('M58 38V22H64V17H70V22H74V38Z',base);
+  // large spiral tail stays outside the belly deformation, preserves squirrel silhouette
+  acc=path('M66 49V40H73V34H82V36H89V44H92V58H89V69H82V78H75V84H65V78H71V69H78V58H76V52H70Z',base,2.5)+
+   path('M77 45H83V49H86V62H82V68H75V72H72V65H77V59H80V51H77Z',shade,1);
+  body=path('M33 36H65V40H74V47H78V66H75V75H69V83H64V88H35V84H28V75H23V67H20V49H25V40H33Z',base);
+  body+=path('M35 67H61V73H66V82H32V75H35Z',light,1.4);
+  feet=path('M28 84H43V91H27V88Z',base)+path('M56 84H70V91H58Z',base);
+  acc+=rect(83,12,2.7,37,ink)+path('M84 0H88V6H94V10H89V16H82V12H76V7H82V2H84Z',accessory,2.3);
+ }else if(index===3){
+  // zig-zag hair silhouette with broad rounded belly and face
+  ears=path('M28 35L23 30L26 24L18 23L22 17L17 13L27 14L29 6L36 12L41 3L48 9L56 3L61 11L70 8L72 17L82 16L78 24L85 29L78 35Z',base,2.5);
+  body=path('M27 28H72V34H79V43H83V59H80V69H75V79H67V87H33V83H25V76H20V67H16V46H21V36H27Z',base);
+  body+=path('M36 39H63V36H67V40H73V69H69V78H62V84H38V80H32V69H27V44H32V39Z',light,1.3);
+  feet=path('M30 83H43V90H27V86Z',light)+path('M57 83H70V90H57Z',light);
+  acc=path('M51 72L66 83H75V96H54V84L47 79Z',accessory,2.2)+
+   path('M47 61L69 80', 'none',2.6)+
+   path('M64 82H67V86H71V89H67V92H63V89H59V86H63Z','#f8dd8a',1.6);
+ }else{
+  ears=path('M26 39V22H30V18H37V20H41V38Z',base)+path('M58 38V20H65V18H71V22H75V38Z',base);
+  acc=path('M66 56H78V62H86V70H90V80H84V86H75V83H70V78H64Z',base,2.3);
+  body=path('M32 34H69V38H76V45H80V59H77V73H71V81H65V88H34V84H27V77H21V67H18V51H22V42H27V38H32Z',base);
+  body+=path('M34 61H65V65H70V78H65V84H35V80H30V66H34Z',light,1.2);
+  feet=path('M27 84H42V91H27Z',base)+path('M58 84H72V91H58Z',base);
+  acc+=path('M49 61H54V68H62V72H55V79H44V72H37V68H45V61Z',accessory,1.5);
  }
- // Small mouth animation layered on the original reference face without redrawing the character.
- if(face!=='neutral'){
-  const positions=[[44,67],[43,68],[31,69],[44,68],[42,68]];
-  const [cx,cy]=positions[index];
-  const mx=Math.round(56+(cx-44)*rowScale(cy));
-  const my=cy+8;
-  g.fillStyle='#292a29';
-  if(face==='surprised')g.fillRect(mx-1,my,3,4);
-  else if(face==='happy'||face==='smile')g.fillRect(mx-3,my+1,7,2);
-  else if(face==='wink'||face==='blink')g.fillRect(mx-2,my+1,4,2);
- }
+ const faceBase= index===3?46:47;
+ const eyeY=index===4?49:faceBase;
+ const eyeColor=ink;
+ let leftEye=rect(38,eyeY,4,5,eyeColor),rightEye=rect(60,eyeY,4,5,eyeColor);
+ if(index===1){leftEye=rect(36,eyeY+3,8,2,ink);rightEye=rect(58,eyeY+3,8,2,ink)}
+ if(index===3){leftEye=rect(38,eyeY,6,3,ink);rightEye=rect(59,eyeY,6,3,ink)}
+ if(faceState==='wink')leftEye=rect(36,eyeY+3,8,2,ink);
+ if(faceState==='blink'||faceState==='happy'){leftEye=rect(36,eyeY+3,8,2,ink);rightEye=rect(58,eyeY+3,8,2,ink)}
+ if(faceState==='surprised'){leftEye=rect(38,eyeY,5,7,ink);rightEye=rect(60,eyeY,5,7,ink)}
+ let mouth=rect(48,60,5,3,ink);
+ if(index===0)mouth=rect(49,58,3,3,ink)+rect(47,62,3,2,ink)+rect(52,62,3,2,ink);
+ if(index===1)mouth=rect(47,61,6,2,ink);
+ if(index===2)mouth=rect(49,60,4,2,ink)+rect(47,64,7,2,ink);
+ if(index===3)mouth=rect(48,63,5,3,ink);
+ if(index===4)mouth=rect(49,60,3,2,ink)+rect(46,64,8,3,ink);
+ if(faceState==='surprised')mouth=rect(47,60,7,7,ink)+rect(49,62,3,3,'#f8b4a6');
+ if(faceState==='happy'||faceState==='smile')mouth=rect(45,60,10,2,ink)+rect(47,62,6,3,ink);
+ face=leftEye+rightEye+rect(29,60,7,4,index===3?'#e6c9a3':'#edaeaa')+rect(66,60,7,4,index===3?'#e6c9a3':'#edaeaa')+mouth;
+ const belly=mainGroupStart+cheeks+body+feet+face+mainGroupEnd;
+ const content=ears+(index===1?acc:'')+belly+(index!==1?acc:'');
+ return '<svg id="petSvg" class="pixel-pet '+stateKey+'" viewBox="-6 -5 112 112" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" role="img" aria-label="'+pets[index].name+'">'+content+'</svg>';
 }
 
 function renderPet(){
- const stateNow=bodyState();
- q('#petHolder').innerHTML=petSvg(state.petIndex,stateNow.key,expression);
- const main=q('#petHolder .pet-canvas');
- if(main){main.id='petSvg';drawPixelPet(main)}
+ const shape=bodyState();
+ q('#petHolder').innerHTML=petSvg(state.petIndex,shape.key,expression);
  q('#petLabel').textContent=pets[state.petIndex].name;
 }
 function renderPetGrid(){
- q('#petGrid').innerHTML=pets.map((p,i)=>'<button class="theme '+(i===state.petIndex?'selected':'')+'" data-pet="'+i+'"><div>'+petSvg(i,'normal','neutral')+'</div><strong>'+p.name+'</strong></button>').join('');
- q('#petGrid').querySelectorAll('canvas.pet-canvas').forEach(drawPixelPet);
+ q('#petGrid').innerHTML=pets.map((pet,i)=>'<button class="theme '+(i===state.petIndex?'selected':'')+'" data-pet="'+i+'"><div>'+petSvg(i,'normal','neutral')+'</div><strong>'+pet.name+'</strong></button>').join('');
  q('#petGrid').querySelectorAll('[data-pet]').forEach(btn=>btn.addEventListener('click',()=>{state.petIndex=Number(btn.dataset.pet);expression='neutral';save();renderAll();toast('キャラを変更したよ')}));
 }
 function todayMeals(){return state.meals.filter(x=>x.date===today())}
@@ -519,11 +617,11 @@ function todayExercises(){return state.exercises.filter(x=>x.date===today())}
 function todayCalories(){return todayMeals().reduce((a,b)=>a+b.cal,0)}
 function todayExerciseBurn(){return Math.round(todayExercises().reduce((a,b)=>a+b.burn,0))}
 function renderSummary(){
- const energy=fedToday(),t=state.targets;
+ const energy=netToday(),t=state.targets;
  q('#energyAmount').textContent=energy+' kcal';
  if(!t){q('#energyStatus').textContent='プロフィールを設定';q('#energyMarker').style.left='0%';return}
  const upper=Math.max(1,t.gain[1]);
- q('#energyStatus').textContent='今日のエサ';
+ q('#energyStatus').textContent='今日の収支';
  const pct=Math.min(99,energy/upper*100);
  q('#energyMarker').style.left=pct+'%';
  const [l0,l1]=t.lose,[m0,m1]=t.maintain,[g0,g1]=t.gain;
@@ -618,6 +716,25 @@ function openFoodSheet(){
   });
 }
 
+
+let activityTimer=null;
+function animateExercise(kind){
+ const stage=q('#stage'),fx=q('#exerciseFx');
+ clearTimeout(activityTimer);
+ stage.classList.remove('act-walk','act-strength','act-swim','act-dance','act-yoga');
+ const map={walk:'act-walk',strength:'act-strength',swim:'act-swim',dance:'act-dance',yoga:'act-yoga'};
+ stage.classList.add(map[kind]||'act-walk');
+ const svg=(inner)=>'<svg viewBox="0 0 160 150" fill="none" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';
+ const wave='<path d="M0 112q13-12 26 0t26 0t26 0t26 0t26 0t26 0" fill="none" stroke="#87cddd" stroke-width="8" stroke-linecap="square"/>';
+ const dumbbells='<g stroke="#4d6067" stroke-width="6" stroke-linecap="square"><path d="M18 62H48M112 62H142"/><path d="M23 48V75M40 48V75M120 48V75M137 48V75"/></g>';
+ const lines='<g stroke="#95b9aa" stroke-width="4"><path d="M17 120h30M110 120h29"/></g>';
+ const stars='<g fill="#eed588"><path d="M30 22l5 10 11 2-8 8 1 12-9-5-10 5 1-12-8-8 11-2Z"/><path d="M133 19l3 7 7 1-5 6 1 8-6-4-6 4 1-8-5-6 7-1Z"/></g>';
+ const mat='<rect x="15" y="127" width="130" height="13" rx="2" fill="#b0c9bb"/>';
+ fx.innerHTML=svg(kind==='strength'?dumbbells:kind==='swim'?wave:kind==='dance'?stars:kind==='yoga'?mat:lines);
+ q('#speech').textContent={walk:'てくてく、お散歩中！',strength:'よいしょ、よいしょ！',swim:'すいすい、泳ぐよ！',dance:'いっしょに踊ろう！',yoga:'ゆっくり伸びるよ！'}[kind]||'うごくよ！';
+ activityTimer=setTimeout(()=>{stage.classList.remove(...Object.values(map));fx.innerHTML='';},6800);
+}
+
 function openExerciseSheet(){
   openSheet('運動', `
     <div class="choices" id="exerciseChoices">${Object.entries(exerciseKinds).map(([k,v],i)=>`<button class="choice ${i===0?'active':''}" data-kind="${k}">${icon(v.icon)}${v.label}</button>`).join('')}</div>
@@ -630,7 +747,7 @@ function openExerciseSheet(){
     const min=Math.round(Number(q('#exerciseMinInput').value)); if(!(min>0)) return;
     const kind=exerciseKinds[selected];
     state.exercises.push({date:today(), kind:selected, label:kind.label, min, burn:Math.round(min*kind.burnPerMin)});
-    save(); closeSheet(); renderAll(); q('#speech').textContent=`${kind.label}したよ。えらい！`; toast('運動を記録したよ');
+    save();closeSheet();renderAll();animateExercise(selected);toast('運動を記録したよ。ゲージが減ったよ');
   });
 }
 
@@ -644,7 +761,10 @@ function openWeightSheet(){
   `);
   q('#saveWeightBtn').addEventListener('click',()=>{
     const date=q('#weightDateInput').value; const weight=Number(q('#weightValueInput').value); if(!date||!(weight>0)) return;
-    state.weights=state.weights.filter(x=>x.date!==date); state.weights.push({date, weight}); state.profile.weight=String(weight); save(); closeSheet(); renderAll(); toast('体重を記録したよ');
+    state.weights=state.weights.filter(x=>x.date!==date);state.weights.push({date,weight});
+    const changed=String(state.profile.weight)!==String(weight);
+    if(changed){state.profile.weight=String(weight);state.targets=calcTargets(state.profile);state._profileSnapshot=JSON.stringify(state.profile);clearDaily(today());}
+    save();closeSheet();renderAll();toast(changed?'体重を更新し、今日のカロリーをリセットしたよ':'体重を記録したよ');
   });
 }
 
@@ -652,16 +772,26 @@ function bindSettings(){
   q('#heightInput').value=state.profile.height; q('#weightInput').value=state.profile.weight; q('#ageInput').value=state.profile.age; q('#sexInput').value=state.profile.sex; q('#activityInput').value=state.profile.activity;
   q('#saveProfileBtn').onclick=()=>{
     state.profile={height:q('#heightInput').value, weight:q('#weightInput').value, age:q('#ageInput').value, sex:q('#sexInput').value, activity:q('#activityInput').value};
-    state.targets=calcTargets(state.profile); save(); renderAll(); toast('目標カロリーを更新したよ');
+    const next=calcTargets(state.profile);
+    if(!next){toast('プロフィールを入力してね');return}
+    const old=state._profileSnapshot||JSON.stringify(state.profile);
+    const current=JSON.stringify(state.profile);
+    const changed=old!==current;
+    state.targets=next;state._profileSnapshot=current;
+    if(changed)clearDaily(today());
+    save();renderAll();toast(changed?'設定を更新し、今日のカロリーをリセットしたよ':'目標カロリーを更新したよ');
   };
 }
 
 function switchPage(id){ qa('.page').forEach(p=>p.classList.remove('active')); q('#'+id).classList.add('active'); qa('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.page===id)); if(id==='logsPage') renderLogs(); if(id==='settingsPage'){ bindSettings(); renderPetGrid(); } }
 function renderAll(){ renderPet();renderSummary();renderTray();renderLogs();bindSettings();renderPetGrid(); }
 
-q('#openFoodBtn').addEventListener('click',openFoodSheet);
-q('#openExerciseBtn').addEventListener('click',openExerciseSheet);
-q('#openWeightBtn').addEventListener('click',openWeightSheet);
+q('#resetCalories').addEventListener('click',()=>{
+ if(confirm('今日のカロリー・エサ・運動記録をゼロにする？'))resetToday('今日のカロリーをリセットしたよ');
+});
+q('#openFoodBtn').addEventListener('click',()=>{ensureDay();openFoodSheet()});
+q('#openExerciseBtn').addEventListener('click',()=>{ensureDay();openExerciseSheet()});
+q('#openWeightBtn').addEventListener('click',()=>{ensureDay();openWeightSheet()});
 q('#closeSheet').addEventListener('click',closeSheet);
 q('#petHolder').addEventListener('click',()=>speakToPet());
 q('#petHolder').setAttribute('role','button');
@@ -675,7 +805,12 @@ qa('.wallpaper').forEach(btn=>btn.addEventListener('click',()=>{
 q('#overlay').addEventListener('click',e=>{ if(e.target===q('#overlay')) closeSheet(); });
 qa('.navbtn').forEach(btn=>btn.addEventListener('click',()=>switchPage(btn.dataset.page)));
 
-if(!state.targets && state.profile.height && state.profile.weight && state.profile.age) state.targets=calcTargets(state.profile);
+if(!state.targets && state.profile.height && state.profile.weight && state.profile.age)state.targets=calcTargets(state.profile);
+state._profileSnapshot=state._profileSnapshot||JSON.stringify(state.profile);
+setInterval(()=>ensureDay(),10000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)ensureDay()});
+window.addEventListener('focus',ensureDay);
+ensureDay();
 save(); renderAll();
 </script>
 </body>
