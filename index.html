@@ -106,10 +106,44 @@ html,body{height:100%;overflow:hidden}
 .activity-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:15px 0}.activity-choice{border:2px solid #dae8d4;background:#f7fbf2;border-radius:10px;padding:12px;font:12px 'DotGothic16';color:#5b8367}.activity-choice.selected{background:#e1f3e0;border-color:#6ba578}
 @media(min-width:750px){.app{max-width:520px;display:block;padding:0}.header{position:absolute;padding:0}.bottom-nav{position:absolute;bottom:0;top:auto}.page{max-width:none}.feed-area{position:absolute}.room-card{position:absolute}.action-grid{position:absolute}}
 @media(max-height:670px){.pet{top:28%;width:170px;height:170px}.room-speech{top:22%}.feed-area{bottom:calc(146px + env(safe-area-inset-bottom))}.action-grid{bottom:calc(77px + env(safe-area-inset-bottom))}.action{min-height:47px}.tray{min-height:45px}.food-item{width:44px;height:44px;flex-basis:44px;min-width:44px}.food-item svg{height:38px;width:38px}}
-[hidden]{display:none!important}.food-item svg,.feed-preview svg{shape-rendering:crispEdges}.scene-btn{border:2px solid #fffdf0;background:#fffbedee;color:#517e59;border-radius:9px;box-shadow:0 4px #47804c5c;font:12px 'DotGothic16';padding:8px 12px}.page.active{display:block}.room-card .room-head{pointer-events:none}</style></head>
+[hidden]{display:none!important}.food-item svg,.feed-preview svg{shape-rendering:crispEdges}.scene-btn{border:2px solid #fffdf0;background:#fffbedee;color:#517e59;border-radius:9px;box-shadow:0 4px #47804c5c;font:12px 'DotGothic16';padding:8px 12px}.page.active{display:block}.room-card .room-head{pointer-events:none}
+/* Reference-style low-color 2D pixel rules */
+:root{--ink:#252823;--green:#78bc70;--cream:#fcf9e9;--border:#252823}
+body,.app{background:#85cf76}
+.brand{display:none!important}
+.header{justify-content:flex-end}
+.header-side{border:2px solid #252823;border-radius:3px;background:#fcf9e9;color:#252823;box-shadow:none;text-shadow:none}
+.room-head{border:2px solid #252823;background:#fcf9e9;border-radius:3px;box-shadow:none}
+.pet-title,.level{color:#252823}
+.level{font-size:10px}
+.pet{filter:none!important}
+.room-speech,.speech{background:#fcf9e9;border:2px solid #252823;border-radius:2px;box-shadow:none;color:#252823}
+.room-card,.card,.feed-area,.food-item,.action,.action.primary,.stat,.panel,.bottom-nav,.sheet,.toast,.scene-btn,.activity-choice,.activity-choice.selected,.preset,.submit,.muted-btn{box-shadow:none!important}
+.feed-area{border:2px solid #252823;background:#fcf9e9;border-radius:3px}
+.feed-top h2{color:#252823}
+.tray{background:transparent}
+.food-item{border:2px solid #252823;background:#fcf9e9;border-radius:2px;padding:2px}
+.food-item span:first-child{display:grid;place-items:center;width:100%;height:100%}
+.food-item svg{display:block!important;width:100%;height:100%;image-rendering:pixelated;shape-rendering:crispEdges}
+.food-item span:last-child:not(:first-child){display:none}
+.feed-preview svg{display:block!important;image-rendering:pixelated;shape-rendering:crispEdges}
+.action,.action.primary{border:2px solid #252823;background:#fcf9e9;border-radius:3px;color:#252823}
+.action.primary{background:#f5dc83}
+.bottom-nav{background:#fcf9e9;border-top:2px solid #252823}
+.bottom-nav button{color:#546458}
+.bottom-nav button[aria-current="page"]{color:#252823}
+.scene-btn{border:2px solid #252823;background:#fcf9e9;color:#252823;border-radius:2px}
+.room-footer .meter{border:2px solid #252823;background:#fcf9e9;border-radius:1px}
+.room-footer .meter>span{background:#72ad75}
+.page{background:#fcf9e9}
+.panel{border:2px solid #252823;background:#fffdf1;border-radius:3px}
+.overlay .sheet{border:2px solid #252823;border-bottom:0;background:#fcf9e9;border-radius:3px 3px 0 0}
+.calories-only input{background:#fffdf3}
+.drag-ghost{filter:none;box-shadow:none;background:transparent;border:0}
+</style></head>
 <body>
 <div class="app">
-<header class="header"><div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 21C3 13 10 5 16 8c6-3 13 5 9 13-2 8-16 8-18 0Z" fill="#89b69a"/><circle cx="12" cy="17" r="1.8" fill="#3b5f4b"/><circle cx="20" cy="17" r="1.8" fill="#3b5f4b"/><path d="m13 21 3 2 3-2" stroke="#3b5f4b" stroke-width="1.8" fill="none"/></svg>mogu room</div><div class="header-side"><span id="dateLabel"></span><b id="modeTop">維持モード</b></div></header>
+<header class="header"><div class="header-side"><span id="dateLabel"></span><b id="modeTop">維持モード</b></div></header>
 <div class="intro" id="intro"><div class="kicker">A LITTLE ROOM, A LITTLE GROWTH</div><h1>きょうも、いっしょに育とう。</h1><p>ごはんをあげて、からだを動かして。小さな暮らしが少しずつ育つ。</p></div>
 <div class="home-left" id="homeLeft">
 <section class="card room-card">
@@ -210,16 +244,37 @@ return '<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" shape-render
 }
 
 function petSvg(idx,lv){
-const colors=[['#f4c4ac','#c8887d','#fff4e9'],['#fff8e8','#9eaf98','#f1e9d7'],['#f5d581','#cd9b69','#f8e5b8'],['#bfd99b','#8cae82','#a8cc9d'],['#e8bbca','#b08cae','#f8e4d7']];
-const [a,b,t]=colors[idx];
-const shapes=[
-'<rect x="26" y="42" width="35" height="65" fill="'+a+'"/><rect x="151" y="42" width="35" height="65" fill="'+a+'"/><rect x="31" y="35" width="25" height="38" fill="'+b+'"/><rect x="156" y="35" width="25" height="38" fill="'+b+'"/><rect x="50" y="63" width="116" height="111" fill="'+a+'"/><rect x="45" y="98" width="126" height="70" fill="'+a+'"/><rect x="50" y="63" width="116" height="24" fill="'+t+'"/><rect x="60" y="51" width="22" height="20" fill="'+t+'"/><rect x="109" y="45" width="25" height="22" fill="'+t+'"/><rect x="146" y="52" width="18" height="20" fill="'+t+'"/><rect x="49" y="143" width="120" height="14" fill="'+t+'"/>',
-'<rect x="58" y="11" width="32" height="93" fill="'+a+'"/><rect x="130" y="11" width="32" height="93" fill="'+a+'"/><rect x="64" y="19" width="16" height="67" fill="#edbdb7"/><rect x="139" y="19" width="16" height="67" fill="#edbdb7"/><path d="M110 66H62L29 171h161L158 66Z" fill="'+a+'"/><rect x="85" y="148" width="50" height="33" fill="#3f5c4d"/>',
-'<rect x="49" y="69" width="127" height="115" fill="'+a+'"/><rect x="38" y="103" width="149" height="60" fill="'+a+'"/><rect x="51" y="59" width="121" height="33" fill="'+b+'"/><rect x="65" y="44" width="93" height="24" fill="'+t+'"/><rect x="95" y="27" width="26" height="19" fill="'+a+'"/>',
-'<rect x="57" y="52" width="110" height="125" fill="'+a+'"/><rect x="35" y="47" width="51" height="53" fill="'+b+'"/><rect x="140" y="47" width="51" height="53" fill="'+b+'"/><rect x="47" y="56" width="33" height="32" fill="'+a+'"/><rect x="146" y="56" width="33" height="32" fill="'+a+'"/><rect x="50" y="97" width="127" height="77" fill="'+a+'"/><path d="M55 110h118M80 58v116m48-116v116M55 145h118" stroke="'+b+'" stroke-width="5" opacity=".55"/>',
-'<rect x="55" y="66" width="113" height="108" fill="'+a+'"/><rect x="46" y="32" width="48" height="58" fill="'+b+'"/><rect x="130" y="32" width="48" height="58" fill="'+b+'"/><rect x="55" y="43" width="27" height="28" fill="'+t+'"/><rect x="141" y="43" width="27" height="28" fill="'+t+'"/><rect x="68" y="64" width="90" height="40" fill="'+t+'"/><rect x="58" y="160" width="108" height="32" fill="#b8cfaa"/>'
-][idx];
-return '<svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-label="'+species[idx].name+'">'+shapes+'<rect x="56" y="180" width="43" height="22" fill="'+b+'"/><rect x="124" y="180" width="43" height="22" fill="'+b+'"/><rect x="81" y="122" width="14" height="19" fill="#3e4d43"/><rect x="126" y="122" width="14" height="19" fill="#3e4d43"/><rect x="83" y="125" width="5" height="6" fill="#fff8e9"/><rect x="128" y="125" width="5" height="6" fill="#fff8e9"/><rect x="58" y="149" width="21" height="11" fill="#e9a7a1"/><rect x="143" y="149" width="21" height="11" fill="#e9a7a1"/><rect x="103" y="153" width="16" height="7" fill="#766056"/><circle id="pet-mouth" cx="111" cy="156" r="15" fill="transparent"/>'+(lv>=4?'<rect x="84" y="184" width="56" height="9" fill="'+t+'"/>':'')+(lv>=7?'<rect x="91" y="39" width="40" height="13" fill="#f7dd8a"/><rect x="103" y="26" width="15" height="13" fill="#ffe9a1"/>':'')+'</svg>'
+const P=[['#252823','#f1cbb2','#fff5de','#da918c'],['#252823','#fff8e9','#719777','#e8b2ab'],['#252823','#f2d27e','#c69b6c','#e8ab96'],['#252823','#b8d38f','#76a37d','#e8b29c'],['#252823','#dfb4c6','#f2dfc8','#a98cac']];
+const [ink,body,accent,cheek]=P[idx]||P[0],n=24,grid=Array(n*n).fill(null);
+const oval=(x,y,cx,cy,rx,ry)=>((x-cx)/rx)**2+((y-cy)/ry)**2<=1;
+function inside(x,y){
+const torso=oval(x,y,11.5,15,7.9,7.15);
+if(idx===0)return torso||oval(x,y,4.4,10.7,2.5,3.7)||oval(x,y,18.6,10.7,2.5,3.7)||oval(x,y,11.5,8.0,6.5,2.8);
+if(idx===1)return torso||oval(x,y,7.1,6.5,2.25,4.8)||oval(x,y,15.9,6.5,2.25,4.8);
+if(idx===2)return torso||oval(x,y,4.5,15.2,2.2,2.7)||oval(x,y,18.5,15.2,2.2,2.7)||oval(x,y,11.5,7.5,2.2,2.2);
+if(idx===3)return torso||oval(x,y,5.7,8.2,2.8,2.8)||oval(x,y,17.3,8.2,2.8,2.8);
+return torso||oval(x,y,5.8,8.6,2.7,3.1)||oval(x,y,17.2,8.6,2.7,3.1);
+}
+for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+if(!inside(x,y))continue;
+let c=body;
+if(idx===0&&y>=8&&y<=10&&x>=6&&x<=17)c=accent;
+if(idx===0&&y===16&&x>=7&&x<=16)c=accent;
+if(idx===1&&y>=18&&x>=8&&x<=15)c=accent;
+if(idx===2&&y>=8&&y<=10&&x>=6&&x<=17)c=accent;
+if(idx===3&&(x+y)%6===0&&y>=11&&y<=18)c=accent;
+if(idx===4&&y>=8&&y<=10&&x>=7&&x<=16)c=accent;
+if(!inside(x-1,y)||!inside(x+1,y)||!inside(x,y-1)||!inside(x,y+1))c=ink;
+grid[y*n+x]=c;
+}
+function put(x,y,c){if(x>=0&&y>=0&&x<n&&y<n&&grid[y*n+x]!==null)grid[y*n+x]=c}
+for(let x of [8,9,14,15])put(x,13,ink);
+put(6,15,cheek);put(7,15,cheek);put(16,15,cheek);put(17,15,cheek);
+put(11,16,ink);put(12,17,ink);put(13,16,ink);
+if(lv>=4)for(let x=10;x<=13;x++)put(x,20,accent);
+if(lv>=7){put(10,6,cheek);put(11,5,cheek);put(12,4,accent);put(13,5,cheek);put(14,6,cheek)}
+let out='';for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(grid[y*n+x])out+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+grid[y*n+x]+'"/>';
+return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" role="img" aria-label="'+species[idx].name+'">'+out+'<rect id="pet-mouth" x="10" y="14" width="5" height="5" fill="transparent"/></svg>';
 }
 function plantSvg(l){return '<svg viewBox="0 0 75 112" aria-hidden="true"><path d="M35 85V38" stroke="#6a9c73" stroke-width="6"/><path d="M35 71Q4 65 14 43q23-1 21 28ZM35 58q30-10 23-33-25 3-23 33Z" fill="#90b98b"/>'+(l>=6?'<path d="M35 44q-24-14-6-36 18 17 6 36Z" fill="#71a97d"/>':'')+'<path d="M18 81h35l-5 27H23Z" fill="#c38e75"/><path d="M16 79h39" stroke="#a97961" stroke-width="6"/></svg>'}
 const lampSvg='<svg viewBox="0 0 55 80" aria-hidden="true"><path d="M14 28 23 7h13l10 21Z" fill="#f1dcab" stroke="#c8b18a" stroke-width="3"/><path d="M29 30v42M14 74h30" stroke="#9e9782" stroke-width="5" stroke-linecap="round"/></svg>';
@@ -238,7 +293,7 @@ $('#xpCaption').textContent=l===10?'おへやがすっかり育ったよ。こ�
 function refreshTray(){
 const pieces=[];pending().forEach(m=>(m.foods||[m.kind||'rice']).forEach((kind,i)=>{if(!(m.eaten||[]).includes(i))pieces.push({meal:m,kind,i})}));
 $('#pendingCount').textContent=pieces.length?'('+pieces.length+')':'';
-$('#tray').innerHTML=pieces.length?pieces.map(p=>'<button type="button" class="food-item" data-id="'+p.meal.id+'" data-piece="'+p.i+'" aria-label="'+foodNames[p.kind]+'をキャラに運ぶ"><span aria-hidden="true">'+foodArt(p.kind)+'</span></button>').join(''):'<div class="tray-empty">ごはんを記録してエサをつくろう</div>';
+$('#tray').innerHTML=pieces.length?pieces.map(p=>'<button type="button" class="food-item" data-id="'+p.meal.id+'" data-piece="'+p.i+'" aria-label="'+(foodNames[p.kind]||'エサ')+'をキャラに運ぶ">'+foodArt(p.kind)+'</button>').join(''):'<div class="tray-empty">ごはんを記録してエサをつくろう</div>';
 $('#trayTip').textContent=pieces.length?'エサをおくちへ':'エサをつくってみよう';
 $('#feedByTap').hidden=true;
 }
@@ -295,20 +350,20 @@ $('#pet').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.prev
 function drawPixelWorld(){
 const canvas=$('#pixelWorld');if(!canvas)return;const b=canvas.getBoundingClientRect();if(!b.width||!b.height)return;
 const w=320,h=Math.round(b.height/b.width*320);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}
-const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;const rect=(x,y,ww,hh,color)=>{g.fillStyle=color;g.fillRect(Math.floor(x),Math.floor(y),ww,hh)};
+const g=canvas.getContext('2d');if(!g)return;g.imageSmoothingEnabled=false;const rect=(x,y,ww,hh,color)=>{g.fillStyle=color;g.fillRect(Math.floor(x),Math.floor(y),ww,hh)};
 const lv=level(),garden=db.scene!=='room',floor=Math.round(h*.69);
 rect(0,0,w,h,garden?'#82d873':'#f1e1cb');
 if(garden){
-rect(0,0,w,77,'#b0e5ae');rect(0,52,w,18,'#8ed684');rect(0,76,w,h-76,'#7cda71');
-for(let i=0;i<35;i++){const x=(i*67+11)%w,y=85+(i*91)%Math.max(100,h-165);rect(x,y,16,3,i%2?'#67c967':'#9ee188');rect(x+5,y-8,3,11,'#58b75c');if(i%5===0){rect(x-4,y-11,8,8,'#f4d98b');rect(x+3,y-7,7,7,'#fff3b5')}}
-for(let i=0;i<6;i++){let x=i*60+7;rect(x,29,14,56,'#b28862');rect(x+3,32,7,49,'#ccab77');rect(x,29,14,5,'#e3c28b')}
+rect(0,0,w,77,'#a4daa0');rect(0,52,w,18,'#85cb7b');rect(0,76,w,h-76,'#85cf76');
+for(let i=0;i<35;i++){const x=(i*67+11)%w,y=85+(i*91)%Math.max(100,h-165);rect(x,y,16,3,i%2?'#69b967':'#a4daa0');rect(x+5,y-8,3,11,'#69b967');if(i%5===0){rect(x-4,y-11,8,8,'#f4d98b');rect(x+3,y-7,7,7,'#fff3b5')}}
+for(let i=0;i<6;i++){let x=i*60+7;rect(x,29,14,56,'#8d9972');rect(x+3,32,7,49,'#aeb58b');rect(x,29,14,5,'#d8d9aa')}
 }else{
 rect(0,0,w,Math.round(h*.7),'#e9dfcc');for(let i=0;i<9;i++)rect(i*43,0,3,Math.round(h*.7),'#f3e7d3');
 rect(0,floor,w,h-floor,'#d2ad8d');rect(0,floor,w,6,'#bb9979');
 rect(19,96,83,100,'#fff4db');rect(29,107,63,77,'#a4cec7');rect(58,107,5,77,'#fff9ed');rect(29,144,63,6,'#fff9ed');rect(68,121,14,14,'#f6d993');
 }
 if(lv>=3){for(let i=0;i<lv+2;i++){let x=(i*67+23)%w,y=175+(i*53)%Math.max(110,h-390);if(garden){rect(x,y,5,22,'#5bb665');rect(x-7,y+6,8,5,'#6bc36a');rect(x+5,y+3,9,6,'#85d27d');if(i%2===0)rect(x-2,y-7,9,9,'#ffe6a1')}else{if(i<4){rect(208,106+i*10,67,3,'#aa876d');rect(214+i*13,89,11,18,i%2?'#acd0a6':'#ecc7a2')}}}}
-rect(70,Math.round(h*.64),180,12,'#4e955b35');
+
 if(db.scene==='room'&&lv>=5){rect(20,floor-91,8,85,'#aa947b');rect(8,floor-101,32,12,'#f4dcad')}
 const activity=window.moguActivity;if(activity&&Date.now()<activity.until){
 const y=Math.round(h*.47),t=Math.floor((Date.now()-activity.start)/240)%2;
