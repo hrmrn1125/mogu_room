@@ -163,6 +163,14 @@ html,body{width:100%;height:100%;overflow-x:hidden}
  .food-piece{width:48px;height:48px}
  .action-btn{min-height:42px;padding:7px}
 }
+
+/* Compact multiplier: × ◀ 1 ▶ */
+.stepper{justify-content:center;gap:6px}
+.stepper-symbol{font-size:22px;font-weight:650;color:#67706a;margin-right:6px;line-height:1}
+.stepper .stepper-arrow{width:38px;height:42px;border-radius:12px;background:transparent;display:flex;align-items:center;justify-content:center;color:#52695b;touch-action:manipulation}
+.stepper .stepper-arrow:active{background:#e7ece5}
+.stepper .stepper-arrow svg{width:18px;height:18px}
+.stepper #exerciseCount{width:54px;height:42px;font-size:22px;font-weight:750;border:0;box-shadow:none;background:transparent;padding:0;caret-color:transparent;pointer-events:none}
 </style>
 </head>
 <body>
@@ -281,11 +289,11 @@ html,body{width:100%;height:100%;overflow-x:hidden}
   <div class="sheet">
     <div class="sheet-head"><h3>運動を記録</h3><button class="close" data-close type="button">閉じる</button></div>
     <div class="choice-grid" id="exerciseChoices"></div>
-    <div class="stepper">
-      <span style="font-weight:800;color:#67706a">×</span>
-      <button id="minusCount" type="button">−</button>
-      <input id="exerciseCount" value="1" inputmode="numeric">
-      <button id="plusCount" type="button">＋</button>
+    <div class="stepper" role="group" aria-label="運動時間の倍率">
+      <span class="stepper-symbol" aria-hidden="true">×</span>
+      <button id="minusCount" class="stepper-arrow" type="button" aria-label="倍率を1減らす"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5 7 12l9 7Z" fill="currentColor"/></svg></button>
+      <input id="exerciseCount" type="text" value="1" inputmode="none" readonly aria-label="10分単位の倍率">
+      <button id="plusCount" class="stepper-arrow" type="button" aria-label="倍率を1増やす"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 9 7-9 7Z" fill="currentColor"/></svg></button>
     </div>
     <button class="primary" id="saveExerciseBtn" type="button">運動を追加</button>
   </div>
