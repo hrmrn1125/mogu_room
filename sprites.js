@@ -617,3 +617,26 @@ function drawFineFoodSprite(ctx,name){
   ctx.fillStyle=grid[y][x];ctx.fillRect(x,y,1,1);
  }
 }
+
+
+
+/* Stable preview renderer: user-authored matrix only.
+   No automatic cheeks, outline rewriting, scale2x or synthesized pixels.
+   Body variation must be a separately approved sprite asset before release. */
+function renderStablePetSprite(ctx,name,desiredWidth,desiredHeight){
+ const info=spriteInfo(name);
+ const source=document.createElement('canvas');
+ source.width=info.width;source.height=info.height;
+ const sourceCtx=source.getContext('2d');
+ sourceCtx.imageSmoothingEnabled=false;
+ drawSprite(sourceCtx,name,1);
+ // Same shared square stage, preserve the native sprite aspect ratio.
+ const margin=12;
+ const scale=Math.min((desiredWidth-margin*2)/info.width,(desiredHeight-margin*2)/info.height);
+ const w=Math.max(1,Math.round(info.width*scale));
+ const h=Math.max(1,Math.round(info.height*scale));
+ ctx.clearRect(0,0,desiredWidth,desiredHeight);
+ ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(source,0,0,info.width,info.height,
+  Math.floor((desiredWidth-w)/2),Math.floor((desiredHeight-h)/2),w,h);
+}
