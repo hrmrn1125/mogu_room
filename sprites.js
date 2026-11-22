@@ -539,15 +539,24 @@ function renderFinePetSprite(ctx,name,stage,face,desiredWidth,desiredHeight){
   else g.fillRect(x-9,y+3,5,1);
  }
  // All characters occupy the same drawing area, with no individual CSS scaling.
- const bounds={x:0,y:0,w:mini.width,h:mini.height};
- const originalMinH=Math.max(...Object.values(SPRITES).map(r=>r.length));
- const displayW=Math.floor(desiredWidth*.84);
- const displayH=Math.floor(desiredHeight*.84);
- const dw=displayW,dh=Math.round(displayW*(h+10)/(w+pad*2));
- const finalH=Math.min(displayH,dh),finalW=Math.round(dw*finalH/dh);
+
+ // Fit the visible silhouette (not invisible padding) into a shared 188px stage.
+ // Characters have equal visual scale while preserving each one's proportions.
+ const pixels=g.getImageData(0,0,mini.width,mini.height).data;
+ let loX=mini.width,loY=mini.height,hiX=-1,hiY=-1;
+ for(let y=0;y<mini.height;y++)for(let x=0;x<mini.width;x++){
+  if(pixels[(y*mini.width+x)*4+3]===0)continue;
+  loX=Math.min(loX,x);hiX=Math.max(hiX,x);
+  loY=Math.min(loY,y);hiY=Math.max(hiY,y);
+ }
+ if(hiX<loX)return;
+ const cropW=hiX-loX+1,cropH=hiY-loY+1;
+ const fit=Math.min((desiredWidth-18)/cropW,(desiredHeight-18)/cropH);
+ const drawW=Math.max(1,Math.round(cropW*fit)),drawH=Math.max(1,Math.round(cropH*fit));
  ctx.clearRect(0,0,desiredWidth,desiredHeight);ctx.imageSmoothingEnabled=false;
- ctx.drawImage(mini,0,0,mini.width,mini.height,
-  Math.floor((desiredWidth-finalW)/2),Math.floor((desiredHeight-finalH)/2),finalW,finalH);
+ ctx.drawImage(mini,loX,loY,cropW,cropH,
+  Math.round((desiredWidth-drawW)/2),Math.round((desiredHeight-drawH)/2),drawW,drawH);
+
 }
 
 
