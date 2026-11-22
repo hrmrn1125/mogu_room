@@ -260,3 +260,33 @@ function drawSprite(ctx,name,px=5){
   ctx.fillStyle=color;ctx.fillRect(x*px,y*px,px,px);
  }
 }
+
+
+const FOOD_SPRITE_PALETTE={
+ K:'#23201E',W:'#F8F4EB',Y:'#F6D669',G:'#A5D6B1',R:'#E7887F',B:'#8EC4EA',
+ N:'#C6A07A',O:'#F0B365',P:'#E7C4E2',M:'#F2E2C8',T:'#D96C5F',C:'#F3E2B8',
+ S:'#C9D8A9',U:'#C56A4B',D:'#E8B4A7'
+};
+const FOOD_SPRITES={
+ onigiri:['....KKK....','...KWWWK...','..KWWWWWK..','.KWWWWWWWK.','.KWWWWWWWK.','.KWWKKWWWK.','.KWWKKWWWK.','..KNNNNNK..','..KKKKKKK..'],
+ ramen:['..KKKKKKKK..','.KNNNNNNNNK.','.KNNNNNNNNK.','..KYYYYYYK..','...KKKKKK...','..KK..KK....','.KK....KK...'],
+ bread:['...KKKKK...','..KMMMMMK..','.KMMMMMMMK.','.KMMMMMMMK.','.KMMMMMMMK.','.KMMMMMMMK.','..KNNNNNK..','...KKKKK...'],
+ apple:['....KK.....','...KGK.....','..KRRRK....','.KRRRRRK...','.KRRRRRK...','.KRRRRRK...','..KRRRK....','...KKK.....'],
+ salad:['...KKKKK...','..KGGSGGK..','.KGSSGGSGK.','.KGGGSSGGK.','..KNNNNNK..','...KKKKK...'],
+ cake:['...KRRRK...','..KRRRRRK..','.KWWWWWWWK.','.KPPPPPPPK.','.KYYYYYYYK.','..KNNNNNK..','...KKKKK...'],
+ milk:['...KKKK....','..KWWWK....','..KWWWK....','.KWWWWK....','.KWWBWK....','.KWWBWK....','.KWWWWK....','..KKKK.....'],
+ fish:['....KK......','..KKBBKK....','.KBBBBBBKK..','KBBBBBBBBBK.','.KBBBBBBKK..','..KKBBKK....','....KK......'],
+ chicken:['..KKKKK....','.KOOOOOKK..','.KOOOOOOOK.','.KOOOOOOOK.','..KOOOOKK..','...KKK.....'],
+ donut:['...KKKKK...','..KOOOOOK..','.KOOYYOOOK.','.KOOYYOOOK.','..KOOOOOK..','...KKKKK...'],
+ bento:['.KKKKKKKKK.','.KWWKKOOOK.','.KYYKKGGGK.','.KRRKKMMMK.','.KNNNNNNNK.','.KKKKKKKKK.'],
+ cookie:['...KKKK....','..KCCCCK...','.KCCKCCCK..','.KCCCCCCK..','..KCCCCK...','...KKKK....']
+};
+function foodSpriteInfo(name){const rows=FOOD_SPRITES[name];return {width:Math.max(...rows.map(r=>r.length)),height:rows.length};}
+function drawFoodSprite(ctx,name,px=4){
+ const rows=FOOD_SPRITES[name];if(!rows)return;
+ ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+ for(let y=0;y<rows.length;y++)for(let x=0;x<rows[y].length;x++){
+  const c=FOOD_SPRITE_PALETTE[rows[y][x]];if(!c)continue;
+  ctx.fillStyle=c;ctx.fillRect(x*px,y*px,px,px);
+ }
+}
