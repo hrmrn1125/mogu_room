@@ -657,7 +657,18 @@ function renderApprovedPetStage(ctx,name,stage,width,height){
  if(accents&&selected.size>0){
    off.fillStyle=SPRITE_PALETTE[accents.light];
    for(const [cx,cy] of accents.cheeks){
-     for(let n=0;n<selected.size;n++)off.fillRect(12+cx+(cx<20?2:-2),6+cy+2+n,2,1);
+     const x=12+cx+(cx<20?2:-2),y=6+cy+2;
+     for(let n=0;n<selected.size;n++){
+       off.fillRect(x-(n>1?1:0),y+n,2+(n>1?2:0),1);
+     }
+   }
+   // The quills and spiral tail never move; a tiny hand-positioned cheek glow
+   // carries the weight change for characters with broad fixed silhouettes.
+   const cheeks=accents.cheeks;
+   for(const [cx,cy] of cheeks){
+      const tint=SPRITE_PALETTE[accents.light];
+      off.fillStyle=tint;
+      for(let n=0;n<selected.size;n++)off.fillRect(12+cx+(cx<20?4:-4),6+cy+4+n,2+n,1);
    }
  }
  if(accents&&stage.startsWith('thin')){
