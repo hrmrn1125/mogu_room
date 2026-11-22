@@ -260,6 +260,21 @@ html,body{width:100%;height:100%;overflow-x:hidden}
 .weight-chart{width:100%;min-width:0;background:#fff;border-radius:16px;overflow:hidden;padding:9px 5px}
 .weight-chart svg{width:100%;height:auto;display:block}
 .weight-chart-empty{min-height:165px;display:flex;align-items:center;justify-content:center;color:#8a938c;font-size:13px}
+
+/* Solid rounded cards for all non-home pages. */
+#page-logs .section,#page-weight .section,#page-settings .section{
+ background-color:#f1f1ec;
+ background-image:none;
+ border-radius:24px;
+ border:1px solid rgba(221,225,217,.3);
+ box-shadow:none;
+ overflow:hidden;
+ isolation:isolate;
+}
+#page-logs .list-item,#page-weight .list-item,#page-settings .list-item{
+ background-color:#fff;background-image:none;
+}
+#page-weight .weight-history-title{justify-content:flex-start}
 </style>
 </head>
 <body>
@@ -328,7 +343,7 @@ html,body{width:100%;height:100%;overflow-x:hidden}
         </div>
       </div>
       <button class="submit" id="saveWeightBtn" type="button">体重を記録</button>
-      <div class="weight-history-title">記録履歴 <span id="weightHistoryCount">0 / 100件</span></div>
+      <div class="weight-history-title">直近の体重</div>
       <div class="weight-history" id="weightHistoryScroll" tabindex="0" aria-label="体重の記録履歴、スクロール可能">
         <div class="list weight-history-list" id="weightList"></div>
       </div>
@@ -696,7 +711,6 @@ let weightChartOffset=0;
 const MAX_CHART_OFFSET=11;
 function renderWeightPage(){
  const records=weightRecords();
- q('#weightHistoryCount').textContent=records.length+' / 100件';
  q('#weightList').innerHTML=records.length?records.map(x=>'<div class="list-item compact-record"><span class="weight-history-date">'+x.date+'</span><strong>'+x.weight.toLocaleString('ja-JP',{maximumFractionDigits:2})+' kg</strong></div>').join(''):'<div class="list-item"><span class="meta">まだ記録がないよ</span></div>';
  renderWeightChart(records);
 }
@@ -712,17 +726,21 @@ function renderWeightChart(records){
  const target=q('#weightChart');
  target.setAttribute('aria-label',label+'の体重推移、'+visible.length+'件');
  if(!visible.length){target.innerHTML='<div class="weight-chart-empty">この期間の記録はまだないよ</div>';return;}
- const values=visible.map(x=>x.weight),low=Math.max(0,Math.floor((Math.min(...values)-1)*2)/2),high=Math.max(low+2,Math.ceil((Math.max(...values)+1)*2)/2);
- const x0=45,x1=325,y0=20,y1=172;
+ const values=visible.map(x=>x.weight);
+ const low=Math.max(0,Math.floor(Math.min(...values))-1);
+ const high=Math.max(low+4,Math.ceil(Math.max(...values))+1);
+ const x0=45,x1=325,y0=20;
+ const plotHeight=Math.max(152,Math.min(700,(high-low)*38));
+ const y1=y0+plotHeight,svgHeight=y1+40;
  const begin=Date.UTC(start.getFullYear(),start.getMonth(),1),finish=Date.UTC(end.getFullYear(),end.getMonth(),end.getDate());
  const xPos=date=>{const p=date.split('-').map(Number);return x0+(Date.UTC(p[0],p[1]-1,p[2])-begin)/Math.max(1,finish-begin)*(x1-x0)};
  const yPos=value=>y1-(value-low)/(high-low)*(y1-y0);
- const axes=[0,1,2,3,4].map(i=>{const yy=y0+i*(y1-y0)/4,v=high-i*(high-low)/4;return '<line x1="'+x0+'" y1="'+yy+'" x2="'+x1+'" y2="'+yy+'" stroke="#e1e7e0"/><text x="'+(x0-6)+'" y="'+(yy+3)+'" text-anchor="end" font-size="10" fill="#75857b">'+v.toFixed(1)+'</text>';}).join('');
+ const axes=Array.from({length:high-low+1},(_,i)=>{const v=high-i,yy=yPos(v);return '<line x1="'+x0+'" y1="'+yy.toFixed(1)+'" x2="'+x1+'" y2="'+yy.toFixed(1)+'" stroke="#e1e7e0"/><text x="'+(x0-6)+'" y="'+(yy+3).toFixed(1)+'" text-anchor="end" font-size="10" fill="#75857b">'+v+'</text>';}).join('');
  const poly=visible.map(x=>xPos(x.date).toFixed(1)+','+yPos(x.weight).toFixed(1)).join(' ');
  const line=visible.length>1?'<polyline points="'+poly+'" fill="none" stroke="#78a889" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>':'';
  const points=visible.map(x=>'<circle cx="'+xPos(x.date).toFixed(1)+'" cy="'+yPos(x.weight).toFixed(1)+'" r="4" fill="white" stroke="#659b76" stroke-width="2.2"><title>'+x.date+'：'+x.weight+' kg</title></circle>').join('');
- const months=[0,1,2].map(i=>{const d=new Date(start.getFullYear(),start.getMonth()+i,1);return '<text x="'+xPos(asDate(d))+'" y="198" text-anchor="'+(i===0?'start':'middle')+'" font-size="11" fill="#75857b">'+(d.getMonth()+1)+'月</text>';}).join('');
- target.innerHTML='<svg viewBox="0 0 342 210" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+axes+line+points+months+'</svg>';
+ const months=[0,1,2].map(i=>{const d=new Date(start.getFullYear(),start.getMonth()+i,1);return '<text x="'+xPos(asDate(d))+'" y="'+(y1+24)+'" text-anchor="'+(i===0?'start':'middle')+'" font-size="11" fill="#75857b">'+(d.getMonth()+1)+'月</text>';}).join('');
+ target.innerHTML='<svg viewBox="0 0 342 '+svgHeight+'" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+axes+line+points+months+'</svg>';
 }
 
 function renderPetPicker() { const wrap=q('#petPicker'); wrap.innerHTML=''; PETS.forEach((pet,idx)=>{ const btn=document.createElement('button'); btn.type='button'; btn.className='pet-option'+(idx===state.petIndex?' selected':''); btn.innerHTML=`<img class="pet-thumb" src="${CUTOUT_ASSETS[pet.key]||ASSETS[pet.key]}" alt="${pet.name}"><div class="name">${pet.name}</div>`; btn.addEventListener('click',()=>{ state.petIndex=idx; save(); renderPetPicker(); renderPet(); petSay(); }); wrap.appendChild(btn); }); }
