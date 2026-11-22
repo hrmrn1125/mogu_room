@@ -322,41 +322,7 @@ function cleanedSpriteRows(name){
   }
   if(comp.length<=2)for(const [cx,cy] of comp)grid[cy][cx]='.';
  }
- // One-pixel external black contour, retaining the face and the tail's spiral lines.
- const before=grid.map(r=>r.slice());
- const outside=Array.from({length:grid.length},()=>Array(width).fill(false));
- const work=[];
- for(let x=0;x<width;x++){work.push([x,0],[x,grid.length-1])}
- for(let y=0;y<grid.length;y++){work.push([0,y],[width-1,y])}
- while(work.length){
-  const [x,y]=work.pop();
-  if(x<0||y<0||y>=grid.length||x>=width||outside[y][x]||before[y][x]!=='.')continue;
-  outside[y][x]=true;
-  work.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
- }
- const isOuter=(x,y)=>{
-  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
-   let xx=x+dx,yy=y+dy;
-   if(xx<0||yy<0||yy>=grid.length||xx>=width)return true;
-   if(outside[yy][xx])return true;
-  }
-  return false;
- };
- const original=grid.map(r=>r.slice());
- for(let y=0;y<grid.length;y++)for(let x=0;x<width;x++){
-  if(original[y][x]==='.')continue;
-  if(isOuter(x,y)){grid[y][x]='K';continue}
-  if(original[y][x]!=='K')continue;
-  // Soften only redundant second outline cells near the outer contour.
-  let neighborOuter=false,nearFill=[];
-  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
-    const xx=x+dx,yy=y+dy;
-    if(xx<0||xx>=width||yy<0||yy>=grid.length)continue;
-    if(isOuter(xx,yy)&&original[yy][xx]==='K')neighborOuter=true;
-    if(original[yy][xx]!=='.'&&original[yy][xx]!=='K')nearFill.push(original[yy][xx]);
-  }
-  if(neighborOuter&&nearFill.length>=2)grid[y][x]=nearFill[0];
- }
+ // Keep the user's original outline strokes intact; only tiny disconnected noise was filtered.
  return grid;
 }
 function bodyVariantPixels(name,stage){
