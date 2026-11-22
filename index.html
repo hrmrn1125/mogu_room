@@ -79,7 +79,7 @@ html,body{height:100%;overflow:hidden}
 .page.active:not(.home-page){display:block!important;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:24px}
 .home-page .center-stage{min-height:0;overflow:hidden;justify-content:center;gap:3px;padding:0}
 .home-page .pet-stage{flex:1 1 auto;min-height:0;height:100%;max-height:none;overflow:visible}
-.home-page #petCanvas{display:block;width:auto!important;max-width:min(75vw,272px);max-height:min(40dvh,340px);height:auto!important;object-fit:contain;image-rendering:pixelated;align-self:center}
+.home-page #petCanvas{display:block;width:min(70vw,236px)!important;height:min(70vw,236px)!important;max-height:min(38dvh,236px);object-fit:contain;image-rendering:pixelated;align-self:center}
 .home-page #petName{margin:0;font-size:15px;flex:0 0 auto}
 .home-page .speech{font-size:13px;line-height:1.4;max-width:min(78vw,270px);margin:0 0 4px;padding:8px 12px;flex:0 0 auto}
 .home-page .bottom-panel{position:relative;align-self:end;gap:8px;min-height:0}
@@ -221,7 +221,7 @@ html,body{height:100%;overflow:hidden}
 
 <div class="toast" id="toast"></div>
 
-<script src="sprites.js"></script>
+<script src="sprites.js?v=3"></script>
 <script>
 const STORAGE_KEY='mogu-room-pixel-v2';
 const PETS=[
@@ -279,51 +279,35 @@ function calcTargets(){
   const bmr=p.sex==='male' ? 10*w + 6.25*h - 5*age + 5 : 10*w + 6.25*h - 5*age - 161;
   const maintain=Math.round(bmr*act); return {lose:[Math.round(maintain-500), Math.round(maintain-150)], maintain:[Math.round(maintain-149), Math.round(maintain+149)], gain:[Math.round(maintain+150), Math.round(maintain+500)]};
 }
+
 function bodyStage(){
-  const n=netCalories(); if(!state.targets||n===0) return 'normal';
-  const t=state.targets;
-  if(n>=t.maintain[0] && n<=t.maintain[1]) return 'normal';
-  if(n<t.maintain[0]){
-    const p=Math.max(0,Math.min(1,n/Math.max(1,t.lose[1])));
-    return p<.34 ? 'thin3' : p<.67 ? 'thin2' : 'thin1';
-  }
-  const p=(n-t.gain[0])/Math.max(1,(t.gain[1]-t.gain[0]));
-  return p<.34 ? 'chubby1' : p<.67 ? 'chubby2' : 'chubby3';
+ const n=netCalories();
+ if(!n)return 'normal';
+ const t=displayTargets();
+ const loseStart=t.lose[0],maintainStart=t.maintain[0],maintainEnd=t.maintain[1],gainEnd=t.gain[1];
+ if(n>=maintainStart&&n<=maintainEnd)return 'normal';
+ if(n<maintainStart){
+  // Body-state cosmetics only. Under-eating is never scored as an achievement.
+  const p=Math.max(0,Math.min(1,n/Math.max(1,t.lose[1])));
+  return p<.34?'thin3':p<.67?'thin2':'thin1';
+ }
+ const p=Math.max(0,(n-maintainEnd)/Math.max(1,gainEnd-maintainEnd));
+ return p<.33?'chubby1':p<.67?'chubby2':'chubby3';
 }
-function deformation(stage){return ({thin3:-3,thin2:-2,thin1:-1,normal:0,chubby1:1,chubby2:2,chubby3:3})[stage]||0}
 function drawPet(){
-  const pet=PETS[state.petIndex], info=spriteInfo(pet.key), rows=SPRITES[pet.key], canvas=q('#petCanvas'), scale=4;
-  canvas.width=info.width*scale + 56; canvas.height=info.height*scale + 36;
-  canvas.style.width=Math.min(240, Math.max(140, info.width*scale*1.15))+'px';
-  canvas.style.height='auto';
-  const ctx=canvas.getContext('2d'); ctx.imageSmoothingEnabled=false; ctx.clearRect(0,0,canvas.width,canvas.height);
-  const off=document.createElement('canvas'); off.width=info.width; off.height=info.height; const octx=off.getContext('2d'); octx.imageSmoothingEnabled=false; drawSprite(octx,pet.key,1);
-  const stage=bodyStage(), def=deformation(stage), ranges=BODY_RANGES[pet.key];
-  const baseX=Math.floor((canvas.width - info.width*scale)/2), baseY=14;
-  for(let y=0;y<info.height;y++){
-    let rowWidth=info.width;
-    const inCheek = y>=ranges.cheek[0] && y<=ranges.cheek[1];
-    const inBelly = y>=ranges.belly[0] && y<=ranges.belly[1];
-    let extra=0;
-    if(def!==0){
-      if(inCheek) extra += def*2;
-      if(inBelly) extra += def*2.8;
-    }
-    rowWidth = Math.max(18, info.width + extra);
-    const dx = Math.floor((canvas.width - rowWidth*scale)/2);
-    ctx.drawImage(off,0,y,info.width,1,dx,baseY+y*scale,rowWidth*scale,scale);
-  }
-  drawFaceReaction(ctx, pet.key, scale, baseX, baseY, state.face);
+ const canvas=q('#petCanvas');
+ const ctx=canvas.getContext('2d');
+ const width=236,height=236;
+ canvas.width=width;canvas.height=height;
+ renderBodySprite(ctx,PETS[state.petIndex].key,bodyStage(),state.face||'neutral',width,height);
 }
-function drawFaceReaction(ctx,key,scale,baseX,baseY,face){
-  if(face==='neutral') return;
-  const p=FACE_POINTS[key]; const x=baseX + p.x*scale; const y=baseY + p.y*scale;
-  ctx.fillStyle=SPRITE_PALETTE.K;
-  if(face==='blink' || face==='wink'){ctx.fillRect(x-12,y+2,10,2);}
-  if(face==='happy' || face==='smile'){ctx.fillStyle='#efb7c7'; ctx.fillRect(x-16,y+10,8,2); ctx.fillRect(x+16,y+10,8,2);}
-  if(face==='surprised'){ctx.fillStyle=SPRITE_PALETTE.K; ctx.fillRect(x+4,y+10,4,8);}
+function drawFoodCanvas(canvas,name){
+ const key=FOOD_SPRITES[name]?name:'bento';
+ const info=foodSpriteInfo(key),px=4;
+ canvas.width=info.width*px;canvas.height=info.height*px;
+ drawFoodSprite(canvas.getContext('2d'),key,px);
 }
-function drawFoodCanvas(canvas,name){const info=foodSpriteInfo(name), px=4; canvas.width=info.width*px; canvas.height=info.height*px; drawFoodSprite(canvas.getContext('2d'),name,px)}
+
 function renderTray(){
   const tray=q('#foodTray'); q('#foodCount').textContent=`${state.foodPieces.length}個`;
   if(!state.foodPieces.length){ tray.innerHTML='<div class="empty">ごはんを記録するとエサがここに並ぶよ</div>'; return; }
@@ -373,18 +357,15 @@ function renderLogs(){
   q('#weightList').innerHTML = state.weights.length ? state.weights.slice().reverse().map(x=>`<div class="list-item"><span>${x.date}</span><span class="muted">${x.weight} kg</span></div>`).join('') : '<div class="muted">まだ記録がないよ</div>';
 }
 function renderPetPicker(){
-  q('#petPicker').innerHTML=PETS.map((pet,i)=>`<button class="pet-option ${i===state.petIndex?'selected':''}" data-pet="${i}"><canvas width="80" height="120"></canvas><strong>${pet.name}</strong></button>`).join('');
-  qa('#petPicker .pet-option').forEach((btn,i)=>{
-    const cv=btn.querySelector('canvas'); const off=document.createElement('canvas'); off.width=40; off.height=60; drawPetThumbnail(cv,PETS[i].key);
-    btn.addEventListener('click',()=>{state.petIndex=i; save(); renderAll();});
-  });
+ q('#petPicker').innerHTML=PETS.map((pet,i)=>'<button class="pet-option '+(i===state.petIndex?'selected':'')+'" data-pet="'+i+'"><canvas width="86" height="86"></canvas><strong>'+pet.name+'</strong></button>').join('');
+ qa('#petPicker .pet-option').forEach((btn,i)=>{
+  const cv=btn.querySelector('canvas');
+  const ctx=cv.getContext('2d');
+  renderBodySprite(ctx,PETS[i].key,'normal','neutral',86,86);
+  btn.addEventListener('click',()=>{state.petIndex=i;save();renderAll()});
+ });
 }
-function drawPetThumbnail(canvas,key){
-  const info=spriteInfo(key), scale=2, ctx=canvas.getContext('2d'); ctx.imageSmoothingEnabled=false; ctx.clearRect(0,0,canvas.width,canvas.height);
-  const off=document.createElement('canvas'); off.width=info.width; off.height=info.height; drawSprite(off.getContext('2d'), key, 1);
-  const x=Math.floor((canvas.width - info.width*scale)/2), y=Math.floor((canvas.height - info.height*scale)/2);
-  ctx.drawImage(off,0,0,info.width,info.height,x,y,info.width*scale,info.height*scale);
-}
+
 function renderSpeech(text){q('#speech').textContent=text || 'タップしておしゃべり'}
 function speak(custom){
   const pet=PETS[state.petIndex]; const lines=pet.say; const message=custom || lines[Math.floor(Math.random()*lines.length)] ;
@@ -413,7 +394,7 @@ function animateExercise(kind){
   setTimeout(()=>ctx.clearRect(0,0,cv.width,cv.height),1600);
 }
 function saveFood(){ ensureDay(); const kcal=Number(q('#foodCalInput').value); if(!(kcal>0)){toast('カロリーを入力してね');return;} const pieces=chooseFoods(kcal); state.meals.push({date:today(),kcal,pieces:pieces.map(x=>x.name)}); state.foodPieces.push(...pieces); save(); q('#foodCalInput').value=''; closeModals(); renderTray(); renderLogs(); toast('エサを作ったよ'); }
-function saveExercise(key){ ensureDay(); const ex=EXERCISES.find(x=>x.key===key); state.exercises.push({date:today(),...ex}); save(); closeModals(); renderGauge(); renderLogs(); animateExercise(key); speak(ex.label); }
+function saveExercise(key){ ensureDay(); const ex=EXERCISES.find(x=>x.key===key); state.exercises.push({date:today(),...ex}); save(); closeModals(); renderGauge(); renderLogs(); drawPet(); animateExercise(key); speak(ex.label); }
 function saveProfile(){ const p={height:q('#heightInput').value,weight:q('#weightInput').value,age:q('#ageInput').value,sex:q('#sexInput').value,activity:q('#activityInput').value}; const nextHash=profileHash(p); const changed=nextHash!==state.profileHash; state.profile=p; state.targets=calcTargets(); state.profileHash=nextHash; if(changed) clearDaily(); save(); renderAll(); toast(changed?'設定変更で今日のカロリーをリセットしたよ':'設定を更新したよ'); }
 function saveWeight(){ const weight=q('#weightRecordInput').value; if(!weight){toast('体重を入力してね');return;} state.weights=state.weights.filter(x=>x.date!==today()); state.weights.push({date:today(),weight}); if(String(state.profile.weight)!==String(weight)){ state.profile.weight=String(weight); q('#weightInput').value=String(weight); state.targets=calcTargets(); state.profileHash=profileHash(state.profile); clearDaily(); }
  save(); renderAll(); toast('体重を保存したよ'); }
