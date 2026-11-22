@@ -857,7 +857,7 @@ function petSay(custom) { const pet=PETS[state.petIndex]; state.bubble = custom 
 function renderSpeech() { q('#speech').textContent=state.bubble || 'タップしておしゃべり'; }
 const CUTOUT_ASSETS={};
 let cutoutsReady=false;
-function makeMascotCutout(src){
+function makeMascotCutout(src,preserveSquirrelShadow=false){
  return new Promise(resolve=>{
   const original=new Image();
   original.onload=()=>{
@@ -871,8 +871,12 @@ function makeMascotCutout(src){
     const img=cx.getImageData(0,0,w,h),a=img.data;
     const seen=new Uint8Array(w*h),queue=new Int32Array(w*h),isBg=(pos)=>{
       const k=pos*4,r=a[k],g=a[k+1],b=a[k+2];
-      // Warm white/cream outside the dark-brown character contour.
-      // Border-connected removal preserves enclosed light-colored faces and bellies.
+      if(preserveSquirrelShadow){
+       // Flood through all non-outline exterior pixels. A warm gradient
+       // cannot be removed reliably by matching only near-white pixels.
+       // The dark outline isolates the ears, cheeks, body, tail and balloon.
+       return !(r<140&&g<115&&b<110);
+      }
       return r>193&&g>188&&b>177&&Math.max(r,g,b)-Math.min(r,g,b)<64;
     };
     let head=0,tail=0;
@@ -897,12 +901,22 @@ function makeMascotCutout(src){
     }
     cx.putImageData(img,0,0);
     if(maxX<0){resolve(src);return;}
-    const margin=8,x0=Math.max(0,minX-margin),y0=Math.max(0,minY-margin);
+    const margin=preserveSquirrelShadow?18:8,x0=Math.max(0,minX-margin),y0=Math.max(0,minY-margin);
     const width=Math.min(w-x0,maxX-minX+1+margin*2);
     const height=Math.min(h-y0,maxY-minY+1+margin*2);
     const out=document.createElement('canvas');out.width=width;out.height=height;
-    out.getContext('2d').drawImage(c,x0,y0,width,height,0,0,width,height);
-    resolve(out.toDataURL('image/webp',0.92));
+    const outCtx=out.getContext('2d');
+    if(preserveSquirrelShadow){
+     // Draw the oval into the same transparent image, tied to the exact
+     // feet baseline so it cannot drift below the mascot in either view.
+     outCtx.beginPath();
+     outCtx.ellipse((minX+maxX)/2-x0,maxY-y0+4,
+       (maxX-minX)*.34,10,0,0,Math.PI*2);
+     outCtx.fillStyle='rgba(211,168,150,.62)';
+     outCtx.fill();
+    }
+    outCtx.drawImage(c,x0,y0,width,height,0,0,width,height);
+    resolve(out.toDataURL('image/webp',0.94));
    }catch(e){resolve(src)}
   };
   original.onerror=()=>resolve(src);
@@ -912,7 +926,7 @@ function makeMascotCutout(src){
 function prepareMascotImages(){
  Promise.all(PETS.map(async pet=>{
   CUTOUT_ASSETS[pet.key]=pet.key==='squirrel'
-   ? await makeMascotCutout(ASSETS[pet.key])
+   ? await makeMascotCutout(ASSETS[pet.key],true)
    : (ASSETS[pet.key].startsWith('data:image/webp;base64,') ? ASSETS[pet.key] : await makeMascotCutout(ASSETS[pet.key]));
  })).then(()=>{
   cutoutsReady=true;
