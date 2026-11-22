@@ -191,6 +191,16 @@ html,body{background:#fff;overflow-x:hidden}
 @keyframes pet-dance{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(8deg) translateY(-8px)}}
 @keyframes pet-yoga{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.91)}}
 @keyframes water-waves{50%{translate:0 8px}}
+
+/* Render the supplied reference pixel matrices at native nearest-neighbor quality. */
+#petSvg.pet-canvas{
+ width:min(61vw,228px);height:auto;max-height:265px;aspect-ratio:64/76;
+ image-rendering:pixelated;image-rendering:crisp-edges;filter:none!important;
+ transform:none!important;display:block;
+}
+.pet-picker .theme canvas.pet-canvas{width:54px!important;height:64px!important;max-height:none;aspect-ratio:64/76;image-rendering:pixelated;flex-shrink:0}
+.pet-picker .theme>div{display:flex;align-items:center;justify-content:center;width:58px;min-width:58px}
+.character-wrap{display:grid;place-items:center}
 </style>
 </head>
 <body>
@@ -306,6 +316,7 @@ html,body{background:#fff;overflow-x:hidden}
 
 <div class="toast" id="toast"></div>
 
+<script src="sprites.js?v=1"></script>
 <script>
 const KEY='mogu-room-revised-proto-v1';
 const pets=[
@@ -517,99 +528,75 @@ function bodyState(){
 
 
 
-const PIX_BLACK='#242527';
-const PET_COLORS=[
- ['#8df0c9','#68d9ad','#d6ffee','#f6a0bd'],
- ['#d2a7f8','#b289e4','#efd8ff','#3f57af'],
- ['#ffa9a3','#ed928e','#ffe1cc','#8bd1f4'],
- ['#3096ab','#197a90','#ffe2bc','#ad73dc'],
- ['#8a97e6','#7181d1','#c8d1ff','#ffe079']
+
+const SPRITE_IDS=['hamster','rabbit','squirrel','hedgehog','otter'];
+const SPRITE_BODY_REGIONS=[
+ {cheek:[14,22],belly:[23,32],cx:23}, 
+ {cheek:[26,38],belly:[39,56],cx:19},
+ {cheek:[28,37],belly:[38,50],cx:16},
+ {cheek:[21,31],belly:[32,47],cx:20},
+ {cheek:[12,21],belly:[22,34],cx:20}
 ];
 function petSvg(index,stateKey,faceState='neutral'){
- const [base,shade,light,accessory]=PET_COLORS[index]||PET_COLORS[0];
- const xstage={thin3:-5,thin2:-3,thin1:-1.5,normal:0,chubby1:2,chubby2:4,chubby3:6}[stateKey]||0;
- const c=50,ink=PIX_BLACK;
- const path=(d,fill,sw=2.1)=>'<path d="'+d+'" fill="'+fill+'" stroke="'+ink+'" stroke-width="'+sw+'" stroke-linejoin="miter" stroke-linecap="square"/>';
- const rect=(x,y,w,h,color)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+color+'"/>';
- const ellipse=(cx,cy,rx,ry,fill,sw=2)=>'<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" fill="'+fill+'" stroke="'+ink+'" stroke-width="'+sw+'"/>';
- const cheeks= xstage>0?'<g fill="'+base+'" stroke="'+ink+'" stroke-width="2">'+ellipse(32-xstage*.2,55,10+xstage*.55,11,base)+ellipse(68+xstage*.2,55,10+xstage*.55,11,base)+'</g>':'';
- const jawScale=Math.max(.86,1+xstage*.014);
- let ears='',body='',face='',acc='',feet='';
- const mainGroupStart='<g transform="translate(50 62) scale('+jawScale+' 1) translate(-50 -62)">';
- const mainGroupEnd='</g>';
- if(index===0){
-  ears=path('M27 34V22H32V18H39V20H43V35Z',base)+path('M57 35V20H62V18H70V23H75V34Z',base);
-  body=path('M32 31H68V35H76V41H81V52H85V66H80V75H74V82H66V88H34V84H25V77H20V67H16V53H20V42H26V36H32Z',base);
-  body+=path('M19 50H27V44H34V62H28V67H20Z',base,1.6)+path('M66 44H73V51H81V67H72V62H66Z',base,1.6);
-  body+=rect(24,71,11,4,shade)+rect(64,71,11,4,shade);
-  feet=path('M30 84H43V90H30Z',base)+path('M57 84H70V90H57Z',base);
-  acc=rect(8,26,3,35,ink)+rect(9,28,1.5,30,'#f9a9b9')+
-  path('M9 9H13V15H19V19H14V25H6V20H0V15H6V9Z',accessory,2.4);
- }else if(index===1){
-  ears=path('M26 39V9H31V5H36V8H40V38Z',base)+path('M58 39V8H63V5H69V9H73V37Z',base);
-  ears+=rect(31,12,4,23,shade)+rect(63,12,4,23,shade);
-  body=path('M28 34H69V39H77V46H82V65H78V74H72V82H66V88H33V83H26V75H21V64H17V47H22V40H28Z',base);
-  feet=path('M30 85H43V91H27V88Z',base)+path('M57 85H70V91H57Z',base);
-  acc=path('M29 34L36 23L50 13L66 14L74 25L65 35Z',accessory,2.5)+
-   path('M34 32L41 25L50 18L63 19L68 25L65 30Z','#536ac6',1)+
-   path('M49 15L41 11L34 12L31 17L38 20Z','#536ac6',1.4)+
-   path('M35 8H38V12H42V16H38V20H33V16H29V12H33V8Z','#ffe077',2);
- }else if(index===2){
-  ears=path('M27 38V22H32V17H38V22H41V37Z',base)+path('M58 38V22H64V17H70V22H74V38Z',base);
-  // large spiral tail stays outside the belly deformation, preserves squirrel silhouette
-  acc=path('M66 49V40H73V34H82V36H89V44H92V58H89V69H82V78H75V84H65V78H71V69H78V58H76V52H70Z',base,2.5)+
-   path('M77 45H83V49H86V62H82V68H75V72H72V65H77V59H80V51H77Z',shade,1);
-  body=path('M33 36H65V40H74V47H78V66H75V75H69V83H64V88H35V84H28V75H23V67H20V49H25V40H33Z',base);
-  body+=path('M35 67H61V73H66V82H32V75H35Z',light,1.4);
-  feet=path('M28 84H43V91H27V88Z',base)+path('M56 84H70V91H58Z',base);
-  acc+=rect(83,12,2.7,37,ink)+path('M84 0H88V6H94V10H89V16H82V12H76V7H82V2H84Z',accessory,2.3);
- }else if(index===3){
-  // zig-zag hair silhouette with broad rounded belly and face
-  ears=path('M28 35L23 30L26 24L18 23L22 17L17 13L27 14L29 6L36 12L41 3L48 9L56 3L61 11L70 8L72 17L82 16L78 24L85 29L78 35Z',base,2.5);
-  body=path('M27 28H72V34H79V43H83V59H80V69H75V79H67V87H33V83H25V76H20V67H16V46H21V36H27Z',base);
-  body+=path('M36 39H63V36H67V40H73V69H69V78H62V84H38V80H32V69H27V44H32V39Z',light,1.3);
-  feet=path('M30 83H43V90H27V86Z',light)+path('M57 83H70V90H57Z',light);
-  acc=path('M51 72L66 83H75V96H54V84L47 79Z',accessory,2.2)+
-   path('M47 61L69 80', 'none',2.6)+
-   path('M64 82H67V86H71V89H67V92H63V89H59V86H63Z','#f8dd8a',1.6);
- }else{
-  ears=path('M26 39V22H30V18H37V20H41V38Z',base)+path('M58 38V20H65V18H71V22H75V38Z',base);
-  acc=path('M66 56H78V62H86V70H90V80H84V86H75V83H70V78H64Z',base,2.3);
-  body=path('M32 34H69V38H76V45H80V59H77V73H71V81H65V88H34V84H27V77H21V67H18V51H22V42H27V38H32Z',base);
-  body+=path('M34 61H65V65H70V78H65V84H35V80H30V66H34Z',light,1.2);
-  feet=path('M27 84H42V91H27Z',base)+path('M58 84H72V91H58Z',base);
-  acc+=path('M49 61H54V68H62V72H55V79H44V72H37V68H45V61Z',accessory,1.5);
+ const name=SPRITE_IDS[index]||SPRITE_IDS[0];
+ return '<canvas id="petSvg" class="pet-canvas" width="64" height="76" data-sprite="'+name+'" data-stage="'+stateKey+'" data-face="'+faceState+'" role="img" aria-label="'+pets[index].name+'"></canvas>';
+}
+function drawPetCanvas(canvas){
+ if(!canvas)return;
+ const name=canvas.dataset.sprite;
+ const data=SPRITES[name];if(!data)return;
+ const index=Math.max(0,SPRITE_IDS.indexOf(name));
+ const stage=canvas.dataset.stage||'normal';
+ const face=canvas.dataset.face||'neutral';
+ const c=canvas.getContext('2d');
+ if(!c)return;
+ c.imageSmoothingEnabled=false;c.clearRect(0,0,64,76);
+ // Draw the exact supplied pixels to an offscreen bitmap first; never interpolate colors.
+ const raw=document.createElement('canvas');raw.width=40;raw.height=data.length;
+ const source=raw.getContext('2d');source.imageSmoothingEnabled=false;drawSprite(source,name,1);
+ const startY=Math.floor((76-data.length)/2);
+ const level={thin3:-3,thin2:-2,thin1:-1,normal:0,chubby1:1,chubby2:2,chubby3:3}[stage]||0;
+ const region=SPRITE_BODY_REGIONS[index];
+ for(let y=0;y<data.length;y++){
+  const [c0,c1]=region.cheek,[b0,b1]=region.belly;
+  function bump(range,peak){
+   const [lo,hi]=range;if(y<lo||y>hi)return 0;
+   const mid=(lo+hi)/2,half=Math.max(1,(hi-lo)/2);
+   return peak*Math.max(0,1-Math.pow((y-mid)/half,2));
+  }
+  // Maximum deformation is small so face, silhouette and props remain recognizable.
+  const amount=level*(bump([c0,c1],.035)+bump([b0,b1],.065));
+  const width=Math.max(34,Math.round(40*(1+amount)));
+  const x=Math.round((64-width)/2);
+  c.drawImage(raw,0,y,40,1,x,startY+y,width,1);
  }
- const faceBase= index===3?46:47;
- const eyeY=index===4?49:faceBase;
- const eyeColor=ink;
- let leftEye=rect(38,eyeY,4,5,eyeColor),rightEye=rect(60,eyeY,4,5,eyeColor);
- if(index===1){leftEye=rect(36,eyeY+3,8,2,ink);rightEye=rect(58,eyeY+3,8,2,ink)}
- if(index===3){leftEye=rect(38,eyeY,6,3,ink);rightEye=rect(59,eyeY,6,3,ink)}
- if(faceState==='wink')leftEye=rect(36,eyeY+3,8,2,ink);
- if(faceState==='blink'||faceState==='happy'){leftEye=rect(36,eyeY+3,8,2,ink);rightEye=rect(58,eyeY+3,8,2,ink)}
- if(faceState==='surprised'){leftEye=rect(38,eyeY,5,7,ink);rightEye=rect(60,eyeY,5,7,ink)}
- let mouth=rect(48,60,5,3,ink);
- if(index===0)mouth=rect(49,58,3,3,ink)+rect(47,62,3,2,ink)+rect(52,62,3,2,ink);
- if(index===1)mouth=rect(47,61,6,2,ink);
- if(index===2)mouth=rect(49,60,4,2,ink)+rect(47,64,7,2,ink);
- if(index===3)mouth=rect(48,63,5,3,ink);
- if(index===4)mouth=rect(49,60,3,2,ink)+rect(46,64,8,3,ink);
- if(faceState==='surprised')mouth=rect(47,60,7,7,ink)+rect(49,62,3,3,'#f8b4a6');
- if(faceState==='happy'||faceState==='smile')mouth=rect(45,60,10,2,ink)+rect(47,62,6,3,ink);
- face=leftEye+rightEye+rect(29,60,7,4,index===3?'#e6c9a3':'#edaeaa')+rect(66,60,7,4,index===3?'#e6c9a3':'#edaeaa')+mouth;
- const belly=mainGroupStart+cheeks+body+feet+face+mainGroupEnd;
- const content=ears+(index===1?acc:'')+belly+(index!==1?acc:'');
- return '<svg id="petSvg" class="pixel-pet '+stateKey+'" viewBox="-6 -5 112 112" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" role="img" aria-label="'+pets[index].name+'">'+content+'</svg>';
+ if(face!=='neutral'){
+  // Reaction accents are separate from the original artwork and disappear after speaking.
+  const coords=[[26,16],[24,31],[24,35],[24,26],[26,17]];
+  const [x,y]=coords[index],py=startY+y;
+  if(face==='surprised'){
+   c.fillStyle=SPRITE_PALETTE.K;
+   c.fillRect(x+3,py-2,2,3);
+  }else if(face==='happy'||face==='smile'){
+   c.fillStyle=SPRITE_PALETTE.I;
+   c.fillRect(x-3,py+2,3,1);
+   c.fillRect(x+8,py+2,3,1);
+  }else if(face==='wink'||face==='blink'){
+   c.fillStyle=SPRITE_PALETTE.K;
+   c.fillRect(x-3,py,4,1);
+  }
+ }
 }
 
 function renderPet(){
  const shape=bodyState();
  q('#petHolder').innerHTML=petSvg(state.petIndex,shape.key,expression);
+ drawPetCanvas(q('#petHolder .pet-canvas'));
  q('#petLabel').textContent=pets[state.petIndex].name;
 }
 function renderPetGrid(){
  q('#petGrid').innerHTML=pets.map((pet,i)=>'<button class="theme '+(i===state.petIndex?'selected':'')+'" data-pet="'+i+'"><div>'+petSvg(i,'normal','neutral')+'</div><strong>'+pet.name+'</strong></button>').join('');
+ q('#petGrid').querySelectorAll('.pet-canvas').forEach(drawPetCanvas);
  q('#petGrid').querySelectorAll('[data-pet]').forEach(btn=>btn.addEventListener('click',()=>{state.petIndex=Number(btn.dataset.pet);expression='neutral';save();renderAll();toast('キャラを変更したよ')}));
 }
 function todayMeals(){return state.meals.filter(x=>x.date===today())}
