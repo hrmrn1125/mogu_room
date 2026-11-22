@@ -1,807 +1,384 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>mogu room prototype</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>mogu room</title>
 <style>
 :root{
-  --bg:#ffffff; --panel:#fafaf8; --line:#e8e8e2; --text:#232323; --sub:#6c6c68;
-  --accent:#7dbf7a; --accent2:#f1d778; --chip:#f5f5f2; --danger:#d78e8e;
+  --bg:#fbfbf8; --panel:#f3f3ef; --line:#e6e7e1; --text:#39433c; --sub:#7c857e;
+  --green:#8fbd8c; --yellow:#d7c56f; --red:#d99683; --track:#d8dbd6; --accent:#9eb69f;
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif}
+body{min-height:100dvh}
 button,input,select{font:inherit}
-button{cursor:pointer}
-input,select{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 13px;color:var(--text)}
-.app{max-width:460px;margin:0 auto;min-height:100%;padding:16px 16px 110px;background:#fff}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-.title{font-size:21px;font-weight:800;letter-spacing:.02em}
-.modechip{font-size:12px;color:var(--sub);background:var(--chip);padding:8px 11px;border-radius:999px}
-.hero{position:relative;background:#fff;border-radius:28px;padding:16px 12px 10px;min-height:370px}
-.stage{position:relative;background:#fff;border-radius:24px;display:flex;align-items:center;justify-content:center;height:310px;overflow:hidden}
-.speech{position:absolute;top:8px;left:50%;transform:translateX(-50%);max-width:210px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px 14px;font-size:13px;line-height:1.55;text-align:center;color:var(--sub)}
-.speech:after{content:"";position:absolute;left:50%;bottom:-8px;width:14px;height:14px;background:#fff;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:translateX(-50%) rotate(45deg)}
-.character-wrap{position:relative;width:220px;height:220px;display:grid;place-items:center}
-#petSvg{width:220px;height:220px;image-rendering:pixelated;shape-rendering:crispEdges}
-#petSvg.thin1{transform:scale(.94,1)}
-#petSvg.thin2{transform:scale(.89,.98)}
-#petSvg.thin3{transform:scale(.83,.96)}
-#petSvg.normal{transform:scale(1)}
-#petSvg.chubby1{transform:scale(1.06,1.02)}
-#petSvg.chubby2{transform:scale(1.11,1.05)}
-#petSvg.chubby3{transform:scale(1.18,1.08)}
-.mouth-target{position:absolute;left:50%;top:49%;width:64px;height:54px;transform:translate(-50%,-50%);border-radius:999px}
-.mouth-target.active{outline:2px dashed #c9c9bf;outline-offset:4px}
-.petname{font-size:17px;font-weight:800;text-align:center;margin-top:6px}
-.subrow{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px}
-.badge{padding:7px 10px;border-radius:999px;background:var(--chip);font-size:12px;color:var(--sub)}
-.food-panel{margin-top:14px;background:var(--panel);border-radius:22px;padding:12px}
-.food-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
-.food-head h2{margin:0;font-size:15px}
-.food-head small{color:var(--sub)}
-.tray{display:flex;gap:10px;overflow:auto;padding:2px 0 4px;min-height:66px}
-.tray::-webkit-scrollbar{display:none}
-.food-item{flex:0 0 58px;width:58px;height:58px;border:1px solid var(--line);background:#fff;border-radius:16px;display:grid;place-items:center;padding:6px;touch-action:none}
-.food-item svg{width:44px;height:44px;image-rendering:pixelated;shape-rendering:crispEdges;display:block}
-.empty{color:var(--sub);font-size:13px;padding:10px 4px}
-.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
-.btn{border:0;border-radius:18px;padding:14px 12px;background:#f6f6f3;color:#262626;font-weight:700}
-.btn.primary{background:#f3e8a8}
-.btn.soft{background:#eff6ee}
-.btn svg{width:18px;height:18px;vertical-align:-4px;margin-right:6px}
-.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
-.card{background:var(--panel);border-radius:20px;padding:14px}
-.card h3{margin:0 0 8px;font-size:13px;color:var(--sub);font-weight:700}
-.value{font-size:24px;font-weight:800;line-height:1.1}
-.targetset{margin-top:4px;font-size:12px;color:var(--sub);line-height:1.7}
-.row{display:flex;gap:10px}.row>*{flex:1}
-.section{margin-top:20px}
-.section h2{font-size:16px;margin:0 0 12px}
-.list{display:grid;gap:10px}
-.entry{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--panel);border-radius:16px}
-.entry small{display:block;color:var(--sub)}
-.logicon{display:grid;place-items:center;width:34px;height:34px;background:#fff;border-radius:12px;flex:0 0 34px}
-.logicon svg{width:24px;height:24px}
-.bottomnav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
-.bottomnav .inner{width:min(460px,100%);display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.navbtn{background:none;border:0;padding:8px 0;color:var(--sub);font-size:11px;font-weight:700}
-.navbtn.active{color:var(--text)}
-.navbtn svg{width:20px;height:20px;display:block;margin:0 auto 4px}
-.page{display:none}.page.active{display:block}
-.overlay{position:fixed;inset:0;background:rgba(20,20,20,.18);display:none;align-items:flex-end;justify-content:center;z-index:50}
-.overlay.open{display:flex}
-.sheet{width:min(460px,100%);background:#fff;border-radius:28px 28px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));max-height:90dvh;overflow:auto}
-.sheethead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.sheethead h3{margin:0;font-size:17px}
-.close{background:#f3f3ef;border:0;border-radius:12px;padding:10px 12px;font-weight:700}
-.cal-input{display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 0 10px}
-.cal-input input{width:180px;font-size:38px;font-weight:800;text-align:right;border-radius:18px;background:#fafaf8}
-.preview{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;background:#fafaf8;border-radius:18px;padding:12px;min-height:76px}
-.preview svg{width:48px;height:48px;image-rendering:pixelated;shape-rendering:crispEdges}
-.small{font-size:12px;color:var(--sub);line-height:1.7}
-.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.choice{background:#fafaf8;border:1px solid var(--line);border-radius:16px;padding:12px 8px;text-align:center;font-size:12px;font-weight:700;color:var(--sub)}
-.choice.active{background:#eff6ee;color:#24572d;border-color:#cfe3cd}
-.choice svg{width:24px;height:24px;display:block;margin:0 auto 6px}
-.submit{width:100%;border:0;border-radius:18px;background:#232323;color:#fff;padding:15px 14px;font-weight:800;margin-top:14px}
-.note{margin-top:10px;padding:12px 14px;background:#fafaf8;border-radius:16px;font-size:12px;color:var(--sub);line-height:1.7}
-.fields{display:grid;gap:12px}
-.themegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.theme{background:#fafaf8;border-radius:18px;padding:12px;min-height:82px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.theme strong{display:block;font-size:13px}.theme small{display:block;color:var(--sub)}
-.lock{font-size:11px;color:#8a8a84;background:#fff;border-radius:999px;padding:6px 8px}
-.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:#232323;color:#fff;padding:11px 14px;border-radius:999px;font-size:13px;display:none;z-index:60}.toast.show{display:block}
-.hidden{display:none !important}
-@media (max-width:370px){.actions{grid-template-columns:1fr 1fr}.summary{grid-template-columns:1fr}.row{display:block}.row>*+*{margin-top:12px}}
-
-/* v2: compact, aligned, quiet game-first UI */
-:root{--text:#2e3430;--sub:#707971;--line:#e9ede8;--panel:#f7f8f5}
-html,body{background:#fff;overflow-x:hidden}
-.app{padding:12px 18px calc(88px + env(safe-area-inset-bottom));max-width:460px}
-.energy-header{margin:0 0 10px;padding:7px 4px 4px}
-.energy-top{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#657369}
-.energy-top span:last-child{font-variant-numeric:tabular-nums}
-.energy-track{position:relative;display:flex;overflow:visible;border-radius:999px;height:11px;margin-top:11px;background:#ecefea}
-.energy-zone{height:100%}.energy-zone.reduce{width:42%;background:#adcbb2;border-radius:999px 0 0 999px}.energy-zone.steady{width:25%;background:#90b8a0}.energy-zone.increase{width:33%;background:#e5c79b;border-radius:0 999px 999px 0}
-.energy-marker{position:absolute;left:0;top:-5px;height:21px;width:5px;background:#333b36;border:2px solid #fff;border-radius:5px;box-shadow:0 0 0 1px #333b36;transition:left .25s}
-.energy-labels{display:flex;justify-content:space-between;font-size:11px;color:#77847b;margin-top:6px}
-.hero{min-height:0;padding:2px 0 0;background:white;border-radius:0}
-.stage{height:clamp(225px,39dvh,315px);background:#fff;border-radius:0}
-.character-wrap{width:min(64vw,250px);height:100%;align-items:end;padding-bottom:7px}
-#petSvg{width:min(64vw,250px);height:min(64vw,250px);transform-origin:center 57%;transition:transform .24s ease}
-#petSvg.thin1{transform:scale(.96,1)}#petSvg.thin2{transform:scale(.93,.98)}#petSvg.thin3{transform:scale(.90,.96)}
-#petSvg.normal{transform:scale(1)}#petSvg.chubby1{transform:scale(1.04,1.02)}#petSvg.chubby2{transform:scale(1.075,1.04)}#petSvg.chubby3{transform:scale(1.115,1.06)}
-#petSvg.is-talking{animation:pet-chat .43s steps(3,end) 2}
-@keyframes pet-chat{50%{translate:0 -7px}}
-.speech{top:5px;z-index:4;max-width:245px;width:max-content;min-width:122px;border:0;background:#f7f8f5;border-radius:14px;padding:8px 12px;font-size:12px;white-space:normal;box-shadow:none}
-.speech:after{border:0;background:#f7f8f5;width:10px;height:10px;bottom:-5px}
-.mouth-target{top:65%;width:95px;height:90px;z-index:3}
-.petname{font-size:15px;margin:1px 0 0;font-weight:800}
-.subrow{display:none}
-.food-panel{margin:10px 0 0;padding:10px 12px;background:#f7f8f5;border-radius:17px}
-.food-head h2{font-size:13px;color:#515b53}.food-head small{font-size:11px}
-.tray{min-height:54px;gap:8px;padding:0}
-.food-item{width:52px;height:52px;flex-basis:52px;border:0;background:#fff;border-radius:12px;padding:4px}
-.food-item svg{width:44px;height:44px;image-rendering:auto;shape-rendering:geometricPrecision;overflow:visible}
-.actions{margin-top:12px;gap:8px;grid-template-columns:repeat(3,minmax(0,1fr))}
-.btn{padding:12px 7px;min-height:46px;border-radius:13px;font-size:13px;background:#f1f3f0}
-.btn.primary{background:#e8efd9}.btn.soft{background:#eff2f1}
-.bottomnav{border-top:1px solid #f0f1ed;padding:6px 12px calc(7px + env(safe-area-inset-bottom))}
-.navbtn{padding:6px 0;font-size:11px}.navbtn.active{color:#438266}
-.page .topbar{margin:8px 0 12px}.page .title{font-size:20px}
-.section{margin-top:17px}.section h2{font-size:15px;font-weight:750;margin-bottom:10px}
-.profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
-.profile-field{min-width:0;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#58665a;font-weight:700}
-.profile-field span{min-height:19px}.profile-field small{font-size:11px;color:#8b968e;font-weight:500}
-.profile-field input,.profile-field select{width:100%;min-width:0;height:44px;padding:10px 11px;border:1px solid #e2e7e0;border-radius:10px;font-size:14px;background:#fff}
-.profile-field.wide{grid-column:1/-1}
-.profile-field select{appearance:auto}
-.profile-grid+.submit{margin-top:14px}
-.card{background:#f9faf8}.themegrid,.pet-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.pet-picker .theme{background:#f8faf7;min-height:75px;display:flex;align-items:center;gap:8px;padding:9px;text-align:left;border:1px solid transparent;cursor:pointer}
-.pet-picker .theme.selected{border-color:#a7c4ad;background:#eff7ef}
-.pet-picker .theme svg{width:57px!important;height:57px!important;flex:0 0 57px}
-.pet-picker .theme strong{font-size:12px;white-space:nowrap}.pet-picker .theme small{display:none}
-.wallpaper-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.wallpaper{display:flex;flex-direction:column;text-align:left;gap:4px;border:0;background:transparent;padding:0;color:#3f4b43}
-.wallpaper-preview{display:block;width:100%;height:92px;border-radius:12px;border:1px solid #e8ebe5;position:relative;overflow:hidden}
-.wall-white{background:#fff}
-.wall-pastel{background:linear-gradient(180deg,#f6ebeb 0 61%,#e6e8d9 61%);}.wall-pastel:after{content:"";position:absolute;bottom:14px;left:17%;width:60px;height:30px;border-radius:30px 30px 6px 6px;background:#e3bdbd;box-shadow:34px -19px 0 -11px #c7d9bb}
-.wall-night{background:radial-gradient(circle at 72% 23%,#f8e3b2 0 12px,transparent 13px),linear-gradient(180deg,#343a65,#62668e 63%,#40435f 63%)}.wall-night:after{content:"· ·  · ·";color:#fff;position:absolute;top:13px;left:13px;letter-spacing:8px}
-.wall-garden{background:linear-gradient(180deg,#e7f0da 0 58%,#b9d9b2 58%)}.wall-garden:after{content:"";position:absolute;bottom:18px;left:15px;width:7px;height:18px;background:#6aa274;box-shadow:19px -8px #7baf7d,68px -5px #7baf7d,89px 0 #6aa274}
-.wallpaper strong{font-size:12px;padding:2px 2px 0}.wallpaper small{font-size:10px;color:#8b988d;padding-left:2px}.wallpaper.selected .wallpaper-preview{outline:2px solid #8cad98;outline-offset:2px}
-.wallpaper.locked .wallpaper-preview{opacity:.9}.wallpaper.locked:focus-visible{outline:2px solid #6a9a73}
-.sheet .preview svg{width:52px;height:52px;image-rendering:auto;shape-rendering:geometricPrecision}
-@media(max-height:740px){.stage{height:clamp(190px,36dvh,260px)}#petSvg{width:min(56vw,215px);height:min(56vw,215px)}.food-panel{margin-top:6px}.actions{margin-top:8px}}
-@media(max-width:350px){.app{padding-left:12px;padding-right:12px}.btn{font-size:11px}.profile-grid{gap:9px}.pet-picker{grid-template-columns:1fr 1fr}}
-
-/* Pixel-illustration mascots v3: clean pixels, tiny accent highlights, no drop shadows. */
-#petSvg,.pet-picker svg{image-rendering:pixelated;shape-rendering:crispEdges;filter:none!important}
-.character-wrap{cursor:pointer}
-#petSvg{width:min(70vw,265px);height:min(70vw,265px)}
-.pet-picker .theme svg{image-rendering:pixelated}
-.pet-picker .theme{min-width:0}.pet-picker .theme strong{white-space:normal}
-
-/* Referenced, pixel-perfect mascots: use the supplied artwork, not reconstructed shapes. */
-#petSvg,.pet-picker .theme .pet-canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;filter:none!important}
-#petSvg{width:min(69vw,265px);height:min(69vw,265px);object-fit:contain}
-#petSvg.thin1,#petSvg.thin2,#petSvg.thin3,#petSvg.chubby1,#petSvg.chubby2,#petSvg.chubby3{transform:none}
-#petSvg.is-talking{animation:pet-chat .43s steps(3,end) 2}
-.pet-picker .theme .pet-canvas{width:61px!important;height:61px!important;flex:0 0 61px}
-.pet-picker .theme div{min-width:0}
-
-/* Clean hand-authored pixel sprites, activity poses and reset */
-.pet-canvas{display:none!important}
-#petSvg.pixel-pet{display:block;width:min(70vw,270px);height:min(70vw,270px);image-rendering:pixelated;shape-rendering:crispEdges;filter:none!important;transform:none!important;overflow:visible}
-.pet-picker .theme svg{width:62px!important;height:62px!important;filter:none;image-rendering:pixelated}
-.character-wrap #petHolder{position:relative;z-index:3}
-.energy-actions{display:flex;align-items:center;gap:10px}
-.reset-calories{padding:5px 8px;color:#707d73;background:#f2f4ef;border:0;border-radius:8px;font-size:11px;font-weight:700}
-.exercise-fx{position:absolute;z-index:4;inset:0;pointer-events:none}
-.exercise-fx svg{position:absolute;inset:0;width:100%;height:100%}
-.stage.act-walk #petHolder{animation:pet-walk .38s steps(2,end) infinite}
-.stage.act-strength #petHolder{animation:pet-lift .7s ease-in-out infinite}
-.stage.act-swim #petHolder{animation:pet-swim .9s ease-in-out infinite}
-.stage.act-dance #petHolder{animation:pet-dance .6s steps(3,end) infinite}
-.stage.act-yoga #petHolder{animation:pet-yoga 1.8s ease-in-out infinite}
-.stage.act-swim .exercise-fx svg{animation:water-waves .9s ease-in-out infinite}
-@keyframes pet-walk{0%,100%{transform:translateX(-8px) translateY(0)}50%{transform:translateX(9px) translateY(-5px)}}
-@keyframes pet-lift{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
-@keyframes pet-swim{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-10px) rotate(5deg)}}
-@keyframes pet-dance{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(8deg) translateY(-8px)}}
-@keyframes pet-yoga{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.91)}}
-@keyframes water-waves{50%{translate:0 8px}}
-
-/* Render the supplied reference pixel matrices at native nearest-neighbor quality. */
-#petSvg.pet-canvas{
- width:auto;height:auto;max-height:265px;
- image-rendering:pixelated;image-rendering:crisp-edges;filter:none!important;
- transform:none!important;display:block;
-}
-.pet-picker .theme canvas.pet-canvas{width:auto!important;height:auto!important;max-width:54px;max-height:64px;image-rendering:pixelated;flex-shrink:0;object-fit:contain}
-.pet-picker .theme>div{display:flex;align-items:center;justify-content:center;width:58px;min-width:58px}
-.character-wrap{display:grid;place-items:center}
+button{border:0;background:none;color:inherit}
+.hidden{display:none!important}
+.app{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;padding:12px 16px calc(86px + env(safe-area-inset-bottom))}
+.page{display:none;flex:1;min-height:0}.page.active{display:flex;flex-direction:column}
+.home-page{display:grid;grid-template-rows:auto 1fr auto;gap:8px;min-height:calc(100dvh - 120px)}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding-top:4px}
+.topbar h1{margin:0;font-size:18px;line-height:1.2;font-weight:800}
+.topbar .kcal-row{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.kcal{font-size:17px;font-weight:800;white-space:nowrap}
+.soft-btn{padding:10px 14px;border-radius:14px;background:var(--panel);font-weight:700;color:#70776f}
+.gauge-wrap{margin-top:4px}
+.gauge{position:relative;height:20px;border-radius:999px;background:var(--track);overflow:hidden}
+.gauge-fill{position:absolute;inset:0;width:100%;background:linear-gradient(90deg,var(--green) 0 40%,var(--yellow) 40% 70%,var(--red) 70% 100%);clip-path:inset(0 100% 0 0);transition:clip-path .25s ease}
+.boundary{position:absolute;top:2px;bottom:2px;width:0;border-left:2px dotted rgba(60,68,63,.5)}
+.boundary.b1{left:40%}.boundary.b2{left:70%}
+.gauge-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);padding:7px 4px 0}
+.center-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;padding:0 6px 6px;position:relative}
+.speech{max-width:240px;background:var(--panel);padding:10px 14px;border-radius:18px;font-weight:700;color:#6d756e;font-size:15px;position:relative;text-align:center;margin-bottom:10px}
+.speech:after{content:"";position:absolute;left:50%;transform:translateX(-50%) rotate(45deg);bottom:-5px;width:10px;height:10px;background:var(--panel)}
+.pet-stage{width:100%;display:flex;align-items:center;justify-content:center;flex:1;position:relative;min-height:220px}
+#petCanvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer;max-width:min(66vw,240px);max-height:320px}
+#fxLayer{position:absolute;inset:0;pointer-events:none}
+#petName{font-size:18px;font-weight:800;margin:8px 0 0;text-align:center}
+.bottom-panel{display:flex;flex-direction:column;gap:10px;padding-bottom:4px}
+.food-panel{background:var(--panel);border-radius:22px;padding:12px 14px 16px}
+.food-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:800}
+.food-tray{display:flex;gap:10px;min-height:76px;overflow-x:auto;padding-bottom:4px}
+.food-item{width:70px;height:70px;border-radius:18px;background:#fff;display:grid;place-items:center;flex:0 0 auto;touch-action:none;box-shadow:inset 0 0 0 1px #ecece7}
+.food-item canvas{image-rendering:pixelated;image-rendering:crisp-edges}
+.empty{min-height:60px;display:flex;align-items:center;color:var(--sub);font-size:14px}
+.action-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.action-btn{background:#e9ecdf;border-radius:18px;padding:16px 10px;text-align:center;font-weight:800;font-size:16px}
+.action-btn.secondary{background:#eceeed}
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;background:rgba(251,251,248,.96);backdrop-filter:blur(8px);border-top:1px solid #e8e8e2;padding:10px 20px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:30}
+.nav-inner{max-width:480px;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nav-btn{padding:10px 4px;text-align:center;font-size:14px;font-weight:700;color:#8b938c}.nav-btn.active{color:#5e8b65}
+.section{background:var(--panel);border-radius:22px;padding:16px;margin-top:10px}
+.section h2{margin:0 0 12px;font-size:17px}
+.field-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}.field.wide{grid-column:1 / -1}
+.field label,.label{font-size:13px;font-weight:700;color:#667067}
+.field input,.field select{height:44px;border:1px solid #e3e5df;background:#fff;border-radius:12px;padding:0 12px;font-size:15px;color:var(--text)}
+.submit{margin-top:14px;width:100%;height:46px;border-radius:14px;background:#dce7d8;font-weight:800}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.list{display:flex;flex-direction:column;gap:10px}.list-item{background:#fff;border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.muted{color:var(--sub);font-size:13px}
+.pet-picker{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.pet-option{background:#fff;border-radius:16px;padding:10px;display:flex;align-items:center;gap:10px;text-align:left;box-shadow:inset 0 0 0 1px #ecece7}
+.pet-option.selected{box-shadow:inset 0 0 0 2px #a7c5a8;background:#f6fbf5}
+.pet-option canvas{image-rendering:pixelated;image-rendering:crisp-edges;flex:0 0 auto}
+.modal-backdrop{position:fixed;inset:0;background:rgba(30,32,30,.28);display:none;align-items:flex-end;justify-content:center;z-index:40;padding:12px}.modal-backdrop.show{display:flex}
+.sheet{width:min(480px,100%);background:var(--bg);border-radius:24px 24px 16px 16px;padding:18px 16px 20px;box-shadow:0 -8px 24px rgba(0,0,0,.08)}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sheet-head h3{margin:0;font-size:18px}
+.choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.choice-btn{background:#fff;border-radius:16px;padding:14px;box-shadow:inset 0 0 0 1px #ecece7;text-align:left}.choice-btn .title{font-weight:800;display:block;margin-bottom:6px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom));background:#3d443f;color:#fff;padding:10px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1}
+@media (max-width:370px){.field-grid{grid-template-columns:1fr}.action-row{gap:8px}.action-btn{font-size:15px;padding:14px 8px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <div id="homePage" class="page active">
-    <div class="energy-header">
-      <div class="energy-top"><span id="energyStatus">今日のエサ</span><span class="energy-actions"><span id="energyAmount">0 kcal</span><button id="resetCalories" class="reset-calories" type="button" aria-label="今日のカロリーとエサと運動をリセット">リセット</button></span></div>
-      <div class="energy-track" id="energyTrack">
-        <span class="energy-zone reduce"></span><span class="energy-zone steady"></span><span class="energy-zone increase"></span>
-        <span class="energy-marker" id="energyMarker"></span>
-      </div>
-      <div class="energy-labels"><span>減量</span><span>維持</span><span>増量</span></div>
-    </div>
-
-    <section class="hero">
-      <div class="speech" id="speech" aria-live="polite">タップしておしゃべり</div>
-      <div class="stage" id="stage">
-        <div class="character-wrap">
-          <div class="mouth-target" id="mouthTarget"></div><div class="exercise-fx" id="exerciseFx" aria-hidden="true"></div>
-          <div id="petHolder"></div>
+  <section class="page home-page active" id="page-home">
+    <div>
+      <div class="topbar">
+        <div>
+          <h1 id="topTitle">プロフィールを設定</h1>
+        </div>
+        <div class="kcal-row">
+          <div class="kcal"><span id="netKcal">0</span> kcal</div>
+          <button class="soft-btn" id="resetBtn" type="button">リセット</button>
         </div>
       </div>
-      <div class="petname" id="petLabel">ミントハムスター</div>
-
-    </section>
-
-    <section class="food-panel">
-      <div class="food-head"><h2>エサ</h2><small id="foodCount">0個</small></div>
-      <div class="tray" id="tray"></div>
-    </section>
-
-    <div class="actions">
-      <button class="btn primary" id="openFoodBtn">ごはん</button>
-      <button class="btn soft" id="openExerciseBtn">運動</button>
-      <button class="btn" id="openWeightBtn">記録</button>
+      <div class="gauge-wrap">
+        <div class="gauge" aria-label="今日のカロリーゲージ">
+          <div class="gauge-fill" id="gaugeFill"></div>
+          <div class="boundary b1"></div>
+          <div class="boundary b2"></div>
+        </div>
+        <div class="gauge-labels"><span>減量</span><span>維持</span><span>増量</span></div>
+      </div>
     </div>
 
-  
+    <div class="center-stage">
+      <div class="speech" id="speech">タップしておしゃべり</div>
+      <div class="pet-stage" id="petStage">
+        <canvas id="petCanvas" width="120" height="180" aria-label="ペット"></canvas>
+        <canvas id="fxLayer" width="320" height="240"></canvas>
+      </div>
+      <div id="petName">ラベンダーうさぎ</div>
+    </div>
 
-  </div>
+    <div class="bottom-panel">
+      <div class="food-panel">
+        <div class="food-head"><span>エサ</span><span id="foodCount">0個</span></div>
+        <div class="food-tray" id="foodTray"></div>
+      </div>
+      <div class="action-row">
+        <button class="action-btn" id="openFoodBtn" type="button">ごはん</button>
+        <button class="action-btn secondary" id="openExerciseBtn" type="button">運動</button>
+        <button class="action-btn secondary" id="toLogsBtn" type="button">記録</button>
+      </div>
+    </div>
+  </section>
 
-  <div id="logsPage" class="page">
-    <div class="topbar"><div class="title">記録</div></div>
-    <section class="section">
-      <h2>今日のログ</h2>
-      <div class="list" id="logsList"></div>
-    </section>
-    <section class="section">
-      <h2>体重の推移</h2>
-      <div class="card" id="weightsCard"></div>
-    </section>
-  </div>
+  <section class="page" id="page-logs">
+    <div class="topbar"><h1>記録</h1></div>
+    <div class="section"><h2>今日の食事</h2><div class="list" id="mealList"></div></div>
+    <div class="section"><h2>今日の運動</h2><div class="list" id="exerciseList"></div></div>
+    <div class="section"><h2>体重履歴</h2><div class="list" id="weightList"></div></div>
+  </section>
 
-  <div id="settingsPage" class="page">
-    <div class="topbar"><div class="title">設定</div></div>
-    <section class="section">
+  <section class="page" id="page-settings">
+    <div class="topbar"><h1>設定</h1></div>
+    <div class="section">
       <h2>プロフィール</h2>
-      <div class="card">
-        <div class="profile-grid">
-          <label class="profile-field"><span>身長 <small>cm</small></span><input id="heightInput" type="number" min="120" max="220" step=".1" inputmode="decimal"></label>
-          <label class="profile-field"><span>体重 <small>kg</small></span><input id="weightInput" type="number" min="20" max="300" step=".1" inputmode="decimal"></label>
-          <label class="profile-field"><span>年齢</span><input id="ageInput" type="number" min="10" max="100" inputmode="numeric"></label>
-          <label class="profile-field"><span>性別（計算用）</span><select id="sexInput"><option value="female">女性</option><option value="male">男性</option></select></label>
-          <label class="profile-field wide"><span>普段の活動量</span><select id="activityInput">
-            <option value="1.2">少ない（座り仕事中心）</option>
-            <option value="1.375">軽め（軽い運動）</option>
-            <option value="1.55">普通（週3〜5日程度の運動）</option>
-            <option value="1.725">多い（ほぼ毎日運動）</option>
-          </select></label>
-        </div>
-        <button class="submit" id="saveProfileBtn" type="button">目安を計算する</button>
-        <p class="small">Mifflin–St Jeor式による推定。体調・年齢・健康状態によって必要量は異なるよ。</p>
+      <div class="field-grid">
+        <div class="field"><label for="heightInput">身長 cm</label><input id="heightInput" type="number" step="0.1"></div>
+        <div class="field"><label for="weightInput">体重 kg</label><input id="weightInput" type="number" step="0.1"></div>
+        <div class="field"><label for="ageInput">年齢</label><input id="ageInput" type="number"></div>
+        <div class="field"><label for="sexInput">性別（計算用）</label><select id="sexInput"><option value="female">女性</option><option value="male">男性</option></select></div>
+        <div class="field wide"><label for="activityInput">活動量</label><select id="activityInput"><option value="1.2">少ない</option><option value="1.375">軽め</option><option value="1.55">普通</option><option value="1.725">多い</option></select></div>
       </div>
-    </section>
-    <section class="section">
-      <h2>キャラクター</h2>
-      <div class="pet-picker" id="petGrid"></div>
-    </section>
-    <section class="section">
-      <h2>背景</h2>
-      <div class="wallpaper-grid">
-        <button type="button" class="wallpaper selected" data-wallpaper="white">
-          <span class="wallpaper-preview wall-white"></span><strong>ホワイト</strong><small>使用中</small>
-        </button>
-        <button type="button" class="wallpaper locked" data-wallpaper="pastel">
-          <span class="wallpaper-preview wall-pastel"></span><strong>パステル</strong><small>プレミアム（準備中）</small>
-        </button>
-        <button type="button" class="wallpaper locked" data-wallpaper="night">
-          <span class="wallpaper-preview wall-night"></span><strong>ナイト</strong><small>プレミアム（準備中）</small>
-        </button>
-        <button type="button" class="wallpaper locked" data-wallpaper="garden">
-          <span class="wallpaper-preview wall-garden"></span><strong>ガーデン</strong><small>プレミアム（準備中）</small>
-        </button>
+      <button class="submit" id="saveProfileBtn" type="button">目安を更新</button>
+      <div class="muted" id="targetText" style="margin-top:10px"></div>
+    </div>
+
+    <div class="section">
+      <h2>キャラを選ぶ</h2>
+      <div class="pet-picker" id="petPicker"></div>
+    </div>
+
+    <div class="section">
+      <h2>体重を記録</h2>
+      <div class="field-grid">
+        <div class="field wide"><label for="weightRecordInput">今日の体重 kg</label><input id="weightRecordInput" type="number" step="0.1"></div>
       </div>
-    </section>
+      <button class="submit" id="saveWeightBtn" type="button">体重を保存</button>
+    </div>
+  </section>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" data-page="home">ホーム</button>
+    <button class="nav-btn" data-page="logs">記録</button>
+    <button class="nav-btn" data-page="settings">設定</button>
   </div>
 </div>
 
-<div class="bottomnav">
-  <div class="inner">
-    <button class="navbtn active" data-page="homePage">ホーム</button>
-    <button class="navbtn" data-page="logsPage">記録</button>
-    <button class="navbtn" data-page="settingsPage">設定</button>
-  </div>
-</div>
-
-<div class="overlay" id="overlay">
+<div class="modal-backdrop" id="foodModal">
   <div class="sheet">
-    <div class="sheethead"><h3 id="sheetTitle">入力</h3><button class="close" id="closeSheet">閉じる</button></div>
-    <div id="sheetBody"></div>
+    <div class="sheet-head"><h3>ごはんを記録</h3><button class="soft-btn" data-close>閉じる</button></div>
+    <div class="field-grid">
+      <div class="field wide"><label for="foodCalInput">カロリー kcal</label><input id="foodCalInput" type="number" step="1" placeholder="例: 700"></div>
+    </div>
+    <button class="submit" id="saveFoodBtn" type="button">エサを作る</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="exerciseModal">
+  <div class="sheet">
+    <div class="sheet-head"><h3>運動を記録</h3><button class="soft-btn" data-close>閉じる</button></div>
+    <div class="choice-grid" id="exerciseChoices"></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script src="sprites.js?v=2"></script>
+<script src="sprites.js"></script>
 <script>
-const KEY='mogu-room-revised-proto-v1';
-const pets=[
-  {name:'ミントハムスター', face:'cheer'},
-  {name:'ラベンダーうさぎ', face:'sleepy'},
-  {name:'ピーチりす', face:'gentle'},
-  {name:'ほしのハリネズミ', face:'cool'},
-  {name:'ペリウィンクルカワウソ', face:'mischief'}
+const STORAGE_KEY='mogu-room-pixel-v2';
+const PETS=[
+  {key:'hamster',name:'ミントハムスター',voice:'ちゅ',say:['きょうもいっしょだちゅ。','おなかのようすをみるちゅ。','もぐもぐしたいちゅ。']},
+  {key:'rabbit',name:'ラベンダーうさぎ',voice:'ぴょん',say:['のんびりいこうぴょん。','ゆっくりでもだいじぴょん。','おしゃべりうれしいぴょん。']},
+  {key:'squirrel',name:'ピーチりす',voice:'りす',say:['きょうもふわっといくりす。','たべるじかんかなりす。','いっしょにがんばるりす。']},
+  {key:'hedgehog',name:'ほしのハリネズミ',voice:'きら',say:['きらっとお世話ありがと。','星みたいにかるくいこう。','いい感じだよ、きら。']},
+  {key:'otter',name:'ペリウィンクルカワウソ',voice:'ぷか',say:['ぷかぷかいい日だぷか。','のんびりでも進んでるぷか。','ちょっと食べたいぷか。']}
 ];
-const foodCatalog=[
-  ['rice',200],['ramen',700],['bread',160],['apple',100],['salad',80],['cake',350],['egg',75],['milk',130],
-  ['soup',120],['sandwich',300],['curry',650],['pasta',550],['fish',180],['chicken',250],['yogurt',110],['cookie',50],
-  ['stew',420],['dumpling',280],['strawberry',35],['donut',230],['nuts',60],['bento',500],['bite',20]
+const FOOD_CATALOG=[
+  {key:'ramen',name:'ラーメン',kcal:700},{key:'bento',name:'おべんとう',kcal:500},{key:'cake',name:'ケーキ',kcal:350},
+  {key:'chicken',name:'チキン',kcal:250},{key:'donut',name:'ドーナツ',kcal:230},{key:'onigiri',name:'おにぎり',kcal:200},
+  {key:'bread',name:'パン',kcal:160},{key:'milk',name:'ミルク',kcal:130},{key:'salad',name:'サラダ',kcal:80},
+  {key:'apple',name:'りんご',kcal:100},{key:'fish',name:'おさかな',kcal:180},{key:'cookie',name:'クッキー',kcal:50}
 ];
-const foodNames={rice:'おにぎり',ramen:'ラーメン',bread:'トースト',apple:'りんご',salad:'サラダ',cake:'ケーキ',egg:'たまご',milk:'ミルク',soup:'スープ',sandwich:'サンドイッチ',curry:'カレー',pasta:'パスタ',fish:'焼き魚',chicken:'チキン',yogurt:'ヨーグルト',cookie:'クッキー',stew:'シチュー',dumpling:'ぎょうざ',strawberry:'いちご',donut:'ドーナツ',nuts:'ナッツ',bento:'おべんとう',bite:'ひとくち'};
-const exerciseKinds={walk:{label:'ウォーキング', icon:'walk', burnPerMin:3.5}, strength:{label:'筋トレ', icon:'strength', burnPerMin:5.5}, swim:{label:'水泳', icon:'swim', burnPerMin:7.5}, dance:{label:'ダンス', icon:'dance', burnPerMin:5}, yoga:{label:'ヨガ', icon:'yoga', burnPerMin:2.5}};
-const state=load();
-state.fedEvents=Array.isArray(state.fedEvents)?state.fedEvents:[];
-state.activeDay=state.activeDay||today();
-state.foodPieces=(state.foodPieces||[]).filter(x=>!x.createdAt||localDateOf(x.createdAt)===state.activeDay);
-let drag=null;let expression='neutral';let lastDialogueIndex=-1;let chatTimer=null;
+const EXERCISES=[
+  {key:'walk',name:'ウォーキング',burn:120,label:'てくてく歩いたよ'},
+  {key:'strength',name:'筋トレ',burn:180,label:'ダンベルで筋トレしたよ'},
+  {key:'swim',name:'水泳',burn:220,label:'すいすい泳いだよ'},
+  {key:'dance',name:'ダンス',burn:160,label:'リズムにのって動いたよ'},
+  {key:'yoga',name:'ヨガ',burn:90,label:'ゆっくり伸びたよ'}
+];
+const FACE_POINTS={hamster:{x:21,y:9},rabbit:{x:19,y:15},squirrel:{x:19,y:14},hedgehog:{x:19,y:12},otter:{x:20,y:11}};
+const BODY_RANGES={hamster:{cheek:[7,12],belly:[13,32]},rabbit:{cheek:[15,22],belly:[24,56]},squirrel:{cheek:[20,27],belly:[28,49]},hedgehog:{cheek:[14,18],belly:[19,44]},otter:{cheek:[9,15],belly:[16,34]}};
+let dragData=null, toastTimer=null, actionTimer=null;
 
+function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function emptyState(){return {
+  date: today(), petIndex:1, foodPieces:[], meals:[], feedings:[], exercises:[], weights:[],
+  profile:{height:'',weight:'',age:'',sex:'female',activity:'1.2'}, targets:null, profileHash:'', face:'neutral'
+}}
 function load(){
-  try{
-    return Object.assign({
-      petIndex:0,bg:'white',
-      profile:{height:'',weight:'',age:'',sex:'female',activity:'1.375'},
-      targets:null,
-      meals:[], exercises:[], weights:[],
-      foodPieces:[]
-    }, JSON.parse(localStorage.getItem(KEY)||'{}'))
-  }catch{ return {petIndex:0,bg:'white',profile:{height:'',weight:'',age:'',sex:'female',activity:'1.375'},targets:null,meals:[],exercises:[],weights:[],foodPieces:[]} }
+  try{const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return emptyState();
+    return {...emptyState(), ...JSON.parse(raw), profile:{...emptyState().profile,...(JSON.parse(raw).profile||{})}};
+  }catch(e){return emptyState()}
 }
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
-function today(){
- const d=new Date();
- return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
-}
-function clearDaily(date){
- const day=date||today();
- state.meals=state.meals.filter(x=>x.date!==day);
- state.fedEvents=state.fedEvents.filter(x=>x.date!==day);
- state.exercises=state.exercises.filter(x=>x.date!==day);
- state.foodPieces=[];
-}
-function ensureDay(){
- const now=today();
- if(state.activeDay===now)return false;
- // Pending snacks should never carry across calendar days.
- state.foodPieces=(state.foodPieces||[]).filter(x=>!x.createdAt||localDateOf(x.createdAt)===now);
- state.activeDay=now;
- save();
- if(document.getElementById('petHolder')){expression='neutral';renderAll();}
- return true;
-}
-function localDateOf(ts){
- const d=new Date(ts);
- return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
-}
-function resetToday(message){
- clearDaily(today());
- expression='neutral';
- save();renderAll();
- q('#speech').textContent='また新しい一日を始めよう。';
- if(message)toast(message);
-}
+let state=load();
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function ensureDay(){if(state.date!==today()){state.date=today();clearDaily();save();toast('日付が変わったのでリセットしたよ');renderAll();}}
+function clearDaily(){state.foodPieces=[];state.meals=state.meals.filter(x=>x.date!==today());state.feedings=state.feedings.filter(x=>x.date!==today());state.exercises=state.exercises.filter(x=>x.date!==today())}
 function q(s){return document.querySelector(s)}
 function qa(s){return [...document.querySelectorAll(s)]}
-function toast(msg){const t=q('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._);toast._=setTimeout(()=>t.classList.remove('show'),2200)}
-function openSheet(title,html){q('#sheetTitle').textContent=title;q('#sheetBody').innerHTML=html;q('#overlay').classList.add('open')}
-function closeSheet(){q('#overlay').classList.remove('open')}
-
-function icon(name){
-  const map={
-    walk:'<path d="M14 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/><path d="m8 20 3-5 2-2 3 3 2 4M3 12l5-4 4 3 4 1 5-2M12 11l-2 5"/>',
-    strength:'<path d="M2 10h3v4H2zM19 10h3v4h-3zM5 11h14"/><path d="M8 9v6M16 9v6"/>',
-    swim:'<path d="M2 15c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2"/><circle cx="14" cy="8" r="2"/><path d="m10 12 4-2 5 1"/>',
-    dance:'<circle cx="12" cy="4" r="2"/><path d="M8 21l2-5 2-2 2 2 2 5M6 12l4-3 2 2 2-2 4 3"/>',
-    yoga:'<circle cx="12" cy="5" r="2"/><path d="M7 11c1 3 3 4 5 4s4-1 5-4M6 21c2-3 4-4 6-4s4 1 6 4"/>'
-  };
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${map[name]||''}</svg>`
+function toast(msg){const el=q('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1800)}
+function netCalories(){return Math.max(0,fedCalories()-exerciseCalories())}
+function fedCalories(){return state.feedings.filter(x=>x.date===today()).reduce((a,b)=>a+b.kcal,0)}
+function exerciseCalories(){return state.exercises.filter(x=>x.date===today()).reduce((a,b)=>a+b.burn,0)}
+function profileHash(p){return JSON.stringify([p.height,p.weight,p.age,p.sex,p.activity])}
+function calcTargets(){
+  const p=state.profile; const h=Number(p.height), w=Number(p.weight), age=Number(p.age), act=Number(p.activity); if(!(h&&w&&age&&act)) return null;
+  const bmr=p.sex==='male' ? 10*w + 6.25*h - 5*age + 5 : 10*w + 6.25*h - 5*age - 161;
+  const maintain=Math.round(bmr*act); return {lose:[Math.round(maintain-500), Math.round(maintain-150)], maintain:[Math.round(maintain-149), Math.round(maintain+149)], gain:[Math.round(maintain+150), Math.round(maintain+500)]};
 }
-
-function foodSvg(kind){
-  const svgs={
-    rice:`<svg viewBox="0 0 24 24"><rect x="7" y="10" width="10" height="8" fill="#262626"/><path d="M5 10 12 4l7 6v8H5Z" fill="#fff8eb" stroke="#262626" stroke-width="1"/></svg>`,
-    ramen:`<svg viewBox="0 0 24 24"><path d="M4 11h16l-2 7H6Z" fill="#d8b6a4" stroke="#262626" stroke-width="1"/><path d="M6 10c2-2 4 0 6-1s3-1 6 1" fill="none" stroke="#eacb69" stroke-width="2"/><path d="M7 4l9-2" stroke="#262626" stroke-width="1.2"/><path d="M9 7 18 5" stroke="#262626" stroke-width="1.2"/></svg>`,
-    bread:`<svg viewBox="0 0 24 24"><path d="M6 18V9c0-2 2-3 4-2 1-1 3-1 4 0 2-1 4 0 4 2v9Z" fill="#dbad79" stroke="#262626" stroke-width="1"/><path d="M8 16V9c1-1 2-1 3 0 1-1 2-1 3 0 1-1 2-1 3 0v7Z" fill="#fff0c5"/></svg>`,
-    apple:`<svg viewBox="0 0 24 24"><path d="M12 7c-4-2-7 1-6 5 1 5 4 7 6 7s5-2 6-7c1-4-2-7-6-5Z" fill="#da9894" stroke="#262626" stroke-width="1"/><path d="M12 7c0-2 1-3 2-4" stroke="#262626" stroke-width="1.2"/><path d="M13 4c2-1 4 0 4 1-2 1-3 1-4-1Z" fill="#86b67f" stroke="#262626" stroke-width="1"/></svg>`,
-    salad:`<svg viewBox="0 0 24 24"><path d="M4 12h16l-2 6H6Z" fill="#f5e8d2" stroke="#262626" stroke-width="1"/><circle cx="8" cy="10" r="3" fill="#80b77e"/><circle cx="13" cy="9" r="3.2" fill="#9bc589"/><circle cx="17" cy="10" r="2.8" fill="#76ae74"/></svg>`,
-    cake:`<svg viewBox="0 0 24 24"><path d="M5 11h14v8H5Z" fill="#efc2b4" stroke="#262626" stroke-width="1"/><path d="M5 13h14" stroke="#fff7e8" stroke-width="2"/><path d="M5 11c1-3 3-2 4-1 1-2 3-2 4-1 2-2 4-1 6 1" fill="#fff8ef" stroke="#262626" stroke-width="1"/><rect x="11" y="5" width="2" height="4" fill="#d88989"/></svg>`,
-    egg:`<svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="6" ry="8" fill="#fff8eb" stroke="#262626" stroke-width="1"/><circle cx="12" cy="13" r="3" fill="#efc56b"/></svg>`,
-    milk:`<svg viewBox="0 0 24 24"><path d="M8 5h8l1 3v11H7V8Z" fill="#f8f8f0" stroke="#262626" stroke-width="1"/><path d="M7 13h10" stroke="#9fc8c7" stroke-width="2"/></svg>`,
-    soup:`<svg viewBox="0 0 24 24"><path d="M4 12h16l-2 6H6Z" fill="#bccfc0" stroke="#262626" stroke-width="1"/><path d="M6 11h12" stroke="#efcf95" stroke-width="2"/><path d="M9 6c-1 1-1 2 0 3M13 5c-1 1-1 2 0 3" stroke="#262626" stroke-width="1.2"/></svg>`,
-    sandwich:`<svg viewBox="0 0 24 24"><path d="M4 9h16L12 18Z" fill="#dcad7c" stroke="#262626" stroke-width="1"/><path d="M6 10h12l-6 6Z" fill="#98bf8f"/></svg>`,
-    curry:`<svg viewBox="0 0 24 24"><path d="M4 12h16l-2 6H6Z" fill="#faf4e2" stroke="#262626" stroke-width="1"/><path d="M5 12c2-4 6-3 8-2 3-1 5 0 6 2" fill="#b58a66"/></svg>`,
-    pasta:`<svg viewBox="0 0 24 24"><ellipse cx="12" cy="15" rx="8" ry="4" fill="#f6f0e4" stroke="#262626" stroke-width="1"/><path d="M6 14c2-3 4 1 6-1s3-2 6 1" fill="none" stroke="#e1c36e" stroke-width="2"/></svg>`,
-    fish:`<svg viewBox="0 0 24 24"><path d="M4 12c3-5 8-4 11-1l5-3v8l-5-3c-3 3-8 4-11-1Z" fill="#aec8c1" stroke="#262626" stroke-width="1"/><circle cx="8" cy="11" r="1" fill="#262626"/></svg>`,
-    chicken:`<svg viewBox="0 0 24 24"><path d="M7 13c-1-4 2-6 5-5 4-1 6 2 5 5-1 4-4 5-7 5-2 0-3-2-3-5Z" fill="#d3a27b" stroke="#262626" stroke-width="1"/><path d="M16 16l3 3" stroke="#fff7e9" stroke-width="2"/></svg>`,
-    yogurt:`<svg viewBox="0 0 24 24"><path d="M7 8h10l-1 10H8Z" fill="#fbf9ef" stroke="#262626" stroke-width="1"/><path d="M6 8h12" stroke="#9ec8bf" stroke-width="2"/><circle cx="12" cy="14" r="2" fill="#dc9aa6"/></svg>`,
-    cookie:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="#e0b67f" stroke="#262626" stroke-width="1"/><circle cx="9" cy="10" r="1" fill="#9a7b61"/><circle cx="14" cy="12" r="1" fill="#9a7b61"/><circle cx="12" cy="15" r="1" fill="#9a7b61"/></svg>`,
-    stew:`<svg viewBox="0 0 24 24"><path d="M4 12h16l-2 6H6Z" fill="#c6aaa5" stroke="#262626" stroke-width="1"/><circle cx="9" cy="12" r="2" fill="#dcb38d"/><circle cx="14" cy="12" r="2" fill="#9fbd90"/></svg>`,
-    dumpling:`<svg viewBox="0 0 24 24"><path d="M5 15c2-5 6-5 7-5 4 0 6 2 7 5-4 3-10 3-14 0Z" fill="#f0deb1" stroke="#262626" stroke-width="1"/><path d="M9 12l1 2M12 11l1 3M15 12l1 2" stroke="#cfbb93" stroke-width="1"/></svg>`,
-    strawberry:`<svg viewBox="0 0 24 24"><path d="M12 8c-4-1-6 2-5 5 1 4 3 5 5 5s4-2 5-5c1-3-1-6-5-5Z" fill="#dd9390" stroke="#262626" stroke-width="1"/><path d="M8 8 12 6l1 2 3-2 1 2" fill="#89b584" stroke="#262626" stroke-width="1"/></svg>`,
-    donut:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="#e6ba88" stroke="#262626" stroke-width="1"/><circle cx="12" cy="12" r="3" fill="#fffaf0"/><path d="M6 10c2-4 8-4 12 0" stroke="#e2a4b0" stroke-width="2"/></svg>`,
-    nuts:`<svg viewBox="0 0 24 24"><ellipse cx="9" cy="13" rx="3" ry="5" fill="#d1a07d" stroke="#262626" stroke-width="1"/><ellipse cx="15" cy="11" rx="3" ry="5" fill="#e4be95" stroke="#262626" stroke-width="1"/></svg>`,
-    bento:`<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1" fill="#a8907d" stroke="#262626" stroke-width="1"/><path d="M12 6v12M4 12h16" stroke="#f0e4c7" stroke-width="1"/><circle cx="8" cy="9" r="2" fill="#faf5e1"/><circle cx="16" cy="9" r="2" fill="#dbab89"/><circle cx="8" cy="15" r="2" fill="#94b58a"/><circle cx="16" cy="15" r="2" fill="#f0cf84"/></svg>`,
-    bite:`<svg viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="6" ry="5" fill="#f1deb6" stroke="#262626" stroke-width="1"/><circle cx="12" cy="13" r="2" fill="#deaf97"/></svg>`
-  };
-  return svgs[kind]||svgs.bite;
-}
-
-function chooseFoods(cal){
-  cal=Math.round(Number(cal)); if(!(cal>0)) return [];
-  if(cal===200) return ['rice']; if(cal===700) return ['ramen']; if(cal===900) return ['rice','ramen']; if(cal<35) return ['bite'];
-  let best={score:Infinity,items:['rice']};
-  function consider(items,sum){
-    const diff=Math.abs(sum-cal), dup=items.length-new Set(items).size;
-    const score=diff*1.7+items.length*12+dup*26;
-    if(score<best.score) best={score,items:[...items]};
+function bodyStage(){
+  const n=netCalories(); if(!state.targets||n===0) return 'normal';
+  const t=state.targets;
+  if(n>=t.maintain[0] && n<=t.maintain[1]) return 'normal';
+  if(n<t.maintain[0]){
+    const p=Math.max(0,Math.min(1,n/Math.max(1,t.lose[1])));
+    return p<.34 ? 'thin3' : p<.67 ? 'thin2' : 'thin1';
   }
-  for(let i=0;i<foodCatalog.length;i++){
-    const [aKey,aCal]=foodCatalog[i]; consider([aKey],aCal);
-    for(let j=i;j<foodCatalog.length;j++){
-      const [bKey,bCal]=foodCatalog[j]; const ab=aCal+bCal; if(ab>cal+140) continue; consider([aKey,bKey],ab);
-      for(let k=j;k<foodCatalog.length;k++){
-        const [cKey,cCal]=foodCatalog[k]; const abc=ab+cCal; if(abc>cal+100) continue; consider([aKey,bKey,cKey],abc);
-      }
+  const p=(n-t.gain[0])/Math.max(1,(t.gain[1]-t.gain[0]));
+  return p<.34 ? 'chubby1' : p<.67 ? 'chubby2' : 'chubby3';
+}
+function deformation(stage){return ({thin3:-3,thin2:-2,thin1:-1,normal:0,chubby1:1,chubby2:2,chubby3:3})[stage]||0}
+function drawPet(){
+  const pet=PETS[state.petIndex], info=spriteInfo(pet.key), rows=SPRITES[pet.key], canvas=q('#petCanvas'), scale=4;
+  canvas.width=info.width*scale + 56; canvas.height=info.height*scale + 36;
+  canvas.style.width=Math.min(240, Math.max(140, info.width*scale*1.15))+'px';
+  canvas.style.height='auto';
+  const ctx=canvas.getContext('2d'); ctx.imageSmoothingEnabled=false; ctx.clearRect(0,0,canvas.width,canvas.height);
+  const off=document.createElement('canvas'); off.width=info.width; off.height=info.height; const octx=off.getContext('2d'); octx.imageSmoothingEnabled=false; drawSprite(octx,pet.key,1);
+  const stage=bodyStage(), def=deformation(stage), ranges=BODY_RANGES[pet.key];
+  const baseX=Math.floor((canvas.width - info.width*scale)/2), baseY=14;
+  for(let y=0;y<info.height;y++){
+    let rowWidth=info.width;
+    const inCheek = y>=ranges.cheek[0] && y<=ranges.cheek[1];
+    const inBelly = y>=ranges.belly[0] && y<=ranges.belly[1];
+    let extra=0;
+    if(def!==0){
+      if(inCheek) extra += def*2;
+      if(inBelly) extra += def*2.8;
     }
+    rowWidth = Math.max(18, info.width + extra);
+    const dx = Math.floor((canvas.width - rowWidth*scale)/2);
+    ctx.drawImage(off,0,y,info.width,1,dx,baseY+y*scale,rowWidth*scale,scale);
   }
-  return best.items;
+  drawFaceReaction(ctx, pet.key, scale, baseX, baseY, state.face);
 }
-
-function calcTargets(profile){
-  const h=Number(profile.height), w=Number(profile.weight), age=Number(profile.age), act=Number(profile.activity);
-  if(!(h>0&&w>0&&age>0&&act>0)) return null;
-  const bmr = profile.sex==='male' ? 10*w + 6.25*h - 5*age + 5 : 10*w + 6.25*h - 5*age - 161;
-  const tdee = Math.round(bmr*act);
-  return {
-    maintain:[Math.round(tdee-100), Math.round(tdee+100)],
-    lose:[Math.round(tdee-500), Math.round(tdee-200)],
-    gain:[Math.round(tdee+150), Math.round(tdee+450)],
-    tdee
-  };
+function drawFaceReaction(ctx,key,scale,baseX,baseY,face){
+  if(face==='neutral') return;
+  const p=FACE_POINTS[key]; const x=baseX + p.x*scale; const y=baseY + p.y*scale;
+  ctx.fillStyle=SPRITE_PALETTE.K;
+  if(face==='blink' || face==='wink'){ctx.fillRect(x-12,y+2,10,2);}
+  if(face==='happy' || face==='smile'){ctx.fillStyle='#efb7c7'; ctx.fillRect(x-16,y+10,8,2); ctx.fillRect(x+16,y+10,8,2);}
+  if(face==='surprised'){ctx.fillStyle=SPRITE_PALETTE.K; ctx.fillRect(x+4,y+10,4,8);}
 }
-
-
-const speechByState={
-lose:[
-'今日はゆっくりお世話してくれる？','ひとくちずつ、いただきます。','おなかの声も聞いてみよう。','急がなくても大丈夫だよ。','今日は何して遊ぶ？',
-'お水を飲んでひと休みしよう。','お昼寝も大事な冒険だよ。','エサを持ってきてくれたの？','ちょっとお散歩したいな。','お日さまの下でごろごろしたい。',
-'今日はどんな日だった？','小さな一歩でもうれしいよ。','のんびりした日も好きだよ。','ぼくのこと見てくれてありがとう。','ふかふかの場所を探そう。',
-'今日は静かな気分なんだ。','ゆっくりもぐもぐしたいな。','元気をためる時間も必要だよ。','おしゃべりできてうれしい。','またあとで遊ぼうね。'
-],
-maintain:[
-'今日はごきげんな日だよ。','会いに来てくれたんだね。','おなかいっぱいの夢を見たよ。','ほっぺをつんつんしてみて。','ここがぼくのお気に入り。',
-'いっしょにお昼寝しよう。','なんだか歌いたい気分！','エサの時間、楽しみだな。','今日もよろしくね。','おへやでお話ししよう。',
-'ふわふわの雲を見つけたよ。','ぼくの顔、よく見てみて。','ちょっとくすぐったいよ。','いいことが起きそうな予感！','おさんぽに行きたいな。',
-'何もしない時間も好きなんだ。','今日はにこにこしていたい。','もう一回タップしてみて。','ふたりでのんびりしよう。','お世話してくれてありがとう。'
-],
-gain:[
-'もぐもぐ、幸せな時間！','今日はたくさんおしゃべりしたい。','まんまる気分だよ。','ふかふかのおふとんが恋しい。','ころころ転がってみようかな。',
-'おなかをなでてみる？','今日はほっぺがぷにぷに。','なんだか眠くなっちゃった。','のんびり過ごすのがいちばん。','おやつの夢を見たんだ。',
-'うれしくて跳ねちゃいそう！','ごろりんとひと休み。','いっしょに景色を見ようよ。','ゆっくり動くのも楽しいね。','今日はごきげんでのびのび。',
-'ごちそうさまって言いたいな。','おいしい夢を見ていたよ。','ほっぺに触れたらくすぐったい。','またいっしょに遊ぼうね。','今日も会えてうれしい！'
-]
-};
-const petVoice=[
- {start:'ちゅっ、',end:'だちゅ。',alt:'ちゅ〜。'},
- {start:'ふぁぁ、',end:'ぴょん。',alt:'だぴょん。'},
- {start:'るるっ、',end:'りす。',alt:'なのりす。'},
- {start:'きらっ、',end:'なのさ。',alt:'だよ、きら。'},
- {start:'ぷかっ、',end:'だぷか。',alt:'ぷかぷか。'}
-];
-function fedToday(){return Math.round(state.fedEvents.filter(x=>x.date===today()).reduce((sum,x)=>sum+(Number(x.cal)||0),0))}
-function netToday(){return Math.max(0,fedToday()-todayExerciseBurn())}
-function fedPieceEnergy(piece){
- if(Number.isFinite(Number(piece.cal))&&Number(piece.cal)>0)return Number(piece.cal);
- const item=foodCatalog.find(([kind])=>kind===piece.kind);return item?item[1]:80;
-}
-function conversationRegime(){
- if(!state.targets||netToday()===0)return 'maintain';
- return netToday()<state.targets.maintain[0]?'lose':netToday()<=state.targets.maintain[1]?'maintain':'gain';
-}
-function speakToPet(forceText){
- const mode=conversationRegime(),lines=speechByState[mode];
- let index=Math.floor(Math.random()*lines.length);if(index===lastDialogueIndex)index=(index+1)%lines.length;lastDialogueIndex=index;
- const pet=petVoice[state.petIndex]||petVoice[0],str=forceText||lines[index];
- const base=str.replace(/[。！!]+$/,'');
- const endings=pet.end;
- q('#speech').textContent=(pet.start&&Math.random()>.5?pet.start:'')+base+endings;
- expression=['happy','blink','surprised','wink','smile','neutral'][index%6];
- renderPet();
- clearTimeout(chatTimer);
- const icon=q('#petSvg');if(icon)icon.classList.add('is-talking');
- chatTimer=setTimeout(()=>{expression='neutral';renderPet()},2500);
-}
-
-function bodyState(){
-  const cal=netToday(); const t=state.targets; if(!t||cal===0) return {key:'normal', label:'ふつう'};
-  const [l0,l1]=t.lose, [m0,m1]=t.maintain, [g0,g1]=t.gain;
-  if(cal>=m0 && cal<=m1) return {key:'normal',label:'ふつう'};
-  if(cal>=l0 && cal<=l1){ const p=(cal-l0)/(l1-l0||1); return p<.34?{key:'thin3',label:'かなりスリム'}:p<.67?{key:'thin2',label:'スリム'}:{key:'thin1',label:'ややスリム'} }
-  if(cal>=g0 && cal<=g1){ const p=(cal-g0)/(g1-g0||1); return p<.34?{key:'chubby1',label:'ややふっくら'}:p<.67?{key:'chubby2',label:'ふっくら'}:{key:'chubby3',label:'かなりふっくら'} }
-  if(cal<l0) return {key:'thin3',label:'かなりスリム'};
-  if(cal>g1) return {key:'chubby3',label:'かなりふっくら'};
-  return cal<m0 ? {key:'thin1',label:'ややスリム'} : {key:'chubby1',label:'ややふっくら'};
-}
-
-
-
-
-const SPRITE_IDS=['hamster','rabbit','squirrel','hedgehog','otter'];
-const SPRITE_BODY_REGIONS=[
- {cheek:[14,22],belly:[23,32],cx:23}, 
- {cheek:[26,38],belly:[39,56],cx:19},
- {cheek:[28,37],belly:[38,50],cx:16},
- {cheek:[21,31],belly:[32,47],cx:20},
- {cheek:[12,21],belly:[22,34],cx:20}
-];
-function petSvg(index,stateKey,faceState='neutral'){
- const name=SPRITE_IDS[index]||SPRITE_IDS[0];
- const info=spriteInfo(name);
- const h=info.height+10;
- const displayWidth=Math.min(235,Math.round(240*52/h));
- return '<canvas id="petSvg" class="pet-canvas" width="52" height="'+h+'" style="width:min(70vw,'+displayWidth+'px);height:auto" data-sprite="'+name+'" data-stage="'+stateKey+'" data-face="'+faceState+'" role="img" aria-label="'+pets[index].name+'"></canvas>';
-}
-function drawPetCanvas(canvas){
- if(!canvas)return;
- const name=canvas.dataset.sprite;
- const data=SPRITES[name];if(!data)return;
- const index=Math.max(0,SPRITE_IDS.indexOf(name));
- const stage=canvas.dataset.stage||'normal';
- const face=canvas.dataset.face||'neutral';
- const c=canvas.getContext('2d');
- if(!c)return;
- c.imageSmoothingEnabled=false;c.clearRect(0,0,canvas.width,canvas.height);
- // Draw the exact supplied pixels to an offscreen bitmap first; never interpolate colors.
- const raw=document.createElement('canvas');raw.width=40;raw.height=data.length;
- const source=raw.getContext('2d');source.imageSmoothingEnabled=false;drawSprite(source,name,1);
- const startY=5;
- const level={thin3:-3,thin2:-2,thin1:-1,normal:0,chubby1:1,chubby2:2,chubby3:3}[stage]||0;
- const region=SPRITE_BODY_REGIONS[index];
- for(let y=0;y<data.length;y++){
-  const [c0,c1]=region.cheek,[b0,b1]=region.belly;
-  function bump(range,peak){
-   const [lo,hi]=range;if(y<lo||y>hi)return 0;
-   const mid=(lo+hi)/2,half=Math.max(1,(hi-lo)/2);
-   return peak*Math.max(0,1-Math.pow((y-mid)/half,2));
-  }
-  // Maximum deformation is small so face, silhouette and props remain recognizable.
-  const amount=level*(bump([c0,c1],.035)+bump([b0,b1],.065));
-  const width=Math.max(34,Math.round(40*(1+amount)));
-  const x=Math.round((52-width)/2);
-  c.drawImage(raw,0,y,40,1,x,startY+y,width,1);
- }
- if(face!=='neutral'){
-  // Reaction accents are separate from the original artwork and disappear after speaking.
-  const coords=[[26,16],[24,31],[24,35],[24,26],[26,17]];
-  const [x,y]=coords[index],py=startY+y;
-  if(face==='surprised'){
-   c.fillStyle=SPRITE_PALETTE.K;
-   c.fillRect(x+3,py-2,2,3);
-  }else if(face==='happy'||face==='smile'){
-   c.fillStyle=SPRITE_PALETTE.I;
-   c.fillRect(x-3,py+2,3,1);
-   c.fillRect(x+8,py+2,3,1);
-  }else if(face==='wink'||face==='blink'){
-   c.fillStyle=SPRITE_PALETTE.K;
-   c.fillRect(x-3,py,4,1);
-  }
- }
-}
-
-function renderPet(){
- const shape=bodyState();
- q('#petHolder').innerHTML=petSvg(state.petIndex,shape.key,expression);
- drawPetCanvas(q('#petHolder .pet-canvas'));
- q('#petLabel').textContent=pets[state.petIndex].name;
-}
-function renderPetGrid(){
- q('#petGrid').innerHTML=pets.map((pet,i)=>'<button class="theme '+(i===state.petIndex?'selected':'')+'" data-pet="'+i+'"><div>'+petSvg(i,'normal','neutral')+'</div><strong>'+pet.name+'</strong></button>').join('');
- q('#petGrid').querySelectorAll('.pet-canvas').forEach(drawPetCanvas);
- q('#petGrid').querySelectorAll('[data-pet]').forEach(btn=>btn.addEventListener('click',()=>{state.petIndex=Number(btn.dataset.pet);expression='neutral';save();renderAll();toast('キャラを変更したよ')}));
-}
-function todayMeals(){return state.meals.filter(x=>x.date===today())}
-function todayExercises(){return state.exercises.filter(x=>x.date===today())}
-function todayCalories(){return todayMeals().reduce((a,b)=>a+b.cal,0)}
-function todayExerciseBurn(){return Math.round(todayExercises().reduce((a,b)=>a+b.burn,0))}
-function renderSummary(){
- const energy=netToday(),t=state.targets;
- q('#energyAmount').textContent=energy+' kcal';
- if(!t){q('#energyStatus').textContent='プロフィールを設定';q('#energyMarker').style.left='0%';return}
- const upper=Math.max(1,t.gain[1]);
- q('#energyStatus').textContent='今日の収支';
- const pct=Math.min(99,energy/upper*100);
- q('#energyMarker').style.left=pct+'%';
- const [l0,l1]=t.lose,[m0,m1]=t.maintain,[g0,g1]=t.gain;
- let a=Math.max(10,l1/upper*100),b=Math.max(10,(m1-l1)/upper*100);
- const first=q('.energy-zone.reduce'),second=q('.energy-zone.steady'),third=q('.energy-zone.increase');
- first.style.width=a+'%';second.style.width=b+'%';third.style.width=Math.max(0,100-a-b)+'%';
- q('#energyTrack').setAttribute('aria-label','エサ '+energy+' kcal、減量目安 '+l0+'〜'+l1+' kcal、維持 '+m0+'〜'+m1+' kcal、増量 '+g0+'〜'+g1+' kcal');
-}
-
+function drawFoodCanvas(canvas,name){const info=foodSpriteInfo(name), px=4; canvas.width=info.width*px; canvas.height=info.height*px; drawFoodSprite(canvas.getContext('2d'),name,px)}
 function renderTray(){
- const tray=q('#tray');
- q('#foodCount').textContent=state.foodPieces.length+'個';
- tray.innerHTML=state.foodPieces.length
- ?state.foodPieces.map((p,idx)=>'<button class="food-item" data-food-index="'+idx+'" aria-label="'+(foodNames[p.kind]||'エサ')+'">'+foodSvg(p.kind)+'</button>').join('')
- :'<div class="empty">ごはんを記録するとエサが出るよ</div>';
- qa('.food-item').forEach(setupFoodDrag);
-}
-
-function setupFoodDrag(btn){
-  btn.addEventListener('pointerdown',e=>{
-    const idx=Number(btn.dataset.foodIndex);
-    drag={idx, ghost:document.createElement('div')};
-    drag.ghost.className='food-item';
-    drag.ghost.style.position='fixed'; drag.ghost.style.zIndex='55'; drag.ghost.style.pointerEvents='none';
-    drag.ghost.style.left=e.clientX-29+'px'; drag.ghost.style.top=e.clientY-29+'px';
-    drag.ghost.innerHTML=state.foodPieces[idx] ? foodSvg(state.foodPieces[idx].kind) : '';
-    document.body.appendChild(drag.ghost);
-    q('#mouthTarget').classList.add('active');
-    btn.setPointerCapture(e.pointerId);
+  const tray=q('#foodTray'); q('#foodCount').textContent=`${state.foodPieces.length}個`;
+  if(!state.foodPieces.length){ tray.innerHTML='<div class="empty">ごはんを記録するとエサがここに並ぶよ</div>'; return; }
+  tray.innerHTML=state.foodPieces.map((piece,i)=>`<div class="food-item" data-i="${i}" aria-label="${piece.name}"><canvas></canvas></div>`).join('');
+  qa('#foodTray .food-item').forEach((el,idx)=>{
+    drawFoodCanvas(el.querySelector('canvas'), state.foodPieces[idx].key);
+    bindDrag(el, idx);
   });
-  btn.addEventListener('pointermove',e=>{
-    if(!drag) return;
-    drag.ghost.style.left=e.clientX-29+'px'; drag.ghost.style.top=e.clientY-29+'px';
-  });
-  btn.addEventListener('pointerup',e=>finishDrag(e.clientX,e.clientY));
-  btn.addEventListener('pointercancel',()=>cancelDrag());
 }
-function finishDrag(x,y){
- if(!drag)return;
- const mouth=q('#mouthTarget').getBoundingClientRect();
- const stage=q('#petHolder').getBoundingClientRect();
- const inside=(x>=mouth.left-35&&x<=mouth.right+35&&y>=mouth.top-35&&y<=mouth.bottom+35)
- ||(x>=stage.left+stage.width*.3&&x<=stage.right-stage.width*.3&&y>=stage.top+stage.height*.3&&y<=stage.bottom-stage.height*.2);
- if(inside){
-  const item=state.foodPieces[drag.idx];
-  if(item){
-    state.fedEvents.push({date:today(),cal:fedPieceEnergy(item)});
-    state.foodPieces.splice(drag.idx,1);
-    save();renderSummary();renderTray();renderPet();
-    speakToPet('おいしい！ ありがとう');
+function chooseFoods(kcal){
+  let remaining=kcal; const pieces=[];
+  const sorted=[...FOOD_CATALOG].sort((a,b)=>b.kcal-a.kcal);
+  while(remaining>0){
+    let picked=sorted.find(item=>item.kcal<=remaining+30);
+    if(!picked) picked=sorted[sorted.length-1];
+    pieces.push({key:picked.key,name:picked.name,kcal:Math.min(remaining,picked.kcal)});
+    remaining-=picked.kcal; if(remaining<40) break;
+    if(pieces.length>6) break;
   }
- }else{
-  toast('お口の近くまで運んでね');
- }
- cancelDrag();
+  if(remaining>0 && pieces.length<7){const last=sorted.find(item=>item.kcal<=Math.max(remaining,80)) || sorted[sorted.length-1]; pieces.push({key:last.key,name:last.name,kcal:remaining})}
+  return pieces;
 }
-
-function cancelDrag(){
-  q('#mouthTarget').classList.remove('active');
-  if(drag?.ghost) drag.ghost.remove();
-  drag=null;
+function renderGauge(){
+  const n=netCalories(); q('#netKcal').textContent=n;
+  if(!state.targets){ q('#topTitle').textContent='プロフィールを設定'; q('#gaugeFill').style.clipPath='inset(0 100% 0 0)'; q('#targetText').textContent=''; return; }
+  q('#topTitle').textContent='今日のカロリー収支';
+  const max=Math.max(1,state.targets.gain[1]); const pct=Math.min(100,n/max*100); q('#gaugeFill').style.clipPath='inset(0 '+(100-pct)+'% 0 0)';
+  q('#targetText').textContent=`減量 ${state.targets.lose[0]}〜${state.targets.lose[1]} kcal / 維持 ${state.targets.maintain[0]}〜${state.targets.maintain[1]} kcal / 増量 ${state.targets.gain[0]}〜${state.targets.gain[1]} kcal`;
 }
-
 function renderLogs(){
-  const items=[];
-  todayMeals().forEach(m=>items.push({type:'meal', text:`${m.cal} kcal`, sub:'ごはん'}));
-  todayExercises().forEach(x=>items.push({type:'exercise', text:`${x.label} ${x.min}分`, sub:`約 ${x.burn} kcal 消費`}));
-  q('#logsList').innerHTML=items.length?items.map(x=>`<div class="entry"><div style="display:flex;align-items:center;gap:10px"><div class="logicon">${x.type==='meal'?foodSvg('rice'):icon('walk')}</div><div><strong>${x.text}</strong><small>${x.sub}</small></div></div></div>`).join(''):'<div class="card"><div class="small">まだ今日の記録がないよ。</div></div>';
-  const latest=[...state.weights].sort((a,b)=>b.date.localeCompare(a.date));
-  q('#weightsCard').innerHTML=latest.length?latest.slice(0,8).map(w=>`<div class="entry"><div><strong>${w.weight} kg</strong><small>${w.date}</small></div></div>`).join(''):'<div class="small">体重記録はまだないよ。</div>';
+  const meals=state.meals.filter(x=>x.date===today()), ex=state.exercises.filter(x=>x.date===today());
+  q('#mealList').innerHTML = meals.length ? meals.map(x=>`<div class="list-item"><span>${x.kcal} kcal</span><span class="muted">${x.pieces.join('・')}</span></div>`).join('') : '<div class="muted">まだ記録がないよ</div>';
+  q('#exerciseList').innerHTML = ex.length ? ex.map(x=>`<div class="list-item"><span>${x.name}</span><span class="muted">-${x.burn} kcal</span></div>`).join('') : '<div class="muted">まだ記録がないよ</div>';
+  q('#weightList').innerHTML = state.weights.length ? state.weights.slice().reverse().map(x=>`<div class="list-item"><span>${x.date}</span><span class="muted">${x.weight} kg</span></div>`).join('') : '<div class="muted">まだ記録がないよ</div>';
 }
-
-function openFoodSheet(){
-  openSheet('ごはん', `
-    <div class="cal-input"><input id="mealCalInput" type="number" min="1" max="10000" value="200"><span>kcal</span></div>
-    <div class="preview" id="foodPreview"></div>
-    <div class="note">カロリーに近い一般的な食品の組み合わせを、自動でエサとして作るよ。エサにはカロリー表示は出ないよ。</div>
-    <button class="submit" id="saveMealBtn">エサをつくる</button>
-  `);
-  const input=q('#mealCalInput');
-  const draw=()=>q('#foodPreview').innerHTML=chooseFoods(Number(input.value)).map(foodSvg).join('')||'<div class="small">カロリーを入力してね。</div>';
-  draw(); input.addEventListener('input',draw);
-  q('#saveMealBtn').addEventListener('click',()=>{
-    const cal=Math.round(Number(input.value)); if(!(cal>0)) return;
-    const foods=chooseFoods(cal);
-    state.meals.push({date:today(), cal});
-    const values=foods.map(kind=>foodCatalog.find(([k])=>k===kind)?.[1]||80);
-    const sum=values.reduce((a,b)=>a+b,0)||1;
-    let remaining=cal;
-    foods.forEach((kind,i)=>{const portion=i===foods.length-1?remaining:Math.round(cal*values[i]/sum);remaining-=portion;state.foodPieces.push({kind,cal:portion,createdAt:Date.now()+Math.random()})});
-    save(); closeSheet(); renderAll(); q('#speech').textContent='エサができたよ。口まで運んでね。'; toast('エサを追加したよ');
+function renderPetPicker(){
+  q('#petPicker').innerHTML=PETS.map((pet,i)=>`<button class="pet-option ${i===state.petIndex?'selected':''}" data-pet="${i}"><canvas width="80" height="120"></canvas><strong>${pet.name}</strong></button>`).join('');
+  qa('#petPicker .pet-option').forEach((btn,i)=>{
+    const cv=btn.querySelector('canvas'); const off=document.createElement('canvas'); off.width=40; off.height=60; drawPetThumbnail(cv,PETS[i].key);
+    btn.addEventListener('click',()=>{state.petIndex=i; save(); renderAll();});
   });
 }
-
-
-let activityTimer=null;
+function drawPetThumbnail(canvas,key){
+  const info=spriteInfo(key), scale=2, ctx=canvas.getContext('2d'); ctx.imageSmoothingEnabled=false; ctx.clearRect(0,0,canvas.width,canvas.height);
+  const off=document.createElement('canvas'); off.width=info.width; off.height=info.height; drawSprite(off.getContext('2d'), key, 1);
+  const x=Math.floor((canvas.width - info.width*scale)/2), y=Math.floor((canvas.height - info.height*scale)/2);
+  ctx.drawImage(off,0,0,info.width,info.height,x,y,info.width*scale,info.height*scale);
+}
+function renderSpeech(text){q('#speech').textContent=text || 'タップしておしゃべり'}
+function speak(custom){
+  const pet=PETS[state.petIndex]; const lines=pet.say; const message=custom || lines[Math.floor(Math.random()*lines.length)] ;
+  state.face=['happy','blink','surprised','wink','smile','neutral'][Math.floor(Math.random()*6)]; renderSpeech(message); drawPet(); save(); clearTimeout(actionTimer); actionTimer=setTimeout(()=>{state.face='neutral'; drawPet();},1800);
+}
+function bindDrag(item, idx){
+  const start=(clientX,clientY)=>{dragData={idx,startEl:item,ghost:item.cloneNode(true),x:clientX,y:clientY}; dragData.ghost.style.position='fixed'; dragData.ghost.style.left=(clientX-35)+'px'; dragData.ghost.style.top=(clientY-35)+'px'; dragData.ghost.style.zIndex='60'; dragData.ghost.style.pointerEvents='none'; document.body.appendChild(dragData.ghost);};
+  const move=(clientX,clientY)=>{ if(!dragData) return; dragData.ghost.style.left=(clientX-35)+'px'; dragData.ghost.style.top=(clientY-35)+'px'; };
+  const end=(clientX,clientY)=>{ if(!dragData) return; const r=q('#petCanvas').getBoundingClientRect(); const hit=clientX>=r.left+r.width*.3 && clientX<=r.left+r.width*.7 && clientY>=r.top+r.height*.25 && clientY<=r.top+r.height*.65;
+    dragData.ghost.remove(); if(hit){ const piece=state.foodPieces.splice(idx,1)[0]; state.feedings.push({date:today(),kcal:piece.kcal,name:piece.name}); save(); renderTray(); renderGauge(); drawPet(); speak(`${piece.name}をもぐもぐした${PETS[state.petIndex].voice}。`);} else {toast('口元まで運んでね')} dragData=null; };
+  item.addEventListener('touchstart',e=>{const t=e.touches[0];start(t.clientX,t.clientY)},{passive:true});
+  item.addEventListener('touchmove',e=>{if(!dragData)return;const t=e.touches[0];move(t.clientX,t.clientY)},{passive:true});
+  item.addEventListener('touchend',e=>{if(!dragData)return;const t=e.changedTouches[0];end(t.clientX,t.clientY)});
+  item.addEventListener('mousedown',e=>{e.preventDefault();start(e.clientX,e.clientY);const mm=ev=>move(ev.clientX,ev.clientY);const mu=ev=>{document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);end(ev.clientX,ev.clientY)};document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu)});
+}
+function openModal(id){q(id).classList.add('show')} function closeModals(){qa('.modal-backdrop').forEach(m=>m.classList.remove('show'))}
+function renderExerciseChoices(){ q('#exerciseChoices').innerHTML=EXERCISES.map((x,i)=>`<button class="choice-btn" data-ex="${x.key}"><span class="title">${x.name}</span><span class="muted">-${x.burn} kcal</span></button>`).join(''); qa('[data-ex]').forEach(btn=>btn.addEventListener('click',()=>saveExercise(btn.dataset.ex))); }
 function animateExercise(kind){
- const stage=q('#stage'),fx=q('#exerciseFx');
- clearTimeout(activityTimer);
- stage.classList.remove('act-walk','act-strength','act-swim','act-dance','act-yoga');
- const map={walk:'act-walk',strength:'act-strength',swim:'act-swim',dance:'act-dance',yoga:'act-yoga'};
- stage.classList.add(map[kind]||'act-walk');
- const svg=(inner)=>'<svg viewBox="0 0 160 150" fill="none" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';
- const wave='<path d="M0 112q13-12 26 0t26 0t26 0t26 0t26 0t26 0" fill="none" stroke="#87cddd" stroke-width="8" stroke-linecap="square"/>';
- const dumbbells='<g stroke="#4d6067" stroke-width="6" stroke-linecap="square"><path d="M18 62H48M112 62H142"/><path d="M23 48V75M40 48V75M120 48V75M137 48V75"/></g>';
- const lines='<g stroke="#95b9aa" stroke-width="4"><path d="M17 120h30M110 120h29"/></g>';
- const stars='<g fill="#eed588"><path d="M30 22l5 10 11 2-8 8 1 12-9-5-10 5 1-12-8-8 11-2Z"/><path d="M133 19l3 7 7 1-5 6 1 8-6-4-6 4 1-8-5-6 7-1Z"/></g>';
- const mat='<rect x="15" y="127" width="130" height="13" rx="2" fill="#b0c9bb"/>';
- fx.innerHTML=svg(kind==='strength'?dumbbells:kind==='swim'?wave:kind==='dance'?stars:kind==='yoga'?mat:lines);
- q('#speech').textContent={walk:'てくてく、お散歩中！',strength:'よいしょ、よいしょ！',swim:'すいすい、泳ぐよ！',dance:'いっしょに踊ろう！',yoga:'ゆっくり伸びるよ！'}[kind]||'うごくよ！';
- activityTimer=setTimeout(()=>{stage.classList.remove(...Object.values(map));fx.innerHTML='';},6800);
+  const cv=q('#fxLayer'); cv.width=q('#petStage').clientWidth; cv.height=q('#petStage').clientHeight; const ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height); ctx.imageSmoothingEnabled=false;
+  const cx=cv.width/2, cy=cv.height/2;
+  if(kind==='walk'){ctx.fillStyle='#9ab9a0'; for(let x=40;x<cv.width-40;x+=32){ctx.fillRect(x,cy+70,18,4)} }
+  if(kind==='strength'){ctx.fillStyle='#66737b'; ctx.fillRect(cx-70,cy-10,40,8); ctx.fillRect(cx+30,cy-10,40,8); ctx.fillRect(cx-30,cy-2,60,4)}
+  if(kind==='swim'){ctx.strokeStyle='#8cc7e3'; ctx.lineWidth=6; for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(20,cy+35+i*16); for(let x=20;x<cv.width-20;x+=24) ctx.lineTo(x+12, cy+35+i*16 + (x/24%2?6:-6)); ctx.stroke();}}
+  if(kind==='dance'){ctx.fillStyle='#f0d777'; [[cx-70,cy-40],[cx+60,cy-20],[cx-30,cy+35]].forEach(([x,y])=>{ctx.fillRect(x,y,10,10);ctx.fillRect(x+10,y-10,10,10);ctx.fillRect(x+20,y,10,10);ctx.fillRect(x+10,y+10,10,10);})}
+  if(kind==='yoga'){ctx.fillStyle='#bacfb6'; ctx.fillRect(cx-70,cy+55,140,10)}
+  setTimeout(()=>ctx.clearRect(0,0,cv.width,cv.height),1600);
 }
+function saveFood(){ ensureDay(); const kcal=Number(q('#foodCalInput').value); if(!(kcal>0)){toast('カロリーを入力してね');return;} const pieces=chooseFoods(kcal); state.meals.push({date:today(),kcal,pieces:pieces.map(x=>x.name)}); state.foodPieces.push(...pieces); save(); q('#foodCalInput').value=''; closeModals(); renderTray(); renderLogs(); toast('エサを作ったよ'); }
+function saveExercise(key){ ensureDay(); const ex=EXERCISES.find(x=>x.key===key); state.exercises.push({date:today(),...ex}); save(); closeModals(); renderGauge(); renderLogs(); animateExercise(key); speak(ex.label); }
+function saveProfile(){ const p={height:q('#heightInput').value,weight:q('#weightInput').value,age:q('#ageInput').value,sex:q('#sexInput').value,activity:q('#activityInput').value}; const nextHash=profileHash(p); const changed=nextHash!==state.profileHash; state.profile=p; state.targets=calcTargets(); state.profileHash=nextHash; if(changed) clearDaily(); save(); renderAll(); toast(changed?'設定変更で今日のカロリーをリセットしたよ':'設定を更新したよ'); }
+function saveWeight(){ const weight=q('#weightRecordInput').value; if(!weight){toast('体重を入力してね');return;} state.weights=state.weights.filter(x=>x.date!==today()); state.weights.push({date:today(),weight}); if(String(state.profile.weight)!==String(weight)){ state.profile.weight=String(weight); q('#weightInput').value=String(weight); state.targets=calcTargets(); state.profileHash=profileHash(state.profile); clearDaily(); }
+ save(); renderAll(); toast('体重を保存したよ'); }
+function resetToday(){ if(confirm('今日のカロリーとエサをゼロにする？')){ clearDaily(); save(); renderAll(); toast('リセットしたよ'); } }
+function switchPage(page){ qa('.page').forEach(x=>x.classList.remove('active')); q(`#page-${page}`).classList.add('active'); qa('.nav-btn').forEach(x=>x.classList.toggle('active', x.dataset.page===page)); }
+function renderAll(){ ensureDay(); q('#petName').textContent=PETS[state.petIndex].name; drawPet(); renderTray(); renderGauge(); renderLogs(); renderPetPicker(); renderSpeech();
+  q('#heightInput').value=state.profile.height; q('#weightInput').value=state.profile.weight; q('#ageInput').value=state.profile.age; q('#sexInput').value=state.profile.sex; q('#activityInput').value=state.profile.activity; q('#weightRecordInput').value=''; }
 
-function openExerciseSheet(){
-  openSheet('運動', `
-    <div class="choices" id="exerciseChoices">${Object.entries(exerciseKinds).map(([k,v],i)=>`<button class="choice ${i===0?'active':''}" data-kind="${k}">${icon(v.icon)}${v.label}</button>`).join('')}</div>
-    <div class="cal-input"><input id="exerciseMinInput" type="number" min="1" max="600" value="30"><span>分</span></div>
-    <button class="submit" id="saveExerciseBtn">運動を記録</button>
-  `);
-  let selected='walk';
-  qa('[data-kind]').forEach(btn=>btn.addEventListener('click',()=>{selected=btn.dataset.kind; qa('[data-kind]').forEach(x=>x.classList.remove('active')); btn.classList.add('active');}));
-  q('#saveExerciseBtn').addEventListener('click',()=>{
-    const min=Math.round(Number(q('#exerciseMinInput').value)); if(!(min>0)) return;
-    const kind=exerciseKinds[selected];
-    state.exercises.push({date:today(), kind:selected, label:kind.label, min, burn:Math.round(min*kind.burnPerMin)});
-    save();closeSheet();renderAll();animateExercise(selected);toast('運動を記録したよ。ゲージが減ったよ');
-  });
-}
-
-function openWeightSheet(){
-  openSheet('体重を記録', `
-    <div class="fields">
-      <div><small class="small">日付</small><input id="weightDateInput" type="date" value="${today()}"></div>
-      <div><small class="small">体重 (kg)</small><input id="weightValueInput" type="number" min="20" max="300" step="0.1"></div>
-      <button class="submit" id="saveWeightBtn">保存</button>
-    </div>
-  `);
-  q('#saveWeightBtn').addEventListener('click',()=>{
-    const date=q('#weightDateInput').value; const weight=Number(q('#weightValueInput').value); if(!date||!(weight>0)) return;
-    state.weights=state.weights.filter(x=>x.date!==date);state.weights.push({date,weight});
-    const changed=String(state.profile.weight)!==String(weight);
-    if(changed){state.profile.weight=String(weight);state.targets=calcTargets(state.profile);state._profileSnapshot=JSON.stringify(state.profile);clearDaily(today());}
-    save();closeSheet();renderAll();toast(changed?'体重を更新し、今日のカロリーをリセットしたよ':'体重を記録したよ');
-  });
-}
-
-function bindSettings(){
-  q('#heightInput').value=state.profile.height; q('#weightInput').value=state.profile.weight; q('#ageInput').value=state.profile.age; q('#sexInput').value=state.profile.sex; q('#activityInput').value=state.profile.activity;
-  q('#saveProfileBtn').onclick=()=>{
-    state.profile={height:q('#heightInput').value, weight:q('#weightInput').value, age:q('#ageInput').value, sex:q('#sexInput').value, activity:q('#activityInput').value};
-    const next=calcTargets(state.profile);
-    if(!next){toast('プロフィールを入力してね');return}
-    const old=state._profileSnapshot||JSON.stringify(state.profile);
-    const current=JSON.stringify(state.profile);
-    const changed=old!==current;
-    state.targets=next;state._profileSnapshot=current;
-    if(changed)clearDaily(today());
-    save();renderAll();toast(changed?'設定を更新し、今日のカロリーをリセットしたよ':'目標カロリーを更新したよ');
-  };
-}
-
-function switchPage(id){ qa('.page').forEach(p=>p.classList.remove('active')); q('#'+id).classList.add('active'); qa('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.page===id)); if(id==='logsPage') renderLogs(); if(id==='settingsPage'){ bindSettings(); renderPetGrid(); } }
-function renderAll(){ renderPet();renderSummary();renderTray();renderLogs();bindSettings();renderPetGrid(); }
-
-q('#resetCalories').addEventListener('click',()=>{
- if(confirm('今日のカロリー・エサ・運動記録をゼロにする？'))resetToday('今日のカロリーをリセットしたよ');
-});
-q('#openFoodBtn').addEventListener('click',()=>{ensureDay();openFoodSheet()});
-q('#openExerciseBtn').addEventListener('click',()=>{ensureDay();openExerciseSheet()});
-q('#openWeightBtn').addEventListener('click',()=>{ensureDay();openWeightSheet()});
-q('#closeSheet').addEventListener('click',closeSheet);
-q('#petHolder').addEventListener('click',()=>speakToPet());
-q('#petHolder').setAttribute('role','button');
-q('#petHolder').setAttribute('tabindex','0');
-q('#petHolder').setAttribute('aria-label','キャラクターと話す');
-q('#petHolder').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();speakToPet()}});
-qa('.wallpaper').forEach(btn=>btn.addEventListener('click',()=>{
- if(btn.classList.contains('locked'))toast('この背景はプレミアムのプレビューだよ');
- else toast('ホワイトを使用中');
-}));
-q('#overlay').addEventListener('click',e=>{ if(e.target===q('#overlay')) closeSheet(); });
-qa('.navbtn').forEach(btn=>btn.addEventListener('click',()=>switchPage(btn.dataset.page)));
-
-if(!state.targets && state.profile.height && state.profile.weight && state.profile.age)state.targets=calcTargets(state.profile);
-state._profileSnapshot=state._profileSnapshot||JSON.stringify(state.profile);
-setInterval(()=>ensureDay(),10000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)ensureDay()});
-window.addEventListener('focus',ensureDay);
-ensureDay();
-save(); renderAll();
+q('#petCanvas').addEventListener('click',()=>speak());
+q('#openFoodBtn').addEventListener('click',()=>openModal('#foodModal'));
+q('#openExerciseBtn').addEventListener('click',()=>openModal('#exerciseModal'));
+q('#saveFoodBtn').addEventListener('click',saveFood);
+q('#saveProfileBtn').addEventListener('click',saveProfile);
+q('#saveWeightBtn').addEventListener('click',saveWeight);
+q('#resetBtn').addEventListener('click',resetToday);
+q('#toLogsBtn').addEventListener('click',()=>switchPage('logs'));
+qa('[data-close]').forEach(btn=>btn.addEventListener('click',closeModals));
+qa('.modal-backdrop').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)closeModals()}));
+qa('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>switchPage(btn.dataset.page)));
+renderExerciseChoices();
+state.targets=state.targets || calcTargets();
+window.addEventListener('focus',ensureDay); document.addEventListener('visibilitychange',()=>{if(!document.hidden)ensureDay()});
+renderAll();
 </script>
 </body>
 </html>
