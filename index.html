@@ -377,6 +377,12 @@ html,body{width:100%;height:100%;overflow-x:hidden}
 #page-weight .weight-chart-section h2,
 #page-logs .section h2,
 #page-settings .section h2{font-size:18px;font-weight:800}
+
+/* Center the multiplier as a single ×1 readout between arrow controls. */
+.stepper .stepper-unit{display:flex;align-items:center;justify-content:center;min-width:66px;height:42px;gap:0;white-space:nowrap;color:#29372f;font-weight:750;font-size:22px}
+.stepper .stepper-unit #exerciseCount{flex:0 0 30px;width:30px;height:42px;text-align:left;font-size:22px;line-height:42px;font-weight:750;padding:0;background:transparent;border:0;box-shadow:none}
+.stepper .stepper-arrow{color:#5b7465}
+.choice-title svg{width:20px;height:20px;display:block}
 </style>
 </head>
 <body>
@@ -475,7 +481,7 @@ html,body{width:100%;height:100%;overflow-x:hidden}
         <div class="field"><label for="sexInput">性別（計算用）</label><select id="sexInput"><option value="female">女性</option><option value="male">男性</option></select></div>
         <div class="field wide"><label for="activityInput">活動量</label><select id="activityInput"><option value="1.2">少ない</option><option value="1.375">やや少ない</option><option value="1.55">ふつう</option><option value="1.725">多い</option></select></div>
       </div>
-      <button class="submit" id="saveProfileBtn" type="button">目安を更新</button>
+      <button class="submit" id="saveProfileBtn" type="button">プロフィールを更新</button>
       <div class="helper" id="targetSummary">減量 / 維持 / 増量 の目安がここに表示されるよ</div>
     </div>
 
@@ -502,7 +508,7 @@ html,body{width:100%;height:100%;overflow-x:hidden}
       <label for="foodCalInput">摂取カロリー kcal</label>
       <input id="foodCalInput" inputmode="numeric" placeholder="500">
     </div>
-    <div class="helper">入力したカロリーに応じて、エサが自動で分かれてホームに並ぶよ。</div>
+    <div class="helper">入力したカロリーに応じたエサが自動でホームに並ぶよ。</div>
     <button class="primary" id="saveFoodBtn" type="button">エサを作る</button>
   </div>
 </div>
@@ -512,9 +518,8 @@ html,body{width:100%;height:100%;overflow-x:hidden}
     <div class="sheet-head"><h3>運動を記録</h3><button class="close" data-close type="button">閉じる</button></div>
     <div class="choice-grid" id="exerciseChoices"></div>
     <div class="stepper" role="group" aria-label="運動時間の倍率">
-      <span class="stepper-symbol" aria-hidden="true">×</span>
       <button id="minusCount" class="stepper-arrow" type="button" aria-label="倍率を1減らす"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5 7 12l9 7Z" fill="currentColor"/></svg></button>
-      <input id="exerciseCount" type="text" value="1" inputmode="none" readonly aria-label="10分単位の倍率">
+      <span class="stepper-unit"><span aria-hidden="true">×</span><input id="exerciseCount" type="text" value="1" inputmode="none" readonly aria-label="10分単位の倍率"></span>
       <button id="plusCount" class="stepper-arrow" type="button" aria-label="倍率を1増やす"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 9 7-9 7Z" fill="currentColor"/></svg></button>
     </div>
     <button class="primary" id="saveExerciseBtn" type="button">運動を追加</button>
@@ -530,7 +535,7 @@ const PETS = [
   {key:'rabbit', name:'ラベンダーうさぎ', voice:'ぴょん', sayings:['のんびりいこうぴょん。','きょうもいっしょに整えるぴょん。','ゆっくりでも大丈夫ぴょん。']},
   {key:'squirrel', name:'ピーチりす', voice:'りす', sayings:['ふわっと進めばいいりす。','おなかの様子を見ていくりす。','いっしょにがんばるりす。']},
   {key:'hedgehog', name:'ほしのハリネズミ', voice:'きら', sayings:['星みたいに軽やかにいこう。','きらっといい感じだよ。','今日はどんな日かな、きら。']},
-  {key:'otter', name:'ペリウィンクルカワウソ', voice:'ぷか', sayings:['ぷかぷか整えていくぷか。','のんびりでも進んでるぷか。','今日も見にきてくれてうれしいぷか。']}
+  {key:'otter', name:'インディゴカワウソ', voice:'ぷか', sayings:['ぷかぷか整えていくぷか。','のんびりでも進んでるぷか。','今日も見にきてくれてうれしいぷか。']}
 ];
 const FOODS = [
   {key:'ramen', name:'ラーメン', kcal:700, color:'#f4dc90'},
@@ -549,13 +554,18 @@ const EXERCISES = [
   {key:'run', name:'ラン', per10:80, label:'いい汗かいたよ'}
 ];
 const SVG = {
-  bowl: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9h18c0 6-4.2 10-9 10S3 15 3 9Z" fill="#f3d8ca" stroke="#6a4b3c" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 7h10" stroke="#6a4b3c" stroke-width="1.6" stroke-linecap="round"/><path d="M7.4 9.2c1.8-2.1 7.6-2.1 9.4 0" stroke="#d9c06b" stroke-width="1.6" stroke-linecap="round"/><path d="M9 6.1v2.2M14 6.1v2.2" stroke="#809b78" stroke-width="1.4" stroke-linecap="round"/></svg>`,
-  shoe: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 14.5c1.8.3 3.2-.3 4.6-2l2.2-2.6 2.1 3.4c.4.7 1 1.1 1.8 1.3l4.3 1.1c1 .3 1.8 1.2 1.8 2.4v.4H4v-4Z" fill="#d4e6df" stroke="#597166" stroke-width="1.5" stroke-linejoin="round"/><path d="M14.3 15.2h3.3M12.6 13.6h2.8" stroke="#597166" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  bowl: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 11.4h16.4c-.3 5.1-3.7 8-8.2 8s-7.9-2.9-8.2-8Z" fill="#edd3c8"/><path d="M5.2 10c.7-1.3 1.8-2 3.1-2.1.7-1.5 2-2.3 3.7-2.1 1.1-1.3 2.9-1.2 3.7.1 1.5 0 2.5.7 3.1 2.1l1.1 1.9"/><path d="M5.1 12.3h13.8" stroke="#6a4b3c"/><path d="M8 7.2c.2.9.9 1.6 1.5 1.9m3.3-3.2c.2 1 1 1.8 1.7 2.3" stroke="#86a77a"/></svg>`,
+  shoe: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="m4 13.3 3.1.3c1.2.1 2.3-.4 3.3-1.5l2.2-3.1 2.3 3.6c.7 1 1.4 1.5 2.8 1.8l2.3.6c1.1.3 1.8 1.2 1.8 2.4V19H3v-4.2c0-.8.3-1.3 1-1.5Z" fill="#d9e7df"/><path d="M15.1 14.2h2.6m-4.1-1.8h2.6M3.5 16.9H21" /><path d="M2.5 8.6h4M1.5 11h3.7" stroke="#80a18e"/></svg>`,
   home: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 10.4 12 4l8 6.4v8.1a1.2 1.2 0 0 1-1.2 1.2h-4.6v-5.2H9.8v5.2H5.2A1.2 1.2 0 0 1 4 18.5v-8.1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
   note: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="3.5" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 2.8v3M15 2.8v3M8.5 11.5h7M8.5 15.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
   gear: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>`,
   weight: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 11a4 4 0 0 1 8 0"/><path d="m12 11 2-2"/></svg>`,
-  walk:`<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="13" cy="4.6" r="2.2" fill="#d9e8db" stroke="#5a7066" stroke-width="1.4"/><path d="m10 21 1.2-5.3-2.2-2.9 2-2.4 2.2 2.4 2.7 1.2M12 8.5l-1.3 2.1M11.2 15.7l4 5.3M12.4 10.1l5-1.2" stroke="#5a7066" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+  walk: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.2" r="2"/><path d="m11.4 8-2.8 3.7-2.5 1.2m5.3-4.9 3.5 3.4 2.7.2m-5.7-.2-1 4.2-3.3 4.7m3.3-4.7 4.9 4.7"/></svg>`,
+  yoga: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5c-5.6-2.5-8.8-7.2-8-13.1 4 .2 6.4 2.1 8 5.8 1.6-3.7 4-5.6 8-5.8.8 5.9-2.4 10.6-8 13.1Z" fill="#dce9d5"/><path d="M12 12.8v7.7"/><path d="M7.7 13.6 12 17l4.4-3.4"/></svg>`,
+  bike: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.3" cy="17.2" r="3.3"/><circle cx="18.8" cy="17.2" r="3.3"/><path d="m5.3 17.2 4.3-8h4.7l4.5 8H11zM8.5 12l2.5 5.2 3.4-8M13.5 9.2h3.1M8.4 9.2H6.5"/></svg>`,
+  dance: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.2" r="2"/><path d="m10.5 7.8-3 4.8-3 1.1m6-5.9 3.8 2.5 4-3.8m-7.8 3.9 3.8 4.7-3 5.2m2.9-5.2 5.2 4.7"/><path d="m5 5.2.5 1.1 1.1.5-1.1.5L5 8.4l-.5-1.1-1.1-.5 1.1-.5z" fill="#c2d9c7"/></svg>`,
+  strength: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M1.8 9.5h2.5v5H1.8zM4.3 7.8h3v8.4h-3zM7.3 12h9.4M16.7 7.8h3v8.4h-3zM19.7 9.5h2.5v5h-2.5z" fill="#d9e7df"/></svg>`,
+  run: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 13.8c2.3.3 3.9-1 5.5-3.5l2-2.2 2.3 3.6c.6 1 1.3 1.5 2.5 1.7l2.2.5c1.3.3 2 1.2 2 2.7v1.1H4.5v-2.3c0-.7.2-1.2.7-1.6Z" fill="#d9e7df"/><path d="M13.6 12h3.5m-2.1 2h3.1M4.5 17.7h17.2M1.5 9h5M.8 11.4h4"/></svg>`,
 };
 function iconFood(key) {
   const map = {
@@ -857,7 +867,7 @@ function renderWeightChart(records){
  const begin=Date.UTC(start.getFullYear(),start.getMonth(),1),finish=Date.UTC(end.getFullYear(),end.getMonth(),end.getDate());
  const xPos=date=>{const p=date.split('-').map(Number);return x0+(Date.UTC(p[0],p[1]-1,p[2])-begin)/Math.max(1,finish-begin)*(x1-x0)};
  const yPos=value=>y1-(value-low)/(high-low)*(y1-y0);
- const axes=Array.from({length:high-low+1},(_,i)=>{const v=high-i,yy=yPos(v);return '<line x1="'+x0+'" y1="'+yy.toFixed(1)+'" x2="'+x1+'" y2="'+yy.toFixed(1)+'" stroke="#e1e7e0"/><text x="'+(x0-6)+'" y="'+(yy+3).toFixed(1)+'" text-anchor="end" font-size="10" fill="#75857b">'+v+'</text>';}).join('');
+ const axes=Array.from({length:high-low+1},(_,i)=>{const v=high-i,yy=yPos(v);return '<line x1="'+x0+'" y1="'+yy.toFixed(1)+'" x2="'+x1+'" y2="'+yy.toFixed(1)+'" stroke="#e1e7e0"/><text x="'+(x0-6)+'" y="'+(yy+3).toFixed(1)+'" text-anchor="end" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-variant-numeric="tabular-nums" fill="#75857b">'+v+'</text>';}).join('');
  const poly=visible.map(x=>xPos(x.date).toFixed(1)+','+yPos(x.weight).toFixed(1)).join(' ');
  const line=visible.length>1?'<polyline points="'+poly+'" fill="none" stroke="#78a889" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>':'';
  const points=visible.map(x=>'<circle cx="'+xPos(x.date).toFixed(1)+'" cy="'+yPos(x.weight).toFixed(1)+'" r="4" fill="white" stroke="#659b76" stroke-width="2.2"><title>'+x.date+'：'+x.weight+' kg</title></circle>').join('');
@@ -871,7 +881,8 @@ function switchPage(page) { qa('.page').forEach(el=>el.classList.toggle('active'
 function openModal(id) { q(id).classList.add('show'); }
 function closeModals() { qa('.modal').forEach(m=>m.classList.remove('show')); }
 function saveFood() { ensureDay(); const kcal=Number(q('#foodCalInput').value); if(!(kcal>0)) { toast('カロリーを入力してね'); return; } const pieces=chooseFoods(kcal); state.meals.push({date:today(), time:nowTime(), kcal}); state.foodPieces.push(...pieces); q('#foodCalInput').value=''; state.bubble='エサを作ったよ。'; save(); closeModals(); renderAll(); }
-function renderExerciseChoices() { const wrap=q('#exerciseChoices'); wrap.innerHTML=''; EXERCISES.forEach(ex=>{ const btn=document.createElement('button'); btn.type='button'; btn.className='choice-btn'+(ex.key===state.selectedExercise?' active':''); btn.innerHTML=`<div class="choice-title"><span style="width:20px;height:20px;display:inline-flex">${SVG.walk}</span><span>${ex.name}</span></div><div class="choice-sub">${ex.per10} kcal / 10分</div>`; btn.addEventListener('click',()=>{ state.selectedExercise=ex.key; save(); renderExerciseChoices(); renderExercisePreview(); }); wrap.appendChild(btn); }); }
+function exerciseIcon(key){return SVG[key] || SVG.walk;}
+function renderExerciseChoices() { const wrap=q('#exerciseChoices'); wrap.innerHTML=''; EXERCISES.forEach(ex=>{ const btn=document.createElement('button'); btn.type='button'; btn.className='choice-btn'+(ex.key===state.selectedExercise?' active':''); btn.innerHTML=`<div class="choice-title"><span style="width:20px;height:20px;display:inline-flex">${exerciseIcon(ex.key)}</span><span>${ex.name}</span></div><div class="choice-sub">${ex.per10} kcal / 10分</div>`; btn.addEventListener('click',()=>{ state.selectedExercise=ex.key; save(); renderExerciseChoices(); renderExercisePreview(); }); wrap.appendChild(btn); }); }
 function renderExercisePreview() { let count=Math.max(1, Number(q('#exerciseCount').value)||1); q('#exerciseCount').value=count; state.exerciseCount=count; const ex=EXERCISES.find(x=>x.key===state.selectedExercise) || EXERCISES[0]; /* Count displayed directly in the centered control. */ }
 function saveExercise() { ensureDay(); const count=Math.max(1, Number(q('#exerciseCount').value)||1); const ex=EXERCISES.find(x=>x.key===state.selectedExercise) || EXERCISES[0]; state.exercises.push({date:today(), time:nowTime(), key:ex.key, name:ex.name, unit:ex.per10, count, minutes:count*10, burn:ex.per10*count}); state.bubble = ex.label; save(); closeModals(); renderAll(); }
 function saveProfile() { const next={ nickname:(q('#nicknameInput').value || 'ニックネーム').slice(0,10), height:q('#heightInput').value || '150', weight:q('#weightInput').value || '50', age:q('#ageInput').value || '30', sex:q('#sexInput').value, activity:q('#activityInput').value }; const changed=!sameProfile(next,state.profile); state.profile=next; state.targets=calcTargets(); if(changed) clearDaily(); save(); renderAll(); toast(changed?'設定変更で今日の記録をリセットしたよ':'設定を更新したよ'); }
