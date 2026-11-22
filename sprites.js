@@ -523,10 +523,12 @@ function renderFinePetSprite(ctx,name,stage,face,desiredWidth,desiredHeight){
    if(rows[y]?.[x]===baseColor)xs.push(x);
   if(xs.length>9){
    const left=Math.min(...xs),right=Math.max(...xs),n=Math.abs(level);
-   g.fillStyle=outline;
+   // Soft colored waist highlights rather than stray black slash marks.
+   const shading={hamster:'G',rabbit:'L',squirrel:'B',hedgehog:'B',otter:'O'}[name];
+   g.fillStyle=SPRITE_PALETTE[shading];
    for(let i=0;i<n;i++){
     const xx=(left+pad+2+i)*d,rx=(right+pad-2-i)*d,yy=(y+3+i)*d;
-    g.fillRect(xx,yy,1,2);g.fillRect(rx,yy,1,2);
+    g.fillRect(xx,yy,2,3);g.fillRect(rx,yy,2,3);
    }
   }
  }
