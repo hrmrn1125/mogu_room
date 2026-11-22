@@ -302,6 +302,81 @@ html,body{width:100%;height:100%;overflow-x:hidden}
 .weight-remove-entry:focus-visible,.weight-delete-toggle:focus-visible{outline:2px solid #a6545a;outline-offset:2px}
 .weight-record-row strong{margin-left:auto;flex-shrink:0}
 @media(max-width:370px){.weight-record-leading{gap:5px}.weight-history-date{font-size:12px}}
+
+/* Shared typography, spacing, and field-like record surfaces.
+   Match the "今日の体重 kg" field label/input across secondary pages. */
+:root{
+ --record-row-height:48px;
+ --record-radius:14px;
+ --record-gap:8px;
+}
+#page-weight .weight-history-title{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ margin:16px 0 6px;
+ padding:0;
+ gap:12px;
+ width:100%;
+ min-height:26px;
+ box-sizing:border-box;
+ color:#6e7770;
+ font-size:13px;
+ font-weight:800;
+ line-height:1.4;
+}
+#page-weight .weight-history-title > span{
+ font:inherit;
+ color:inherit;
+}
+#page-weight .weight-delete-toggle{
+ margin-left:auto;
+ align-self:center;
+ font-size:12px;
+ line-height:1.35;
+ padding:5px 10px;
+ border-radius:10px;
+}
+#page-weight .weight-history{
+ max-height:160px;
+ border-radius:var(--record-radius);
+}
+#page-weight .weight-history-list{gap:var(--record-gap)}
+#page-weight .weight-record-row,
+#page-weight .weight-history-list > .list-item{
+ min-height:var(--record-row-height);
+ height:var(--record-row-height);
+ padding:0 14px;
+ background:#fff;
+ border:1px solid var(--line);
+ border-radius:var(--record-radius);
+ box-shadow:none;
+ box-sizing:border-box;
+}
+#page-weight .weight-history-date{
+ font-size:16px;
+ font-weight:400;
+ line-height:1.25;
+ color:#7a867d;
+}
+#page-weight .weight-record-row strong{
+ font-size:16px;
+ font-weight:750;
+ line-height:1.25;
+}
+/* Same-priority rows use the same white surface, spacing, and corner radius. */
+#page-logs .list,
+#page-weight .weight-history-list{gap:var(--record-gap)}
+#page-logs .list-item{
+ min-height:var(--record-row-height);
+ padding:10px 14px;
+ border:1px solid var(--line);
+ border-radius:var(--record-radius);
+ box-shadow:none;
+}
+#page-weight .weight-chart-section h2,
+#page-logs .section h2,
+#page-settings .section h2{font-size:18px;font-weight:800}
 </style>
 </head>
 <body>
