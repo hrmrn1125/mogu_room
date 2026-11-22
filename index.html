@@ -186,6 +186,17 @@ body{position:relative}
  .nav-btn{font-size:12px;gap:4px}
 }
 
+
+/* Approved illustration system: preserve original proportions, no pixelation or body warping. */
+.home-page #petCanvas,#petCanvas{
+ image-rendering:auto!important;object-fit:contain;
+ filter:none!important;
+}
+.pet-option img{
+ display:block;width:76px;height:86px;max-width:40%;
+ object-fit:contain;flex:0 0 auto;image-rendering:auto;
+}
+.pet-option strong{min-width:0;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -298,6 +309,7 @@ body{position:relative}
 <div class="toast" id="toast"></div>
 
 <script src="sprites.js?v=8"></script>
+<script src="mascot-art.js?v=1"></script>
 <script>
 const STORAGE_KEY='mogu-room-pixel-v2';
 const PETS=[
@@ -350,6 +362,12 @@ function load(){
  }catch(e){return defaults}
 }
 let state=load();
+const PET_IMAGE_CACHE={};
+for(const pet of PETS){
+ const img=new Image();PET_IMAGE_CACHE[pet.key]=img;
+ img.onload=()=>{if(PETS[state.petIndex].key===pet.key)drawPet()};
+ img.src=APPROVED_MASCOTS[pet.key];
+}
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
 function ensureDay(){if(state.date!==today()){state.date=today();clearDaily();save();toast('日付が変わったのでリセットしたよ');renderAll();}}
 function clearDaily(){state.foodPieces=[];state.meals=state.meals.filter(x=>x.date!==today());state.feedings=state.feedings.filter(x=>x.date!==today());state.exercises=state.exercises.filter(x=>x.date!==today())}
@@ -381,9 +399,15 @@ function bodyStage(){
  return p<.33?'chubby1':p<.67?'chubby2':'chubby3';
 }
 function drawPet(){
- const canvas=q('#petCanvas'),ctx=canvas.getContext('2d');
- canvas.width=236;canvas.height=236;
- renderApprovedPetStage(ctx,PETS[state.petIndex].key,bodyStage(),236,236);
+ const canvas=q('#petCanvas'),ctx=canvas.getContext('2d'),size=236;
+ canvas.width=size;canvas.height=size;
+ ctx.clearRect(0,0,size,size);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ const pet=PETS[state.petIndex];
+ const art=PET_IMAGE_CACHE[pet.key];
+ if(!art||!art.complete||art.naturalWidth===0)return;
+ const scale=Math.min((size-8)/art.naturalWidth,(size-8)/art.naturalHeight);
+ const w=art.naturalWidth*scale,h=art.naturalHeight*scale;
+ ctx.drawImage(art,(size-w)/2,(size-h)/2,w,h);
 }
 function drawFoodCanvas(canvas,name){
  drawFineFoodSprite(canvas.getContext('2d'),name);
@@ -437,13 +461,8 @@ function renderLogs(){
   q('#weightList').innerHTML = state.weights.length ? state.weights.slice().reverse().map(x=>`<div class="list-item"><span>${x.date}</span><span class="muted">${x.weight} kg</span></div>`).join('') : '<div class="muted">まだ記録がないよ</div>';
 }
 function renderPetPicker(){
- q('#petPicker').innerHTML=PETS.map((pet,i)=>'<button class="pet-option '+(i===state.petIndex?'selected':'')+'" data-pet="'+i+'"><canvas width="86" height="86"></canvas><strong>'+pet.name+'</strong></button>').join('');
- qa('#petPicker .pet-option').forEach((btn,i)=>{
-  const cv=btn.querySelector('canvas');
-  const ctx=cv.getContext('2d');
-  renderApprovedPetStage(ctx,PETS[i].key,'normal',86,86);
-  btn.addEventListener('click',()=>{state.petIndex=i;save();renderAll()});
- });
+ q('#petPicker').innerHTML=PETS.map((pet,i)=>'<button class="pet-option '+(i===state.petIndex?'selected':'')+'" data-pet="'+i+'" type="button"><img src="'+APPROVED_MASCOTS[pet.key]+'" alt="" width="76" height="86" decoding="async"><strong>'+pet.name+'</strong></button>').join('');
+ qa('#petPicker .pet-option').forEach((btn,i)=>btn.addEventListener('click',()=>{state.petIndex=i;state.face='neutral';save();renderAll()}));
 }
 
 function renderSpeech(text){q('#speech').textContent=text || 'タップしておしゃべり'}
