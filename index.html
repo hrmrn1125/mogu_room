@@ -647,18 +647,42 @@ function netCalories() { return Math.max(0, fedCalories() - exerciseCalories());
 function bodyStage() { const t=state.targets, n=netCalories(); if(!t) return 'normal'; if(n===0) return 'normal'; if(n<t.lose[0]) return 'thin2'; if(n<t.lose[1]) return 'thin1'; if(n<=t.maintain[1]) return 'normal'; if(n<t.gain[0] + (t.gain[1]-t.gain[0])/3) return 'chubby1'; if(n<t.gain[0] + (t.gain[1]-t.gain[0])*2/3) return 'chubby2'; return 'chubby3'; }
 function stageTransform(stage) { return {thin2:'scale(.92,1.02)',thin1:'scale(.97,1.01)',normal:'scale(1)',chubby1:'scale(1.06,.99)',chubby2:'scale(1.12,.98)',chubby3:'scale(1.18,.97)'}[stage] || 'scale(1)'; }
 function chooseFoods(kcal) {
-  // Convert the exact logged calories to varied representative foods.
-  // Each generated piece retains its allocated amount; no calories are lost.
-  let remaining=Math.max(0,Math.round(Number(kcal)||0));
+  const total=Math.max(0,Math.round(Number(kcal)||0));
+  if(total===0)return [];
+  // Representative foods are allocated to the logged energy total, not claimed as exact real meals.
+  // Optimize combinations in 10 kcal steps to avoid dozens of tiny leftover pieces.
+  const coins=FOODS.map(food=>({...food,units:Math.round(food.kcal/10)}));
   const pieces=[];
-  const sorted=[...FOODS].sort((a,b)=>b.kcal-a.kcal);
-  while(remaining>0 && pieces.length<23){
-    const last=pieces.length===22;
-    const food=last?sorted[0]:(sorted.find(item=>item.kcal<=remaining)||sorted[sorted.length-1]);
-    const amount=last?remaining:Math.min(remaining,food.kcal);
-    pieces.push({key:food.key,kcal:amount});
-    remaining-=amount;
+  let rest=total;
+  while(rest>10000 && pieces.length<16){
+    pieces.push({key:'pizza',kcal:850});
+    rest-=850;
   }
+  const units=Math.max(1,Math.round(rest/10));
+  const count=Array(units+1).fill(Infinity),last=Array(units+1).fill(-1);
+  count[0]=0;
+  for(let u=1;u<=units;u++){
+    for(let i=0;i<coins.length;i++){
+      const step=coins[i].units;
+      if(step<=u && count[u-step]+1<count[u]){
+        count[u]=count[u-step]+1;last[u]=i;
+      }
+    }
+  }
+  if(!Number.isFinite(count[units])){
+    // Tiny values (under 40 kcal) still produce a single visible food.
+    pieces.push({key:'berry',kcal:rest});
+    return pieces;
+  }
+  let u=units;
+  while(u>0){
+    const food=coins[last[u]];
+    pieces.push({key:food.key,kcal:food.kcal});
+    u-=food.units;
+  }
+  // Keep the exact logged total, including odd kcal values between 10 kcal steps.
+  const allocated=pieces.reduce((sum,p)=>sum+p.kcal,0);
+  pieces[pieces.length-1].kcal+=total-allocated;
   return pieces;
 }
 function petSay(custom) { const pet=PETS[state.petIndex]; state.bubble = custom || pet.sayings[Math.floor(Math.random()*pet.sayings.length)]; save(); renderSpeech(); }
