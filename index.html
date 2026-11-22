@@ -110,6 +110,18 @@ html,body{height:100%;overflow:hidden}
 .pet-option{min-width:0}
 .pet-option strong{font-size:12px;overflow-wrap:anywhere;word-break:normal}
 .pet-option canvas{width:auto;height:auto;max-width:76px;max-height:94px}
+
+/* Easy-to-tap two-action home and reliable nickname fitting */
+.home-page .action-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.home-page .action-two .action-btn{font-size:15px;font-weight:800;min-height:50px}
+.home-page .action-two #openFoodBtn{background:#e8ecdc;color:#354f3c}
+.home-page .action-two #openExerciseBtn{background:#b9d4c2;color:#1f5038}
+.home-page .action-two #openFoodBtn:active,.home-page .action-two #openExerciseBtn:active{filter:brightness(.94);transform:scale(.99)}
+.topbar{align-items:center}
+#topTitle{max-width:none;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:15px}
+.topbar>div:first-child{flex:1 1 auto;min-width:0;max-width:calc(100% - 176px)}
+.topbar .kcal-row{flex:0 0 auto}
+#nicknameInput{width:100%}
 </style>
 </head>
 <body>
@@ -118,7 +130,7 @@ html,body{height:100%;overflow:hidden}
     <div>
       <div class="topbar">
         <div>
-          <h1 id="topTitle">プロフィールを設定</h1>
+          <h1 id="topTitle">ニックネーム</h1>
         </div>
         <div class="kcal-row">
           <div class="kcal"><span id="netKcal">0</span> kcal</div>
@@ -149,10 +161,10 @@ html,body{height:100%;overflow:hidden}
         <div class="food-head"><span>エサ</span><span id="foodCount">0個</span></div>
         <div class="food-tray" id="foodTray"></div>
       </div>
-      <div class="action-row">
+      <div class="action-row action-two">
         <button class="action-btn" id="openFoodBtn" type="button">ごはん</button>
-        <button class="action-btn secondary" id="openExerciseBtn" type="button">運動</button>
-        <button class="action-btn secondary" id="toLogsBtn" type="button">記録</button>
+        <button class="action-btn exercise-primary" id="openExerciseBtn" type="button">運動</button>
+        
       </div>
     </div>
   </section>
@@ -167,7 +179,7 @@ html,body{height:100%;overflow:hidden}
   <section class="page" id="page-settings">
     <div class="topbar"><h1>設定</h1></div>
     <div class="section">
-      <h2>プロフィール</h2>
+      <h2>プロフィール</h2><div class="field" style="margin-bottom:12px"><label for="nicknameInput">ニックネーム（10文字以内）</label><input id="nicknameInput" type="text" maxlength="10" autocomplete="nickname" placeholder="ニックネーム"></div>
       <div class="field-grid">
         <div class="field"><label for="heightInput">身長 cm</label><input id="heightInput" type="number" step="0.1"></div>
         <div class="field"><label for="weightInput">体重 kg</label><input id="weightInput" type="number" step="0.1"></div>
@@ -255,13 +267,20 @@ settings:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="
 };
 function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function emptyState(){return {
-  date: today(), petIndex:1, foodPieces:[], meals:[], feedings:[], exercises:[], weights:[],
-  profile:{height:'',weight:'',age:'',sex:'female',activity:'1.2'}, targets:null, profileHash:'', face:'neutral'
+  date: today(), petIndex:1, foodPieces:[], meals:[], feedings:[], exercises:[], weights:[], nickname:'ニックネーム',
+  profile:{height:'150',weight:'50',age:'30',sex:'female',activity:'1.2'}, targets:null, profileHash:'', face:'neutral'
 }}
 function load(){
-  try{const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return emptyState();
-    return {...emptyState(), ...JSON.parse(raw), profile:{...emptyState().profile,...(JSON.parse(raw).profile||{})}};
-  }catch(e){return emptyState()}
+ const defaults=emptyState();
+ try{
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(!raw)return defaults;
+  const previous=JSON.parse(raw);
+  const profile={...defaults.profile,...previous.profile};
+  for(const key of ['height','weight','age'])if(profile[key]===''||profile[key]==null)profile[key]=defaults.profile[key];
+  const nickname=typeof previous.nickname==='string'&&previous.nickname.trim()?Array.from(previous.nickname.trim()).slice(0,10).join(''):'ニックネーム';
+  return {...defaults,...previous,nickname,profile};
+ }catch(e){return defaults}
 }
 let state=load();
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
@@ -345,7 +364,7 @@ function renderGauge(){
  const pct=Math.max(0,Math.min(100,100*n/cap));
  q('#gaugeFill').style.clipPath='inset(0 '+(100-pct)+'% 0 0)';
  gauge.setAttribute('aria-label','今日の収支 '+n+' kcal、減量・維持・増量の目安');
- q('#topTitle').textContent=state.targets?'今日のカロリー収支':'目安（仮）';
+ q('#topTitle').textContent=state.nickname||'ニックネーム';
  q('#targetText').textContent=state.targets?
    '減量 '+t.lose[0]+'〜'+t.lose[1]+' kcal / 維持 '+t.maintain[0]+'〜'+t.maintain[1]+' kcal / 増量 '+t.gain[0]+'〜'+t.gain[1]+' kcal':
    'プロフィールを保存すると自分に合った推定範囲になるよ';
@@ -395,13 +414,21 @@ function animateExercise(kind){
 }
 function saveFood(){ ensureDay(); const kcal=Number(q('#foodCalInput').value); if(!(kcal>0)){toast('カロリーを入力してね');return;} const pieces=chooseFoods(kcal); state.meals.push({date:today(),kcal,pieces:pieces.map(x=>x.name)}); state.foodPieces.push(...pieces); save(); q('#foodCalInput').value=''; closeModals(); renderTray(); renderLogs(); toast('エサを作ったよ'); }
 function saveExercise(key){ ensureDay(); const ex=EXERCISES.find(x=>x.key===key); state.exercises.push({date:today(),...ex}); save(); closeModals(); renderGauge(); renderLogs(); drawPet(); animateExercise(key); speak(ex.label); }
-function saveProfile(){ const p={height:q('#heightInput').value,weight:q('#weightInput').value,age:q('#ageInput').value,sex:q('#sexInput').value,activity:q('#activityInput').value}; const nextHash=profileHash(p); const changed=nextHash!==state.profileHash; state.profile=p; state.targets=calcTargets(); state.profileHash=nextHash; if(changed) clearDaily(); save(); renderAll(); toast(changed?'設定変更で今日のカロリーをリセットしたよ':'設定を更新したよ'); }
+function saveProfile(){
+ const p={height:q('#heightInput').value,weight:q('#weightInput').value,age:q('#ageInput').value,sex:q('#sexInput').value,activity:q('#activityInput').value};
+ const nickname=Array.from(q('#nicknameInput').value.trim()).slice(0,10).join('')||'ニックネーム';
+ if(!(Number(p.height)>0&&Number(p.weight)>0&&Number(p.age)>0)){toast('身長・体重・年齢を入力してね');return}
+ const changed=profileHash(p)!==profileHash(state.profile);
+ state.profile=p;state.nickname=nickname;state.targets=calcTargets();state.profileHash=profileHash(p);
+ if(changed)clearDaily();
+ save();renderAll();toast(changed?'プロフィール変更で今日の記録をリセットしたよ':'設定を保存したよ');
+}
 function saveWeight(){ const weight=q('#weightRecordInput').value; if(!weight){toast('体重を入力してね');return;} state.weights=state.weights.filter(x=>x.date!==today()); state.weights.push({date:today(),weight}); if(String(state.profile.weight)!==String(weight)){ state.profile.weight=String(weight); q('#weightInput').value=String(weight); state.targets=calcTargets(); state.profileHash=profileHash(state.profile); clearDaily(); }
  save(); renderAll(); toast('体重を保存したよ'); }
 function resetToday(){ if(confirm('今日のカロリーとエサをゼロにする？')){ clearDaily(); save(); renderAll(); toast('リセットしたよ'); } }
 function switchPage(page){ qa('.page').forEach(x=>x.classList.remove('active')); q(`#page-${page}`).classList.add('active'); qa('.nav-btn').forEach(x=>x.classList.toggle('active', x.dataset.page===page)); }
 function renderAll(){ ensureDay(); q('#petName').textContent=PETS[state.petIndex].name; drawPet(); renderTray(); renderGauge(); renderLogs(); renderPetPicker(); renderSpeech();
-  q('#heightInput').value=state.profile.height; q('#weightInput').value=state.profile.weight; q('#ageInput').value=state.profile.age; q('#sexInput').value=state.profile.sex; q('#activityInput').value=state.profile.activity; q('#weightRecordInput').value=''; }
+  q('#nicknameInput').value=state.nickname||'ニックネーム'; q('#heightInput').value=state.profile.height; q('#weightInput').value=state.profile.weight; q('#ageInput').value=state.profile.age; q('#sexInput').value=state.profile.sex; q('#activityInput').value=state.profile.activity; q('#weightRecordInput').value=''; }
 
 q('#petCanvas').addEventListener('click',()=>speak());
 q('#openFoodBtn').addEventListener('click',()=>openModal('#foodModal'));
@@ -410,13 +437,13 @@ q('#saveFoodBtn').addEventListener('click',saveFood);
 q('#saveProfileBtn').addEventListener('click',saveProfile);
 q('#saveWeightBtn').addEventListener('click',saveWeight);
 q('#resetBtn').addEventListener('click',resetToday);
-q('#toLogsBtn').addEventListener('click',()=>switchPage('logs'));
+
 qa('[data-close]').forEach(btn=>btn.addEventListener('click',closeModals));
 qa('.modal-backdrop').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)closeModals()}));
 qa('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>switchPage(btn.dataset.page)));
 qa('[data-icon]').forEach(el=>{el.innerHTML=NAV_ICON[el.dataset.icon]||''});
 renderExerciseChoices();
-state.targets=state.targets || calcTargets();
+state.targets=calcTargets(); state.profileHash=profileHash(state.profile); save();
 window.addEventListener('focus',ensureDay); document.addEventListener('visibilitychange',()=>{if(!document.hidden)ensureDay()});
 renderAll();
 </script>
