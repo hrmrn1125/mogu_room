@@ -194,11 +194,11 @@ html,body{background:#fff;overflow-x:hidden}
 
 /* Render the supplied reference pixel matrices at native nearest-neighbor quality. */
 #petSvg.pet-canvas{
- width:min(61vw,228px);height:auto;max-height:265px;aspect-ratio:64/76;
+ width:auto;height:auto;max-height:265px;
  image-rendering:pixelated;image-rendering:crisp-edges;filter:none!important;
  transform:none!important;display:block;
 }
-.pet-picker .theme canvas.pet-canvas{width:54px!important;height:64px!important;max-height:none;aspect-ratio:64/76;image-rendering:pixelated;flex-shrink:0}
+.pet-picker .theme canvas.pet-canvas{width:auto!important;height:auto!important;max-width:54px;max-height:64px;image-rendering:pixelated;flex-shrink:0;object-fit:contain}
 .pet-picker .theme>div{display:flex;align-items:center;justify-content:center;width:58px;min-width:58px}
 .character-wrap{display:grid;place-items:center}
 </style>
@@ -316,7 +316,7 @@ html,body{background:#fff;overflow-x:hidden}
 
 <div class="toast" id="toast"></div>
 
-<script src="sprites.js?v=1"></script>
+<script src="sprites.js?v=2"></script>
 <script>
 const KEY='mogu-room-revised-proto-v1';
 const pets=[
@@ -539,7 +539,10 @@ const SPRITE_BODY_REGIONS=[
 ];
 function petSvg(index,stateKey,faceState='neutral'){
  const name=SPRITE_IDS[index]||SPRITE_IDS[0];
- return '<canvas id="petSvg" class="pet-canvas" width="64" height="76" data-sprite="'+name+'" data-stage="'+stateKey+'" data-face="'+faceState+'" role="img" aria-label="'+pets[index].name+'"></canvas>';
+ const info=spriteInfo(name);
+ const h=info.height+10;
+ const displayWidth=Math.min(235,Math.round(240*52/h));
+ return '<canvas id="petSvg" class="pet-canvas" width="52" height="'+h+'" style="width:min(70vw,'+displayWidth+'px);height:auto" data-sprite="'+name+'" data-stage="'+stateKey+'" data-face="'+faceState+'" role="img" aria-label="'+pets[index].name+'"></canvas>';
 }
 function drawPetCanvas(canvas){
  if(!canvas)return;
@@ -550,11 +553,11 @@ function drawPetCanvas(canvas){
  const face=canvas.dataset.face||'neutral';
  const c=canvas.getContext('2d');
  if(!c)return;
- c.imageSmoothingEnabled=false;c.clearRect(0,0,64,76);
+ c.imageSmoothingEnabled=false;c.clearRect(0,0,canvas.width,canvas.height);
  // Draw the exact supplied pixels to an offscreen bitmap first; never interpolate colors.
  const raw=document.createElement('canvas');raw.width=40;raw.height=data.length;
  const source=raw.getContext('2d');source.imageSmoothingEnabled=false;drawSprite(source,name,1);
- const startY=Math.floor((76-data.length)/2);
+ const startY=5;
  const level={thin3:-3,thin2:-2,thin1:-1,normal:0,chubby1:1,chubby2:2,chubby3:3}[stage]||0;
  const region=SPRITE_BODY_REGIONS[index];
  for(let y=0;y<data.length;y++){
@@ -567,7 +570,7 @@ function drawPetCanvas(canvas){
   // Maximum deformation is small so face, silhouette and props remain recognizable.
   const amount=level*(bump([c0,c1],.035)+bump([b0,b1],.065));
   const width=Math.max(34,Math.round(40*(1+amount)));
-  const x=Math.round((64-width)/2);
+  const x=Math.round((52-width)/2);
   c.drawImage(raw,0,y,40,1,x,startY+y,width,1);
  }
  if(face!=='neutral'){
