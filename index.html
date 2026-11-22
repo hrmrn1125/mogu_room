@@ -911,8 +911,9 @@ function makeMascotCutout(src){
 }
 function prepareMascotImages(){
  Promise.all(PETS.map(async pet=>{
-  CUTOUT_ASSETS[pet.key]=ASSETS[pet.key].startsWith('data:image/webp;base64,')
-   ? ASSETS[pet.key] : await makeMascotCutout(ASSETS[pet.key]);
+  CUTOUT_ASSETS[pet.key]=pet.key==='squirrel'
+   ? await makeMascotCutout(ASSETS[pet.key])
+   : (ASSETS[pet.key].startsWith('data:image/webp;base64,') ? ASSETS[pet.key] : await makeMascotCutout(ASSETS[pet.key]));
  })).then(()=>{
   cutoutsReady=true;
   renderPet();renderPetPicker();
@@ -923,8 +924,9 @@ function renderPet() {
  const stage=bodyStage();
  const variantSrc=typeof BODY_VARIANT_IMAGES!=='undefined' && BODY_VARIANT_IMAGES[pet.key] && BODY_VARIANT_IMAGES[pet.key][stage];
  const useVariant=stage!=='normal' && typeof variantSrc==='string' && variantSrc.startsWith('data:image/webp;base64,');
- // Use the previously approved squirrel standard artwork with its intrinsic ground shadow.
- img.src=pet.key==='squirrel'?ASSETS.squirrel:(CUTOUT_ASSETS[pet.key]||ASSETS[pet.key]);
+ // Use the transparent standard cutout, including the original squirrel's ground shadow.
+ img.src=CUTOUT_ASSETS[pet.key]||ASSETS[pet.key];
+ img.style.visibility=(pet.key==='squirrel'&&!CUTOUT_ASSETS.squirrel)?'hidden':'visible';
  img.alt=pet.name;
  // Normal-stage positioning is now controlled in CSS.
  img.classList.toggle('hidden',useVariant);
@@ -1120,14 +1122,14 @@ function renderPetPicker() {
   const btn=document.createElement('button');
   btn.type='button';
   btn.className='pet-option'+(idx===state.petIndex?' selected':'');
-  // Use the same normal artwork source as home. The squirrel needs its own
-  // thumbnail ground shadow, because the background-cutout removes that ellipse.
-  const asset=pet.key==='squirrel'?ASSETS.squirrel:(CUTOUT_ASSETS[pet.key]||ASSETS[pet.key]);
+  // Keep the settings preview identical to the transparent standard home artwork.
+  const asset=CUTOUT_ASSETS[pet.key]||ASSETS[pet.key];
   const frame=document.createElement('span');
   frame.className='pet-thumb-frame';
   const img=document.createElement('img');
   img.className='pet-thumb';
   img.src=asset;
+  if(pet.key==='squirrel'&&!CUTOUT_ASSETS.squirrel)img.style.visibility='hidden';
   img.alt=pet.name;
   frame.appendChild(img);
   const name=document.createElement('div');name.className='name';name.textContent=pet.name;
