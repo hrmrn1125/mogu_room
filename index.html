@@ -529,6 +529,18 @@ html,body{width:100%;height:100%;overflow-x:hidden}
     transform:scale(1.17);
   }
 }
+
+/* Align the normal hedgehog and otter to the variant art baseline without resizing. */
+#page-home .pet-card.standard-height-match > .pet-img {
+ transform:translateY(-10%) !important;
+ transform-origin:center center;
+}
+@media(max-width:390px){
+ #page-home .pet-card.standard-height-match > .pet-img{transform:translateY(-10%) !important;}
+}
+/* Original squirrel artwork includes the shadow beneath its paws. */
+#page-home .pet-card.squirrel-shadow::before,
+.pet-thumb-frame.squirrel-thumb::before{content:none !important;display:none !important;}
 </style>
 </head>
 <body>
@@ -904,9 +916,10 @@ function renderPet() {
  const stage=bodyStage();
  const variantSrc=typeof BODY_VARIANT_IMAGES!=='undefined' && BODY_VARIANT_IMAGES[pet.key] && BODY_VARIANT_IMAGES[pet.key][stage];
  const useVariant=stage!=='normal' && typeof variantSrc==='string' && variantSrc.startsWith('data:image/webp;base64,');
- img.src=CUTOUT_ASSETS[pet.key]||ASSETS[pet.key];
+ // Use the previously approved squirrel standard artwork with its intrinsic ground shadow.
+ img.src=pet.key==='squirrel'?ASSETS.squirrel:(CUTOUT_ASSETS[pet.key]||ASSETS[pet.key]);
  img.alt=pet.name;
- img.style.transform='none';
+ // Normal-stage positioning is now controlled in CSS.
  img.classList.toggle('hidden',useVariant);
  variant.classList.toggle('hidden',!useVariant);
  if(useVariant && variant.src!==variantSrc) variant.src=variantSrc;
@@ -1101,9 +1114,9 @@ function renderPetPicker() {
   btn.className='pet-option'+(idx===state.petIndex?' selected':'');
   // Use the same normal artwork source as home. The squirrel needs its own
   // thumbnail ground shadow, because the background-cutout removes that ellipse.
-  const asset=CUTOUT_ASSETS[pet.key]||ASSETS[pet.key];
+  const asset=pet.key==='squirrel'?ASSETS.squirrel:(CUTOUT_ASSETS[pet.key]||ASSETS[pet.key]);
   const frame=document.createElement('span');
-  frame.className='pet-thumb-frame'+(pet.key==='squirrel'?' squirrel-thumb':'');
+  frame.className='pet-thumb-frame';
   const img=document.createElement('img');
   img.className='pet-thumb';
   img.src=asset;
