@@ -70,6 +70,46 @@ button{border:0;background:none;color:inherit}
 .choice-btn{background:#fff;border-radius:16px;padding:14px;box-shadow:inset 0 0 0 1px #ecece7;text-align:left}.choice-btn .title{font-weight:800;display:block;margin-bottom:6px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom));background:#3d443f;color:#fff;padding:10px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1}
 @media (max-width:370px){.field-grid{grid-template-columns:1fr}.action-row{gap:8px}.action-btn{font-size:15px;padding:14px 8px}}
+
+/* Screen hierarchy — the home page is truly three zones, other tabs don't bleed through */
+html,body{height:100%;overflow:hidden}
+.app{height:100dvh;min-height:0;overflow:hidden;padding:calc(8px + env(safe-area-inset-top)) 16px calc(68px + env(safe-area-inset-bottom))}
+.page{display:none!important;min-height:0}
+.page.active.home-page{display:grid!important;flex:none;grid-template-rows:auto minmax(0,1fr) auto;gap:8px;height:100%;min-height:0}
+.page.active:not(.home-page){display:block!important;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:24px}
+.home-page .center-stage{min-height:0;overflow:hidden;justify-content:center;gap:3px;padding:0}
+.home-page .pet-stage{flex:1 1 auto;min-height:0;height:100%;max-height:none;overflow:visible}
+.home-page #petCanvas{display:block;width:auto!important;max-width:min(75vw,272px);max-height:min(40dvh,340px);height:auto!important;object-fit:contain;image-rendering:pixelated;align-self:center}
+.home-page #petName{margin:0;font-size:15px;flex:0 0 auto}
+.home-page .speech{font-size:13px;line-height:1.4;max-width:min(78vw,270px);margin:0 0 4px;padding:8px 12px;flex:0 0 auto}
+.home-page .bottom-panel{position:relative;align-self:end;gap:8px;min-height:0}
+.home-page .food-panel{padding:9px 12px;border-radius:17px}
+.home-page .food-head{font-size:14px;margin-bottom:7px}
+.home-page .food-tray{min-height:56px;max-height:70px;gap:8px}
+.home-page .food-item{height:54px;width:58px;border-radius:12px}
+.home-page .food-item canvas{max-width:50px;max-height:45px;object-fit:contain}
+.home-page .action-row{gap:8px}
+.home-page .action-btn{padding:12px 6px;font-size:14px;border-radius:14px;min-height:46px}
+.bottom-nav{padding:6px 14px calc(6px + env(safe-area-inset-bottom));height:calc(62px + env(safe-area-inset-bottom));box-sizing:border-box}
+.nav-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 3px;font-size:13px}
+.nav-btn svg{width:19px;height:19px;flex:none;stroke:currentColor}
+.topbar h1{font-size:15px;max-width:50%;line-height:1.3}
+.topbar .kcal-row{gap:6px}
+.topbar .kcal{font-size:16px}
+.topbar .soft-btn{font-size:12px;padding:8px 10px}
+.gauge{height:18px}
+.gauge-fill{position:absolute;inset:0;width:100%;clip-path:inset(0 100% 0 0);background:linear-gradient(90deg,var(--green) 0 var(--green-edge,65%),var(--yellow) var(--green-edge,65%) var(--yellow-edge,82%),var(--red) var(--yellow-edge,82%) 100%);transition:clip-path .3s ease}
+.boundary.b1{left:var(--green-edge,65%)}.boundary.b2{left:var(--yellow-edge,82%)}
+@media(max-height:670px){
+ .home-page .speech{padding:5px 10px}
+ .home-page #petCanvas{max-height:34dvh}
+ .home-page .food-item{height:46px;width:50px}
+ .home-page .food-tray{min-height:48px}
+ .home-page .action-btn{padding:8px 4px;min-height:40px}
+}
+.pet-option{min-width:0}
+.pet-option strong{font-size:12px;overflow-wrap:anywhere;word-break:normal}
+.pet-option canvas{width:auto;height:auto;max-width:76px;max-height:94px}
 </style>
 </head>
 <body>
@@ -156,9 +196,9 @@ button{border:0;background:none;color:inherit}
 
 <div class="bottom-nav">
   <div class="nav-inner">
-    <button class="nav-btn active" data-page="home">ホーム</button>
-    <button class="nav-btn" data-page="logs">記録</button>
-    <button class="nav-btn" data-page="settings">設定</button>
+    <button class="nav-btn active" data-page="home"><span class="nav-icon" data-icon="home"></span>ホーム</button>
+    <button class="nav-btn" data-page="logs"><span class="nav-icon" data-icon="logs"></span>記録</button>
+    <button class="nav-btn" data-page="settings"><span class="nav-icon" data-icon="settings"></span>設定</button>
   </div>
 </div>
 
@@ -208,6 +248,11 @@ const FACE_POINTS={hamster:{x:21,y:9},rabbit:{x:19,y:15},squirrel:{x:19,y:14},he
 const BODY_RANGES={hamster:{cheek:[7,12],belly:[13,32]},rabbit:{cheek:[15,22],belly:[24,56]},squirrel:{cheek:[20,27],belly:[28,49]},hedgehog:{cheek:[14,18],belly:[19,44]},otter:{cheek:[9,15],belly:[16,34]}};
 let dragData=null, toastTimer=null, actionTimer=null;
 
+const NAV_ICON={
+home:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10H3V10Z"/><path d="M9 20v-7h6v7"/></svg>',
+logs:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3v3m6-3v3M8 11h8M8 15h5"/></svg>',
+settings:'<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.7 5.7l1.4 1.4m9.8 9.8 1.4 1.4M18.3 5.7l-1.4 1.4m-9.8 9.8-1.4 1.4"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2"/></svg>'
+};
 function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function emptyState(){return {
   date: today(), petIndex:1, foodPieces:[], meals:[], feedings:[], exercises:[], weights:[],
@@ -301,12 +346,25 @@ function chooseFoods(kcal){
   if(remaining>0 && pieces.length<7){const last=sorted.find(item=>item.kcal<=Math.max(remaining,80)) || sorted[sorted.length-1]; pieces.push({key:last.key,name:last.name,kcal:remaining})}
   return pieces;
 }
+function displayTargets(){
+ // A neutral provisional ruler until profile values are supplied. Never present it as a personalized goal.
+ return state.targets||{lose:[1350,1750],maintain:[1751,2250],gain:[2251,2750]};
+}
 function renderGauge(){
-  const n=netCalories(); q('#netKcal').textContent=n;
-  if(!state.targets){ q('#topTitle').textContent='プロフィールを設定'; q('#gaugeFill').style.clipPath='inset(0 100% 0 0)'; q('#targetText').textContent=''; return; }
-  q('#topTitle').textContent='今日のカロリー収支';
-  const max=Math.max(1,state.targets.gain[1]); const pct=Math.min(100,n/max*100); q('#gaugeFill').style.clipPath='inset(0 '+(100-pct)+'% 0 0)';
-  q('#targetText').textContent=`減量 ${state.targets.lose[0]}〜${state.targets.lose[1]} kcal / 維持 ${state.targets.maintain[0]}〜${state.targets.maintain[1]} kcal / 増量 ${state.targets.gain[0]}〜${state.targets.gain[1]} kcal`;
+ const n=netCalories(),t=displayTargets(),cap=Math.max(1,t.gain[1]);
+ const greenEdge=Math.max(5,Math.min(94,100*t.lose[1]/cap));
+ const yellowEdge=Math.max(greenEdge+2,Math.min(98,100*t.maintain[1]/cap));
+ const gauge=q('.gauge');
+ gauge.style.setProperty('--green-edge',greenEdge+'%');
+ gauge.style.setProperty('--yellow-edge',yellowEdge+'%');
+ q('#netKcal').textContent=n;
+ const pct=Math.max(0,Math.min(100,100*n/cap));
+ q('#gaugeFill').style.clipPath='inset(0 '+(100-pct)+'% 0 0)';
+ gauge.setAttribute('aria-label','今日の収支 '+n+' kcal、減量・維持・増量の目安');
+ q('#topTitle').textContent=state.targets?'今日のカロリー収支':'目安（仮）';
+ q('#targetText').textContent=state.targets?
+   '減量 '+t.lose[0]+'〜'+t.lose[1]+' kcal / 維持 '+t.maintain[0]+'〜'+t.maintain[1]+' kcal / 増量 '+t.gain[0]+'〜'+t.gain[1]+' kcal':
+   'プロフィールを保存すると自分に合った推定範囲になるよ';
 }
 function renderLogs(){
   const meals=state.meals.filter(x=>x.date===today()), ex=state.exercises.filter(x=>x.date===today());
@@ -375,6 +433,7 @@ q('#toLogsBtn').addEventListener('click',()=>switchPage('logs'));
 qa('[data-close]').forEach(btn=>btn.addEventListener('click',closeModals));
 qa('.modal-backdrop').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)closeModals()}));
 qa('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>switchPage(btn.dataset.page)));
+qa('[data-icon]').forEach(el=>{el.innerHTML=NAV_ICON[el.dataset.icon]||''});
 renderExerciseChoices();
 state.targets=state.targets || calcTargets();
 window.addEventListener('focus',ensureDay); document.addEventListener('visibilitychange',()=>{if(!document.hidden)ensureDay()});
