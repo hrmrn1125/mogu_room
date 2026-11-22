@@ -395,6 +395,43 @@ function bodyVariantPixels(name,stage){
    }
   }
  }
+
+ // Hedgehog's spikes are wider than its face; modifying only the outside silhouette
+ // barely changes its apparent weight. Expand/shrink the cream cheeks and tummy too.
+ if(name==='hedgehog'&&level!==0){
+  for(let y=16;y<=41;y++){
+   const cream=[];
+   for(let x=7;x<width+7;x++)if(g[y][x]==='A')cream.push(x);
+   if(cream.length<8)continue;
+   const lo=cream[0],hi=cream.at(-1);
+   const center= y<28?22:35;
+   const radius=y<28?8:11;
+   const falloff=Math.sqrt(Math.max(0,1-Math.pow((y-center)/radius,2)));
+   const n=Math.round(Math.abs(level)*2.1*falloff);
+   if(n===0)continue;
+   const sides=[-1,1];
+   for(const dir of sides){
+    // Keep the purple star bag on the right of the lower body intact.
+    if(dir===1&&y>=29)continue;
+    const edge=dir===-1?lo:hi;
+    const nextEdge=edge+dir*n;
+    if(nextEdge<4||nextEdge>=g[y].length-4)continue;
+    if(level>0){
+     g[y][edge]='A';
+     for(let i=1;i<=n;i++){
+      const x=edge+dir*i;
+      const current=g[y][x];
+      if(current==='P'||current==='L')continue;
+      g[y][x]=i===n?'K':'A';
+     }
+    }else{
+     for(let i=0;i<n;i++)g[y][edge-dir*i]='M';
+     const x=edge-dir*n;
+     if(x>=0&&x<g[y].length)g[y][x]='K';
+    }
+   }
+  }
+ }
  const result={grid:g,width:g[0].length,height,filled:g.flat().filter(c=>c!=='.').length};
  PIXEL_SPRITE_CACHE.set(k,result);return result;
 }
