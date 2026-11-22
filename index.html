@@ -297,7 +297,7 @@ body{position:relative}
 
 <div class="toast" id="toast"></div>
 
-<script src="sprites.js?v=6"></script>
+<script src="sprites.js?v=7"></script>
 <script>
 const STORAGE_KEY='mogu-room-pixel-v2';
 const PETS=[
@@ -380,7 +380,7 @@ function bodyStage(){
 function drawPet(){
  const canvas=q('#petCanvas'),ctx=canvas.getContext('2d');
  canvas.width=236;canvas.height=236;
- renderFinePetSprite(ctx,PETS[state.petIndex].key,bodyStage(),state.face||'neutral',236,236);
+ renderStablePetSprite(ctx,PETS[state.petIndex].key,236,236);
 }
 function drawFoodCanvas(canvas,name){
  drawFineFoodSprite(canvas.getContext('2d'),name);
@@ -429,7 +429,7 @@ function renderGauge(){
 }
 function renderLogs(){
   const meals=state.meals.filter(x=>x.date===today()), ex=state.exercises.filter(x=>x.date===today());
-  q('#mealList').innerHTML = meals.length ? meals.map(x=>`<div class="list-item"><span>${x.kcal} kcal</span><span class="muted">${x.pieces.join('・')}</span></div>`).join('') : '<div class="muted">まだ記録がないよ</div>';
+  q('#mealList').innerHTML = meals.length ? meals.map(x=>`<div class="list-item"><span class="muted">${x.time || '時刻未記録'}</span><strong>${Number(x.kcal).toLocaleString('ja-JP')} kcal</strong></div>`).join('') : '<div class="muted">まだ記録がないよ</div>';
   q('#exerciseList').innerHTML = ex.length ? ex.map(x=>`<div class="list-item"><span>${x.name}</span><span class="muted">-${x.burn} kcal</span></div>`).join('') : '<div class="muted">まだ記録がないよ</div>';
   q('#weightList').innerHTML = state.weights.length ? state.weights.slice().reverse().map(x=>`<div class="list-item"><span>${x.date}</span><span class="muted">${x.weight} kg</span></div>`).join('') : '<div class="muted">まだ記録がないよ</div>';
 }
@@ -438,7 +438,7 @@ function renderPetPicker(){
  qa('#petPicker .pet-option').forEach((btn,i)=>{
   const cv=btn.querySelector('canvas');
   const ctx=cv.getContext('2d');
-  renderFinePetSprite(ctx,PETS[i].key,'normal','neutral',86,86);
+  renderStablePetSprite(ctx,PETS[i].key,86,86);
   btn.addEventListener('click',()=>{state.petIndex=i;save();renderAll()});
  });
 }
@@ -470,7 +470,7 @@ function animateExercise(kind){
   if(kind==='yoga'){ctx.fillStyle='#bacfb6'; ctx.fillRect(cx-70,cy+55,140,10)}
   setTimeout(()=>ctx.clearRect(0,0,cv.width,cv.height),1600);
 }
-function saveFood(){ ensureDay(); const kcal=Number(q('#foodCalInput').value); if(!(kcal>0)){toast('カロリーを入力してね');return;} const pieces=chooseFoods(kcal); state.meals.push({date:today(),kcal,pieces:pieces.map(x=>x.name)}); state.foodPieces.push(...pieces); save(); q('#foodCalInput').value=''; closeModals(); renderTray(); renderLogs(); toast('エサを作ったよ'); }
+function saveFood(){ ensureDay(); const kcal=Number(q('#foodCalInput').value); if(!(kcal>0)){toast('カロリーを入力してね');return;} const pieces=chooseFoods(kcal); state.meals.push({date:today(),time:new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',hour12:false}),kcal}); state.foodPieces.push(...pieces); save(); q('#foodCalInput').value=''; closeModals(); renderTray(); renderLogs(); toast('エサを作ったよ'); }
 function saveExercise(key){ ensureDay(); const ex=EXERCISES.find(x=>x.key===key); state.exercises.push({date:today(),...ex}); save(); closeModals(); renderGauge(); renderLogs(); drawPet(); animateExercise(key); speak(ex.label); }
 function saveProfile(){
  const p={height:q('#heightInput').value,weight:q('#weightInput').value,age:q('#ageInput').value,sex:q('#sexInput').value,activity:q('#activityInput').value};
