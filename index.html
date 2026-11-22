@@ -275,6 +275,32 @@ html,body{width:100%;height:100%;overflow-x:hidden}
  background-color:#fff;background-image:none;
 }
 #page-weight .weight-history-title{justify-content:flex-start}
+
+/* Non-destructive editing mode for saved weight entries. */
+.weight-delete-toggle{
+ flex:0 0 auto;
+ border-radius:11px;
+ padding:6px 11px;
+ font-size:13px;
+ font-weight:700;
+ color:#8c625f;
+ background:#fff;
+ border:1px solid #e8dad8;
+ touch-action:manipulation;
+}
+.weight-delete-toggle[aria-pressed="true"]{color:#d04b55;background:#fff1f1;border-color:#f0c5c7}
+.weight-delete-toggle:disabled{opacity:.42}
+.weight-record-leading{display:flex;gap:9px;align-items:center;min-width:0}
+.weight-remove-entry{
+ width:28px;height:28px;flex:0 0 28px;
+ display:inline-flex;align-items:center;justify-content:center;
+ border-radius:50%;
+ touch-action:manipulation;
+}
+.weight-remove-entry svg{display:block;width:25px;height:25px;pointer-events:none}
+.weight-remove-entry:focus-visible,.weight-delete-toggle:focus-visible{outline:2px solid #a6545a;outline-offset:2px}
+.weight-record-row strong{margin-left:auto;flex-shrink:0}
+@media(max-width:370px){.weight-record-leading{gap:5px}.weight-history-date{font-size:12px}}
 </style>
 </head>
 <body>
@@ -343,7 +369,7 @@ html,body{width:100%;height:100%;overflow-x:hidden}
         </div>
       </div>
       <button class="submit" id="saveWeightBtn" type="button">体重を記録</button>
-      <div class="weight-history-title">直近の体重</div>
+      <div class="weight-history-title"><span>直近の体重</span><button id="toggleWeightDelete" class="weight-delete-toggle" type="button" aria-pressed="false">削除</button></div>
       <div class="weight-history" id="weightHistoryScroll" tabindex="0" aria-label="体重の記録履歴、スクロール可能">
         <div class="list weight-history-list" id="weightList"></div>
       </div>
@@ -709,10 +735,30 @@ function weightRecords(){
 }
 let weightChartOffset=0;
 const MAX_CHART_OFFSET=11;
+let weightDeleteMode=false;
 function renderWeightPage(){
  const records=weightRecords();
- q('#weightList').innerHTML=records.length?records.map(x=>'<div class="list-item compact-record"><span class="weight-history-date">'+x.date+'</span><strong>'+x.weight.toLocaleString('ja-JP',{maximumFractionDigits:2})+' kg</strong></div>').join(''):'<div class="list-item"><span class="meta">まだ記録がないよ</span></div>';
+ const toggle=q('#toggleWeightDelete');
+ toggle.textContent=weightDeleteMode?'完了':'削除';
+ toggle.setAttribute('aria-pressed',String(weightDeleteMode));
+ toggle.disabled=records.length===0&&!weightDeleteMode;
+ q('#weightList').innerHTML=records.length?records.map(x=>{
+  const remove=weightDeleteMode?'<button class="weight-remove-entry" type="button" data-weight-date="'+x.date+'" aria-label="'+x.date+'の体重記録を削除"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#d9575b"/><path d="M7.5 12h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>':'';
+  return '<div class="list-item compact-record weight-record-row"><div class="weight-record-leading">'+remove+'<span class="weight-history-date">'+x.date+'</span></div><strong>'+x.weight.toLocaleString('ja-JP',{maximumFractionDigits:2})+' kg</strong></div>';
+ }).join(''):'<div class="list-item"><span class="meta">まだ記録がないよ</span></div>';
  renderWeightChart(records);
+}
+function deleteWeightRecord(date){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return;
+ const existing=weightRecords().find(x=>x.date===date);
+ if(!existing)return;
+ if(!confirm(date+' の体重記録（'+existing.weight+' kg）を削除する？'))return;
+ state.weights=(Array.isArray(state.weights)?state.weights:[]).filter(x=>x.date!==date);
+ save();
+ const history=q('#weightHistoryScroll'),scrollTop=history.scrollTop;
+ renderWeightPage();
+ history.scrollTop=scrollTop;
+ toast('体重記録を削除したよ');
 }
 function renderWeightChart(records){
  const now=new Date(),start=new Date(now.getFullYear(),now.getMonth()-2-3*weightChartOffset,1);
@@ -780,6 +826,16 @@ q('#saveFoodBtn').addEventListener('click',saveFood);
 q('#saveExerciseBtn').addEventListener('click',saveExercise);
 q('#saveProfileBtn').addEventListener('click',saveProfile);
 q('#saveWeightBtn').addEventListener('click',saveWeight);
+q('#toggleWeightDelete').addEventListener('click',()=>{
+ weightDeleteMode=!weightDeleteMode;
+ renderWeightPage();
+});
+q('#weightList').addEventListener('click',event=>{
+ const deleteButton=event.target.closest('.weight-remove-entry');
+ if(!deleteButton||!weightDeleteMode)return;
+ deleteWeightRecord(deleteButton.dataset.weightDate);
+});
+
 q('#weightChartOlder').addEventListener('click',()=>{weightChartOffset=Math.min(MAX_CHART_OFFSET,weightChartOffset+1);renderWeightChart(weightRecords());});
 q('#weightChartNewer').addEventListener('click',()=>{weightChartOffset=Math.max(0,weightChartOffset-1);renderWeightChart(weightRecords());});
 q('#resetBtn').addEventListener('click',resetToday);
