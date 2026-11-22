@@ -7,42 +7,6 @@ const SPRITE_PALETTE = {
   P:'#8867B6',Q:'#2F5499'
 };
 const SPRITES = {
- hamster:[
-"..............KKKKKK..........KKKKK.....",
-"....KKK......KKKKKKKKK.......KKKKKKK....",
-"...KKJKK.KK..KKEEEEEKK......KKEEEEEKF...",
-"...KJJJKKKKKKKKGGGEEKKKKKKKKKKEEEGGGKK..",
-"..KKJJJJKJJKKKKGGGGEKKKKKKKKKKEGGGGGKK..",
-".KKKJJJJJJK..KKGGGGEEEEEEEEEEEEEGGGGKK..",
-"KKJJJJJJJKK...KKGGGEEEEEEEEEEEEEGGGKK...",
-"KKKNJJJJJJK....KKGEEEEEEEEEEEEEEGGKK....",
-".KKNJJJJJJNK...KKEEEEEEEEEEEEEEEEKK.....",
-"..KKJJKKKNNKK.FKEEEEEEEEEEEEEEEEEEEK....",
-"..KKNNKKKKKK..KKEEEEEEEEEEEEEEEEEEEK....",
-"..KKNKKKKKK..KKGGEEEKEEEEEEEEKKEEGGGKK..",
-"....KKKKK...KKKGGEEKKKEEEEEEKKKEEGGGKK..",
-".......KK...KKGEEEEKKKEEEEEEKKKEEEEEGKK.",
-"........KKKKGGEEEEEEEEEEEEEEEEEEEEEEEGGK",
-"........KKKKGGEEEEEEEEEEKEEEEEEEEEEEEGGK",
-"........KKAKGEEEEEEEEEEKEKEEEEEEEEEEEEEK",
-"........KKKKGEEEEEEEEEEKEEEEEEEEEEEEEEEK",
-".........KKKGEEEEEEEEEEEEEEEEEEEEEEEEEEK",
-".........KKKGEEEEEEEEGEEEEEEGGEEEEEEEGGK",
-".........KKGKKGEEEEGGGEEEEEEGGGEEEEEGKK.",
-".........KKGEKKGGGGKEEEEEEEEEEKGGGGGKK..",
-"..........KGGGKGGGGKEEEEEEEEEEKGGGGGKK..",
-"...........KGGGEEEEEEEEEEEEEEEEEEEEKK...",
-"............KKKGGGEEEEEEEEEEEEEEGGEEKK..",
-".............KKKKEEEEEEEEEEEEEEEKKGGKK..",
-".............KKKKEEEEEEEEEEEEEEEKKGGKK..",
-".............KKEEEGEEEEEEEEEEEEGEEEKK...",
-".............KKEEEEGEEEEEEEEEEGEEEEKK...",
-".............KKGEEEGEEEEEEEEEEGEEEGKK...",
-".............KKGGGGEGGGGGGGGGGEGGGGKK...",
-"..............KKGGGGGKKKKKKKGGGGGGKK....",
-"...............KGGGGGKKKKKKKKGGGGKK.....",
-"................KKKKK.......KKKKKK......"
- ],
  rabbit:[
 "..KKKKKKK.......................KK......",
 "..KKKKKKK......................KKK......",
@@ -295,7 +259,6 @@ function drawFoodSprite(ctx,name,px=4){
 // Seven deterministic body-outline variants per character. The original maps remain
 // untouched for the normal appearance; non-body accessories and facial pixels stay fixed.
 const BODY_AREAS={
- hamster:{cheek:{rows:[12,20],cols:[13,39]},belly:{rows:[21,31],cols:[13,39]},fill:'E'},
  rabbit:{cheek:{rows:[24,35],cols:[1,32]},belly:{rows:[39,54],cols:[1,31]},fill:'D'},
  squirrel:{cheek:{rows:[29,37],cols:[1,23]},belly:{rows:[38,48],cols:[1,24]},fill:'J'},
  hedgehog:{cheek:{rows:[17,25],cols:[8,33]},belly:{rows:[26,43],cols:[8,28]},fill:'A'},
@@ -413,7 +376,7 @@ function renderBodySprite(ctx,name,stage,face,desiredWidth,desiredHeight){
  }
  // A fixed-pixel reaction, separate from the referenced character data.
  if(face&&face!=='neutral'){
-  const facial={hamster:[25,17],rabbit:[23,32],squirrel:[19,31],hedgehog:[21,24],otter:[22,17]};
+  const facial={rabbit:[23,32],squirrel:[19,31],hedgehog:[21,24],otter:[22,17]};
   const [bx,by]=facial[name],x=bx+7;
   if(face==='happy'||face==='smile'){
    sc.fillStyle=SPRITE_PALETTE.I;sc.fillRect(x-8,by+3,3,1);sc.fillRect(x+6,by+3,3,1);
@@ -444,7 +407,7 @@ function renderFinePetSprite(ctx,name,stage,face,desiredWidth,desiredHeight){
  const d=2,pad=18,mini=document.createElement('canvas');
  mini.width=(w+pad*2)*d;mini.height=(h+10)*d;
  const g=mini.getContext('2d');g.imageSmoothingEnabled=false;
- const baseColor={hamster:'E',rabbit:'D',squirrel:'J',hedgehog:'A',otter:'L'}[name];
+ const baseColor={rabbit:'D',squirrel:'J',hedgehog:'A',otter:'L'}[name];
  const fill=SPRITE_PALETTE[baseColor],outline=SPRITE_PALETTE.K,level=PET_BODY_STAGES[stage]||0;
  const at=(x,y,color)=>{g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),1,1)};
  const blob=(cx,cy,rx,ry,base)=>{
@@ -500,7 +463,7 @@ function renderFinePetSprite(ctx,name,stage,face,desiredWidth,desiredHeight){
   if(xs.length>9){
    const left=Math.min(...xs),right=Math.max(...xs),n=Math.abs(level);
    // Soft colored waist highlights rather than stray black slash marks.
-   const shading={hamster:'G',rabbit:'L',squirrel:'B',hedgehog:'B',otter:'O'}[name];
+   const shading={rabbit:'L',squirrel:'B',hedgehog:'B',otter:'O'}[name];
    g.fillStyle=SPRITE_PALETTE[shading];
    for(let i=0;i<n;i++){
     const xx=(left+pad+2+i)*d,rx=(right+pad-2-i)*d,yy=(y+3+i)*d;
@@ -509,7 +472,7 @@ function renderFinePetSprite(ctx,name,stage,face,desiredWidth,desiredHeight){
   }
  }
  if(face&&face!=='neutral'){
-  const p={hamster:[24,17],rabbit:[22,32],squirrel:[17,31],hedgehog:[20,24],otter:[21,16]}[name];
+  const p={rabbit:[22,32],squirrel:[17,31],hedgehog:[20,24],otter:[21,16]}[name];
   const x=(p[0]+pad)*d,y=(p[1]+5)*d;
   g.fillStyle=face==='surprised'?outline:SPRITE_PALETTE.I;
   if(face==='surprised')g.fillRect(x,y+5,3,3);
@@ -639,4 +602,71 @@ function renderStablePetSprite(ctx,name,desiredWidth,desiredHeight){
  ctx.imageSmoothingEnabled=false;
  ctx.drawImage(source,0,0,info.width,info.height,
   Math.floor((desiredWidth-w)/2),Math.floor((desiredHeight-h)/2),w,h);
+}
+
+
+/*
+ * Approved four-character sprite family:
+ * Base geometry: original user-provided pixel map, never distorted.
+ * Seven discrete, hand-placed cheek / belly accents per character.
+ * All external accessories are part of the immutable base artwork.
+ */
+const CHARACTER_ACCENTS={
+ rabbit: { cheeks:[[6,31],[28,31]],waist:[[6,45],[27,45]],skin:'D',light:'L' },
+ squirrel:{ cheeks:[[5,32],[17,32]],waist:[[5,43],[19,43]],skin:'J',light:'B' },
+ hedgehog:{ cheeks:[[12,24],[29,24]],waist:[[13,39],[27,39]],skin:'A',light:'B' },
+ otter:{ cheeks:[[13,15],[32,15]],waist:[[14,26],[31,26]],skin:'L',light:'F' }
+};
+// These seven fixed masks were selected to show distinct stages without resizing any pixel row.
+const BODY_STAGE_MARKS={
+ thin3:{face:['..K..','..K..','..K..'],tummy:['.KKK.','..K..','..K..'],size:0},
+ thin2:{face:['..K..','..K..'],tummy:['..KK.','..K..'],size:0},
+ thin1:{face:['..K..'],tummy:['..K..'],size:0},
+ normal:{face:[],tummy:[],size:0},
+ chubby1:{face:['.SSS.','SSSSS','.SSS.'],tummy:['.SSS.','SSSSS','.SSS.'],size:1},
+ chubby2:{face:['.SSSS.','SSSSSS','SSSSSS','.SSSS.'],tummy:['.SSSS.','SSSSSS','SSSSSS','.SSSS.'],size:2},
+ chubby3:{face:['..SSSS..','.SSSSSS.','SSSSSSSS','SSSSSSSS','.SSSSSS.','..SSSS..'],tummy:['..SSSS..','.SSSSSS.','SSSSSSSS','SSSSSSSS','.SSSSSS.','..SSSS..'],size:3}
+};
+function renderApprovedPetStage(ctx,name,stage,width,height){
+ const info=spriteInfo(name), source=document.createElement('canvas');
+ source.width=info.width+24;source.height=info.height+12;
+ const off=source.getContext('2d');
+ off.imageSmoothingEnabled=false;
+ const base=document.createElement('canvas');base.width=info.width;base.height=info.height;
+ drawSprite(base.getContext('2d'),name,1);
+ const accents=CHARACTER_ACCENTS[name];
+ const selected=BODY_STAGE_MARKS[stage]||BODY_STAGE_MARKS.normal;
+ if(accents&&stage!=='normal'){
+  const apply=(pos,mask,color,outline=false)=>{
+    const [cx,cy]=pos;
+    for(let yy=0;yy<mask.length;yy++)for(let xx=0;xx<mask[yy].length;xx++){
+      const code=mask[yy][xx];if(code==='.')continue;
+      off.fillStyle=code==='K'?(outline?SPRITE_PALETTE.K:SPRITE_PALETTE[accents.light]):color;
+      off.fillRect(12+cx+xx-Math.floor(mask[yy].length/2),6+cy+yy-Math.floor(mask.length/2),1,1);
+    }
+  };
+  if(selected.size>0){
+    // New cheeks and belly surfaces sit behind the original unchanged character art.
+    for(const pos of accents.cheeks)apply(pos,selected.face,SPRITE_PALETTE[accents.skin]);
+    for(const pos of accents.waist)apply(pos,selected.tummy,SPRITE_PALETTE[accents.skin]);
+  }
+ }
+ // The original silhouette always wins, preserving eyes, outline and accessories.
+ off.drawImage(base,12,6);
+ if(accents&&stage.startsWith('thin')){
+  // Slim stages are intentionally subtle: several crisp contour marks on the body,
+  // not a geometric pinch that would damage the reference sprite.
+  const n=Number(stage.at(-1));
+  off.fillStyle=SPRITE_PALETTE[accents.light];
+  for(const pos of accents.waist){
+    for(let k=0;k<n;k++)off.fillRect(12+pos[0]+(pos[0]<20?1:-1)*k,6+pos[1]-k,1,2);
+  }
+ }
+ // One shared 224px visual stage; preserve each sprite's natural aspect ratio.
+ const drawW=width*0.88,drawH=height*0.88;
+ const scale=Math.min(drawW/source.width,drawH/source.height);
+ const w=Math.round(source.width*scale),h=Math.round(source.height*scale);
+ ctx.clearRect(0,0,width,height);ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(source,0,0,source.width,source.height,
+  Math.round((width-w)/2),Math.round((height-h)/2),w,h);
 }
