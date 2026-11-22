@@ -171,6 +171,39 @@ html,body{width:100%;height:100%;overflow-x:hidden}
 .stepper .stepper-arrow:active{background:#e7ece5}
 .stepper .stepper-arrow svg{width:18px;height:18px}
 .stepper #exerciseCount{width:54px;height:42px;font-size:22px;font-weight:750;border:0;box-shadow:none;background:transparent;padding:0;caret-color:transparent;pointer-events:none}
+
+/* Speech bubble: protected text clearance and a discreet tail, without breaking one-screen layout. */
+#page-home .center-stage{gap:12px}
+#page-home .speech{
+  box-sizing:border-box;
+  max-width:min(86vw,288px);
+  min-width:0;
+  padding:12px 19px 15px;
+  line-height:1.55;
+  font-size:13px;
+  font-weight:650;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  isolation:isolate;
+  flex:0 0 auto;
+}
+#page-home .speech::after{
+  width:9px;
+  height:9px;
+  bottom:-5px;
+  background:#f0f1eb;
+  border-right:1px solid #dde2d9;
+  border-bottom:1px solid #dde2d9;
+  box-shadow:none;
+  pointer-events:none;
+}
+#page-home .pet-wrap{min-height:0;flex:1 1 auto}
+#page-home .pet-img{max-width:min(68vw,250px);max-height:94%;height:auto;width:auto;object-fit:contain}
+@media(max-height:650px){
+ #page-home .center-stage{gap:9px}
+ #page-home .speech{padding:9px 15px 12px;font-size:12px;line-height:1.45}
+ #page-home .pet-img{max-width:min(64vw,220px);max-height:92%}
+}
 </style>
 </head>
 <body>
