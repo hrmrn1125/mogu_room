@@ -122,6 +122,10 @@ html,body{height:100%;overflow:hidden}
 .topbar>div:first-child{flex:1 1 auto;min-width:0;max-width:calc(100% - 176px)}
 .topbar .kcal-row{flex:0 0 auto}
 #nicknameInput{width:100%}
+
+/* Fine pixel recipes displayed in the same visual density as character art */
+.home-page .food-item canvas{width:45px!important;height:45px!important;image-rendering:pixelated}
+.home-page #petCanvas{image-rendering:pixelated}
 </style>
 </head>
 <body>
@@ -233,7 +237,7 @@ html,body{height:100%;overflow:hidden}
 
 <div class="toast" id="toast"></div>
 
-<script src="sprites.js?v=4"></script>
+<script src="sprites.js?v=5"></script>
 <script>
 const STORAGE_KEY='mogu-room-pixel-v2';
 const PETS=[
@@ -314,19 +318,13 @@ function bodyStage(){
  return p<.33?'chubby1':p<.67?'chubby2':'chubby3';
 }
 function drawPet(){
- const canvas=q('#petCanvas');
- const ctx=canvas.getContext('2d');
- const width=236,height=236;
- canvas.width=width;canvas.height=height;
- renderBodySprite(ctx,PETS[state.petIndex].key,bodyStage(),state.face||'neutral',width,height);
+ const canvas=q('#petCanvas'),ctx=canvas.getContext('2d');
+ canvas.width=236;canvas.height=236;
+ renderFinePetSprite(ctx,PETS[state.petIndex].key,bodyStage(),state.face||'neutral',236,236);
 }
 function drawFoodCanvas(canvas,name){
- const key=FOOD_SPRITES[name]?name:'bento';
- const info=foodSpriteInfo(key),px=4;
- canvas.width=info.width*px;canvas.height=info.height*px;
- drawFoodSprite(canvas.getContext('2d'),key,px);
+ drawFineFoodSprite(canvas.getContext('2d'),name);
 }
-
 function renderTray(){
   const tray=q('#foodTray'); q('#foodCount').textContent=`${state.foodPieces.length}個`;
   if(!state.foodPieces.length){ tray.innerHTML='<div class="empty">ごはんを記録するとエサがここに並ぶよ</div>'; return; }
@@ -380,7 +378,7 @@ function renderPetPicker(){
  qa('#petPicker .pet-option').forEach((btn,i)=>{
   const cv=btn.querySelector('canvas');
   const ctx=cv.getContext('2d');
-  renderBodySprite(ctx,PETS[i].key,'normal','neutral',86,86);
+  renderFinePetSprite(ctx,PETS[i].key,'normal','neutral',86,86);
   btn.addEventListener('click',()=>{state.petIndex=i;save();renderAll()});
  });
 }
