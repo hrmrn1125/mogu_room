@@ -103,6 +103,66 @@ img{display:block;max-width:100%}
   .pet-picker{grid-template-columns:1fr}
   .choice-grid{grid-template-columns:1fr}
 }
+
+/* iPhone one-screen home: header, character, food and actions remain within visual viewport. */
+html,body{width:100%;height:100%;overflow-x:hidden}
+.app{height:100dvh;min-height:0;max-width:480px;overflow:hidden;padding:10px 16px calc(68px + env(safe-area-inset-bottom))}
+.page{display:none;min-width:0;max-width:100%}
+.page.active:not(#page-home){display:block;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:20px}
+#page-home.active{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;height:100%;min-height:0;gap:5px;overflow:hidden}
+.top-row{margin-top:0;gap:8px;min-width:0}
+.nickname{font-size:17px;font-weight:750;min-width:0;max-width:39%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kcal{font-size:17px;font-weight:750}
+.soft-btn{padding:8px 12px;border-radius:14px;font-size:13px;font-weight:700}
+.gauge-shell{margin-top:2px;min-height:0}
+.gauge{height:19px}
+.gauge-legend{height:24px;margin-top:6px}
+.zone-label{min-width:0;width:auto;white-space:nowrap;transform:translateX(-50%)}
+.zone-label .main{font-size:12px;font-weight:650}
+#loseLabel{left:0!important;transform:none}
+#gainLabel{left:100%!important;transform:translateX(-100%)}
+.gauge-ranges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;background:#f1f2ec;border-radius:12px;padding:5px 8px;margin-top:2px}
+.gauge-ranges .range-label{font-size:10px;line-height:1.2;font-weight:550;color:#748177;text-align:center;white-space:nowrap;min-width:0}
+.gauge-ranges .range-label:first-child{text-align:left}
+.gauge-ranges .range-label:last-child{text-align:right}
+.center-stage{min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0;gap:4px}
+.speech{max-width:240px;margin:0;padding:8px 14px;font-size:13px;font-weight:650;line-height:1.35;border-radius:15px;box-shadow:none;background:#f0f1eb;border:1px solid #dde2d9;color:#546359}
+.speech:after{background:#f0f1eb;border-color:#dde2d9}
+.pet-wrap{min-height:0;height:auto;margin:0;flex:1 1 auto;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.pet-card{height:100%;max-width:100%;display:flex;justify-content:center;align-items:center}
+.pet-img{height:100%;width:auto;max-width:min(73vw,270px);max-height:100%;object-fit:contain;transition:none}
+.bottom-panel{margin-top:0;min-width:0}
+.card{border-radius:18px;padding:10px 12px;box-shadow:none}
+.food-head{font-size:14px;margin-bottom:5px;font-weight:700}
+.food-tray{min-height:54px;max-height:62px;gap:7px}
+.food-piece{width:55px;height:55px;border-radius:13px}
+.food-piece svg{width:48px;height:48px}
+.empty{min-height:54px;font-size:12px}
+.action-row{gap:10px;margin-top:8px}
+.action-btn{padding:10px 8px;min-height:48px;border-radius:15px;font-size:16px;font-weight:720;box-shadow:none}
+.action-btn .icon{width:21px;height:21px}
+.action-btn svg{width:21px;height:21px}
+.bottom-nav{padding:6px 18px calc(6px + env(safe-area-inset-bottom));height:calc(58px + env(safe-area-inset-bottom));box-sizing:border-box}
+.nav-btn{padding:8px 3px;font-size:13px;font-weight:650;gap:6px}
+.nav-btn svg{width:19px;height:19px}
+.page.active:not(#page-home) .section{min-width:0}
+.field-grid,.pet-picker,.choice-grid{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0}
+.field,.pet-option,.choice-btn,.field input,.field select{min-width:0;max-width:100%}
+@media(max-width:370px){
+ .app{padding-left:12px;padding-right:12px}
+ .nickname{font-size:15px}
+ .kcal{font-size:15px}
+ .gauge-ranges{padding:5px 4px}
+ .gauge-ranges .range-label{font-size:9px}
+ .pet-picker{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-height:650px){
+ .app{padding-top:5px}
+ .speech{font-size:12px;padding:6px 10px}
+ .food-tray{min-height:45px;max-height:52px}
+ .food-piece{width:48px;height:48px}
+ .action-btn{min-height:42px;padding:7px}
+}
 </style>
 </head>
 <body>
@@ -123,9 +183,14 @@ img{display:block;max-width:100%}
         <div class="boundary" id="boundary2"></div>
       </div>
       <div class="gauge-legend" id="gaugeLegend">
-        <div class="zone-label" id="loseLabel"><div class="main">減量</div><div class="sub" id="loseRange">-</div></div>
-        <div class="zone-label" id="maintainLabel"><div class="main">維持</div><div class="sub" id="maintainRange">-</div></div>
-        <div class="zone-label" id="gainLabel"><div class="main">増量</div><div class="sub" id="gainRange">-</div></div>
+        <div class="zone-label" id="loseLabel"><div class="main">減量</div></div>
+        <div class="zone-label" id="maintainLabel"><div class="main">維持</div></div>
+        <div class="zone-label" id="gainLabel"><div class="main">増量</div></div>
+      </div>
+      <div class="gauge-ranges" aria-label="1日のカロリー目安">
+        <span class="range-label" id="loseRange">-</span>
+        <span class="range-label" id="maintainRange">-</span>
+        <span class="range-label" id="gainRange">-</span>
       </div>
     </div>
 
@@ -339,7 +404,7 @@ function renderSpeech() { q('#speech').textContent=state.bubble || 'タップし
 function renderPet() { const pet=PETS[state.petIndex]; const img=q('#petImage'); img.src=ASSETS[pet.key]; img.alt=pet.name; img.style.transform = stageTransform(bodyStage()); }
 function renderTray() { const tray=q('#foodTray'); q('#foodCount').textContent=`${state.foodPieces.length}個`; if(!state.foodPieces.length) { tray.innerHTML='<div class="empty">ごはんを記録するとエサがここに並ぶよ</div>'; return; } tray.innerHTML=''; state.foodPieces.forEach((piece,idx)=>{ const btn=document.createElement('button'); btn.type='button'; btn.className='food-piece'; btn.setAttribute('aria-label','エサ'); btn.innerHTML=iconFood(piece.key); btn.addEventListener('click',()=>feedPiece(idx)); tray.appendChild(btn); }); }
 function feedPiece(idx) { const piece=state.foodPieces.splice(idx,1)[0]; if(!piece) return; state.feedings.push({date:today(), time:nowTime(), kcal:piece.kcal}); state.bubble='もぐもぐしたよ。'; save(); renderAll(); }
-function renderGauge() { const t=state.targets || calcTargets(); state.targets=t; const n=netCalories(); q('#netKcal').textContent=n; q('#nicknameLabel').textContent = state.profile.nickname || 'ニックネーム'; if(!t) return; const max=Math.max(1, t.gain[1]); const fillPct=Math.min(100, (n/max)*100); const b1=(t.maintain[0]/max)*100; const b2=(t.maintain[1]/max)*100; q('#gaugeFill').style.width = fillPct+'%'; q('#gauge').style.setProperty('--b1', `${Math.max(0,Math.min(100,b1))}%`); q('#gauge').style.setProperty('--b2', `${Math.max(0,Math.min(100,b2))}%`); q('#boundary1').style.left = `${b1}%`; q('#boundary2').style.left = `${b2}%`; const loseMid = ((t.lose[0]+t.lose[1])/2)/max*100; const maintainMid = ((t.maintain[0]+t.maintain[1])/2)/max*100; const gainMid = ((t.gain[0]+t.gain[1])/2)/max*100; q('#loseLabel').style.left=`${loseMid}%`; q('#maintainLabel').style.left=`${maintainMid}%`; q('#gainLabel').style.left=`${Math.min(96,gainMid)}%`; q('#loseRange').textContent=`${t.lose[0]}〜${t.lose[1]}kcal`; q('#maintainRange').textContent=`${t.maintain[0]}〜${t.maintain[1]}kcal`; q('#gainRange').textContent=`${t.gain[0]}〜${t.gain[1]}kcal`; q('#targetSummary').textContent = `減量 ${t.lose[0]}〜${t.lose[1]} kcal / 維持 ${t.maintain[0]}〜${t.maintain[1]} kcal / 増量 ${t.gain[0]}〜${t.gain[1]} kcal`; }
+function renderGauge() { const t=state.targets || calcTargets(); state.targets=t; const n=netCalories(); q('#netKcal').textContent=n; q('#nicknameLabel').textContent = state.profile.nickname || 'ニックネーム'; if(!t) return; const max=Math.max(1, t.gain[1]); const fillPct=Math.min(100, (n/max)*100); const b1=(t.maintain[0]/max)*100; const b2=(t.maintain[1]/max)*100; q('#gaugeFill').style.width = fillPct+'%'; q('#gauge').style.setProperty('--b1', `${Math.max(0,Math.min(100,b1))}%`); q('#gauge').style.setProperty('--b2', `${Math.max(0,Math.min(100,b2))}%`); q('#boundary1').style.left = `${b1}%`; q('#boundary2').style.left = `${b2}%`; const loseMid = ((t.lose[0]+t.lose[1])/2)/max*100; const maintainMid = ((t.maintain[0]+t.maintain[1])/2)/max*100; const gainMid = ((t.gain[0]+t.gain[1])/2)/max*100; q('#loseLabel').style.left='0%'; q('#maintainLabel').style.left=`${maintainMid}%`; q('#gainLabel').style.left='100%'; q('#loseRange').textContent=`${t.lose[0]}〜${t.lose[1]}kcal`; q('#maintainRange').textContent=`${t.maintain[0]}〜${t.maintain[1]}kcal`; q('#gainRange').textContent=`${t.gain[0]}〜${t.gain[1]}kcal`; q('#targetSummary').textContent = `減量 ${t.lose[0]}〜${t.lose[1]} kcal / 維持 ${t.maintain[0]}〜${t.maintain[1]} kcal / 増量 ${t.gain[0]}〜${t.gain[1]} kcal`; }
 function renderLogs() { const meals=state.meals.filter(x=>x.date===today()); const exercises=state.exercises.filter(x=>x.date===today()); q('#mealList').innerHTML = meals.length ? meals.slice().reverse().map(x=>`<div class="list-item"><div><div style="font-weight:900">${x.kcal} kcal</div><div class="meta">${x.time}</div></div><div class="meta">食事</div></div>`).join('') : '<div class="list-item"><span class="meta">まだ記録がないよ</span></div>'; q('#exerciseList').innerHTML = exercises.length ? exercises.slice().reverse().map(x=>`<div class="list-item"><div><div style="font-weight:900">${x.name}</div><div class="meta">${x.minutes}分</div></div><div class="meta">-${x.burn} kcal</div></div>`).join('') : '<div class="list-item"><span class="meta">まだ記録がないよ</span></div>'; q('#weightList').innerHTML = state.weights.length ? state.weights.slice().reverse().map(x=>`<div class="list-item"><div style="font-weight:900">${x.weight} kg</div><div class="meta">${x.date}</div></div>`).join('') : '<div class="list-item"><span class="meta">まだ記録がないよ</span></div>'; }
 function renderPetPicker() { const wrap=q('#petPicker'); wrap.innerHTML=''; PETS.forEach((pet,idx)=>{ const btn=document.createElement('button'); btn.type='button'; btn.className='pet-option'+(idx===state.petIndex?' selected':''); btn.innerHTML=`<img class="pet-thumb" src="${ASSETS[pet.key]}" alt="${pet.name}"><div class="name">${pet.name}</div>`; btn.addEventListener('click',()=>{ state.petIndex=idx; save(); renderPetPicker(); renderPet(); petSay(); }); wrap.appendChild(btn); }); }
 function renderProfile() { q('#nicknameInput').value=state.profile.nickname||''; q('#heightInput').value=state.profile.height; q('#weightInput').value=state.profile.weight; q('#ageInput').value=state.profile.age; q('#sexInput').value=state.profile.sex; q('#activityInput').value=state.profile.activity; }
