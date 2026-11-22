@@ -549,3 +549,84 @@ function renderFinePetSprite(ctx,name,stage,face,desiredWidth,desiredHeight){
  ctx.drawImage(mini,0,0,mini.width,mini.height,
   Math.floor((desiredWidth-finalW)/2),Math.floor((desiredHeight-finalH)/2),finalW,finalH);
 }
+
+
+/* 36×36 pixel recipes: more readable than the former 10px icons. */
+function drawFineFoodSprite(ctx,name){
+ const S=36,ink='#302c29';
+ const col={rice:'#fff6e7',gold:'#f0cd73',brown:'#c99872',cream:'#f8e6c7',
+  pink:'#e89ba0',red:'#d67d79',green:'#87b78d',leaf:'#6d9d79',
+  blue:'#9cc8d8',dark:'#6a594e',nori:'#4c6255',bowl:'#caa6a5'};
+ const grid=Array.from({length:S},()=>Array(S).fill(''));
+ const pixel=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x>=0&&x<S&&y>=0&&y<S)grid[y][x]=c};
+ const block=(x,y,w,h,c)=>{for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)pixel(xx,yy,c)};
+ const shape=(predicate,fill,border=1)=>{
+  const mask=Array.from({length:S},(_,y)=>Array.from({length:S},(_,x)=>predicate(x+.5,y+.5)));
+  for(let y=0;y<S;y++)for(let x=0;x<S;x++)if(mask[y][x]){
+   let outline=false;
+   for(let dy=-border;dy<=border;dy++)for(let dx=-border;dx<=border;dx++)
+    if(y+dy<0||x+dx<0||y+dy>=S||x+dx>=S||!mask[y+dy]?.[x+dx])outline=true;
+   pixel(x,y,outline?ink:fill);
+  }
+ };
+ const oval=(x,y,rx,ry,fill,border=1)=>shape((a,b)=>((a-x)/rx)**2+((b-y)/ry)**2<=1,fill,border);
+ const poly=(pts,fill,border=1)=>shape((a,b)=>{
+  let inIt=false;
+  for(let i=0,j=pts.length-1;i<pts.length;j=i++){
+   const [xi,yi]=pts[i],[xj,yj]=pts[j];
+   if((yi>b)!==(yj>b)&&a<(xj-xi)*(b-yi)/(yj-yi)+xi)inIt=!inIt;
+  }return inIt;
+ },fill,border);
+ const bowl=(fill=col.bowl)=>{poly([[4,18],[32,18],[29,29],[24,33],[11,33],[7,29]],fill);block(7,19,22,2,col.cream)};
+ switch(name){
+ case 'onigiri':
+  poly([[17,4],[21,5],[32,22],[31,30],[26,33],[9,33],[4,29],[6,22],[14,7]],col.rice);
+  block(12,24,12,8,col.nori);block(15,25,6,7,col.dark);break;
+ case 'ramen':
+  bowl();
+  oval(18,18,14,6,col.gold);
+  for(let i=0;i<5;i++){const x=8+i*5;block(x,15+(i%2),3,2,col.cream)}
+  oval(24,16,5,4,col.rice);oval(24,16,2,2,col.gold,0);
+  block(9,10,2,8,col.nori);block(15,9,2,8,col.nori);
+  block(18,6,14,2,ink);break;
+ case 'bread':
+  poly([[6,13],[7,9],[11,7],[15,7],[18,9],[21,7],[26,7],[30,10],[30,31],[6,31]],col.brown);
+  poly([[10,13],[13,11],[23,11],[26,14],[26,28],[10,28]],col.cream);break;
+ case 'apple':
+  oval(18,20,12,13,col.red);block(17,4,3,8,ink);
+  poly([[18,9],[24,4],[30,6],[27,12]],col.green);oval(12,16,3,4,col.pink,0);break;
+ case 'salad':
+  oval(11,14,7,8,col.green);oval(20,11,7,7,col.leaf);oval(26,17,6,8,col.green);
+  oval(18,19,4,4,col.red);bowl('#f4e9d7');break;
+ case 'cake':
+  block(7,11,22,20,col.pink);block(8,17,20,4,col.rice);block(8,27,20,3,col.brown);
+  oval(18,12,11,5,col.rice);oval(18,7,4,4,col.red);block(18,2,2,4,ink);break;
+ case 'milk':
+  poly([[10,7],[14,4],[23,4],[26,8],[26,31],[10,31]],col.rice);
+  block(12,16,13,10,col.blue);block(14,18,9,6,col.rice);break;
+ case 'fish':
+  poly([[4,18],[11,10],[24,10],[29,14],[34,7],[34,29],[29,23],[24,27],[11,26]],col.blue);
+  oval(12,17,2,2,ink,0);block(21,13,2,11,col.dark);break;
+ case 'chicken':
+  oval(16,17,12,11,col.brown);poly([[21,18],[30,25],[28,31],[22,26]],col.cream);
+  oval(29,29,4,4,col.rice);break;
+ case 'donut':
+  oval(18,18,14,14,col.brown);oval(18,18,6,6,col.rice); // the hole
+  for(const [x,y] of [[9,12],[23,10],[12,27],[27,22]])block(x,y,3,1,col.pink);
+  break;
+ case 'bento':
+  block(3,6,30,26,col.dark);block(5,8,26,22,col.cream);
+  block(17,9,2,20,ink);block(6,19,24,2,ink);
+  oval(12,14,5,4,col.rice);oval(25,14,5,4,col.brown);
+  oval(12,25,5,4,col.green);oval(25,25,5,4,col.gold);break;
+ case 'cookie':
+  oval(18,18,13,13,col.brown);
+  for(const [x,y] of [[12,12],[21,10],[24,23],[14,26],[18,18]])oval(x,y,2,2,col.dark,0);break;
+ default:oval(18,18,12,12,col.gold);break;
+ }
+ ctx.canvas.width=S;ctx.canvas.height=S;ctx.clearRect(0,0,S,S);
+ ctx.imageSmoothingEnabled=false;
+ for(let y=0;y<S;y++)for(let x=0;x<S;x++)if(grid[y][x]){
+  ctx.fillStyle=grid[y][x];ctx.fillRect(x,y,1,1);
+ }
+}
