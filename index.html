@@ -953,10 +953,52 @@ function cropTransparentPadding(src){
   img.onerror=()=>resolve(src);img.src=src;
  });
 }
+// The four squirrel illustrations must share the SAME transparent 640x704
+// coordinate space. Extract the approved normal artwork using a meaningful
+// alpha threshold (rather than nearly-transparent stray export pixels), then
+// align the balloon top and floor shadow with the thin/chubby sprites.
+// No redrawing, stretching, artificial shadow, or change to other characters.
+function normalizeSquirrelStandard(src){
+ return new Promise(resolve=>{
+  const img=new Image();
+  img.onload=()=>{
+   try{
+    const w=img.naturalWidth,h=img.naturalHeight;
+    const source=document.createElement('canvas');
+    source.width=w;source.height=h;
+    const cx=source.getContext('2d',{willReadFrequently:true});
+    cx.drawImage(img,0,0);
+    const pixels=cx.getImageData(0,0,w,h).data;
+    let left=w,top=h,right=-1,bottom=-1;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+     // Ignore isolated near-transparent export noise, retain the actual shadow.
+     if(pixels[(y*w+x)*4+3]<12)continue;
+     if(x<left)left=x;if(x>right)right=x;
+     if(y<top)top=y;if(y>bottom)bottom=y;
+    }
+    if(right<left){resolve(src);return;}
+    const sw=right-left+1,sh=bottom-top+1;
+    const target=document.createElement('canvas');
+    target.width=640;target.height=704;
+    const ctx=target.getContext('2d');
+    const scale=Math.min(630/sh,620/sw);
+    const dw=sw*scale,dh=sh*scale;
+    // All squirrel variants have their visible outline between y=37 and y=667.
+    const dx=(640-dw)/2,dy=37+(630-dh)/2;
+    ctx.imageSmoothingEnabled=true;
+    ctx.imageSmoothingQuality='high';
+    ctx.drawImage(source,left,top,sw,sh,dx,dy,dw,dh);
+    resolve(target.toDataURL('image/png'));
+   }catch(e){resolve(src)}
+  };
+  img.onerror=()=>resolve(src);
+  img.src=src;
+ });
+}
 function prepareMascotImages(){
  Promise.all(PETS.map(async pet=>{
   CUTOUT_ASSETS[pet.key]=pet.key==='squirrel'
-   ? await cropTransparentPadding(window.MOGU_SQUIRREL_STANDARD||ASSETS.squirrel)
+   ? await normalizeSquirrelStandard(window.MOGU_SQUIRREL_STANDARD||ASSETS.squirrel)
    : (ASSETS[pet.key].startsWith('data:image/webp;base64,') ? ASSETS[pet.key] : await makeMascotCutout(ASSETS[pet.key]));
  })).then(()=>{
   cutoutsReady=true;
