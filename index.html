@@ -530,13 +530,20 @@ html,body{width:100%;height:100%;overflow-x:hidden}
   }
 }
 
-/* Align the normal hedgehog and otter to the variant art baseline without resizing. */
+/* Align the standard art to the same on-screen silhouette height and baseline
+   as the approved thin/chubby variations. The hedgehog source has larger
+   transparent margins, so it needs scale as well as vertical alignment. */
 #page-home .pet-card.standard-height-match > .pet-img {
  transform:translateY(-10%) !important;
  transform-origin:center center;
 }
+#page-home .pet-card.standard-hedgehog-match > .pet-img {
+ transform:translateY(-10%) scale(1.20) !important;
+ transform-origin:center center;
+}
 @media(max-width:390px){
  #page-home .pet-card.standard-height-match > .pet-img{transform:translateY(-10%) !important;}
+ #page-home .pet-card.standard-hedgehog-match > .pet-img{transform:translateY(-10%) scale(1.20) !important;}
 }
 /* Original squirrel artwork includes the shadow beneath its paws. */
 #page-home .pet-card.squirrel-shadow::before,
@@ -929,6 +936,7 @@ function renderPet() {
  // Only these two normal illustrations have different built-in canvas proportions.
  // Enlarge visually from the feet, without editing or stretching the approved drawing.
  petCard.classList.toggle('standard-height-match',!useVariant && (pet.key==='hedgehog'||pet.key==='otter'));
+ petCard.classList.toggle('standard-hedgehog-match',!useVariant && pet.key==='hedgehog');
 }
 function renderTray() {
  const tray=q('#foodTray');
