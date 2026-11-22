@@ -383,6 +383,13 @@ html,body{width:100%;height:100%;overflow-x:hidden}
 .stepper .stepper-unit #exerciseCount{flex:0 0 30px;width:30px;height:42px;text-align:left;font-size:22px;line-height:42px;font-weight:750;padding:0;background:transparent;border:0;box-shadow:none}
 .stepper .stepper-arrow{color:#5b7465}
 .choice-title svg{width:20px;height:20px;display:block}
+
+/* Home action icons use the same footprint and stroke-only style as tab icons. */
+#page-home .action-btn .icon{width:21px;height:21px;flex:0 0 21px;display:flex;align-items:center;justify-content:center;color:#536d5c}
+#page-home .action-btn .icon svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor}
+#page-home .food-piece svg{filter:none;box-shadow:none}
+#page-home .food-piece{box-shadow:inset 0 0 0 1px #e7e7e1}
+.food-drag-ghost{box-shadow:none}
 </style>
 </head>
 <body>
@@ -538,12 +545,18 @@ const PETS = [
   {key:'otter', name:'インディゴカワウソ', voice:'ぷか', sayings:['ぷかぷか整えていくぷか。','のんびりでも進んでるぷか。','今日も見にきてくれてうれしいぷか。']}
 ];
 const FOODS = [
-  {key:'ramen', name:'ラーメン', kcal:700, color:'#f4dc90'},
-  {key:'bento', name:'おべんとう', kcal:500, color:'#f2b7b1'},
-  {key:'cake', name:'ケーキ', kcal:350, color:'#f8c9de'},
-  {key:'onigiri', name:'おにぎり', kcal:200, color:'#ffffff'},
-  {key:'salad', name:'サラダ', kcal:90, color:'#cde8bd'},
-  {key:'milk', name:'ミルク', kcal:120, color:'#ffffff'}
+  {key:'pizza',name:'ピザ',kcal:850},
+  {key:'ramen',name:'ラーメン',kcal:700},
+  {key:'bento',name:'お弁当',kcal:600},
+  {key:'curry',name:'カレー',kcal:550},
+  {key:'cake',name:'ケーキ',kcal:350},
+  {key:'sandwich',name:'サンドイッチ',kcal:280},
+  {key:'onigiri',name:'おにぎり',kcal:200},
+  {key:'pudding',name:'プリン',kcal:160},
+  {key:'milk',name:'牛乳',kcal:130},
+  {key:'apple',name:'リンゴ',kcal:100},
+  {key:'salad',name:'サラダ',kcal:80},
+  {key:'berry',name:'いちご',kcal:40}
 ];
 const EXERCISES = [
   {key:'walk', name:'ウォーキング', per10:35, label:'てくてく歩いたよ'},
@@ -554,8 +567,8 @@ const EXERCISES = [
   {key:'run', name:'ラン', per10:80, label:'いい汗かいたよ'}
 ];
 const SVG = {
-  bowl: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 11.4h16.4c-.3 5.1-3.7 8-8.2 8s-7.9-2.9-8.2-8Z" fill="#edd3c8"/><path d="M5.2 10c.7-1.3 1.8-2 3.1-2.1.7-1.5 2-2.3 3.7-2.1 1.1-1.3 2.9-1.2 3.7.1 1.5 0 2.5.7 3.1 2.1l1.1 1.9"/><path d="M5.1 12.3h13.8" stroke="#6a4b3c"/><path d="M8 7.2c.2.9.9 1.6 1.5 1.9m3.3-3.2c.2 1 1 1.8 1.7 2.3" stroke="#86a77a"/></svg>`,
-  shoe: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="m4 13.3 3.1.3c1.2.1 2.3-.4 3.3-1.5l2.2-3.1 2.3 3.6c.7 1 1.4 1.5 2.8 1.8l2.3.6c1.1.3 1.8 1.2 1.8 2.4V19H3v-4.2c0-.8.3-1.3 1-1.5Z" fill="#d9e7df"/><path d="M15.1 14.2h2.6m-4.1-1.8h2.6M3.5 16.9H21" /><path d="M2.5 8.6h4M1.5 11h3.7" stroke="#80a18e"/></svg>`,
+  bowl: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12h17q-.5 7.3-8.5 7.3T3.5 12Z"/><path d="M4.8 12q.4-3.2 3.1-3.8.4-2.3 2.7-2.4 1.4-2 3.4-.6 2.3-.6 3.2 2 2.5.9 2.2 4.8"/><path d="M6 15.2h12"/></svg>`,
+  shoe: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9" width="2.5" height="6" rx=".5"/><rect x="5.5" y="7" width="3.2" height="10" rx=".7"/><path d="M8.7 12h6.6"/><rect x="15.3" y="7" width="3.2" height="10" rx=".7"/><rect x="19" y="9" width="2.5" height="6" rx=".5"/></svg>`,
   home: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 10.4 12 4l8 6.4v8.1a1.2 1.2 0 0 1-1.2 1.2h-4.6v-5.2H9.8v5.2H5.2A1.2 1.2 0 0 1 4 18.5v-8.1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
   note: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="3.5" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 2.8v3M15 2.8v3M8.5 11.5h7M8.5 15.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
   gear: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>`,
@@ -568,15 +581,21 @@ const SVG = {
   run: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#597166" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 13.8c2.3.3 3.9-1 5.5-3.5l2-2.2 2.3 3.6c.6 1 1.3 1.5 2.5 1.7l2.2.5c1.3.3 2 1.2 2 2.7v1.1H4.5v-2.3c0-.7.2-1.2.7-1.6Z" fill="#d9e7df"/><path d="M13.6 12h3.5m-2.1 2h3.1M4.5 17.7h17.2M1.5 9h5M.8 11.4h4"/></svg>`,
 };
 function iconFood(key) {
-  const map = {
-    ramen:`<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><ellipse cx="32" cy="53" rx="16" ry="4" fill="#e6d6cf"/><path d="M14 25h36c0 14-8.5 22-18 22S14 39 14 25Z" fill="#d5b1aa" stroke="#68483b" stroke-width="2.8" stroke-linejoin="round"/><path d="M20 22h24" stroke="#68483b" stroke-width="2.8" stroke-linecap="round"/><path d="M19 26c3.2-3 22.8-3 26 0" stroke="#e5cc78" stroke-width="3" stroke-linecap="round"/><path d="M22 18v8M29 17v8M37 18v8" stroke="#79966f" stroke-width="2.6" stroke-linecap="round"/><circle cx="41" cy="28" r="4.5" fill="#fff5c8" stroke="#68483b" stroke-width="2.4"/><path d="M39 28.2h4" stroke="#e4c65f" stroke-width="2" stroke-linecap="round"/></svg>`,
-    bento:`<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><ellipse cx="32" cy="54" rx="15" ry="4" fill="#e8dad3"/><rect x="13" y="16" width="38" height="30" rx="7" fill="#d5b1aa" stroke="#68483b" stroke-width="2.8"/><rect x="17" y="20" width="14" height="10" rx="3" fill="#f6d77a"/><rect x="33" y="20" width="14" height="10" rx="3" fill="#f4b9b3"/><rect x="17" y="32" width="10" height="9" rx="3" fill="#d7e9c5"/><rect x="29" y="32" width="18" height="9" rx="3" fill="#fff"/></svg>`,
-    cake:`<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><ellipse cx="32" cy="54" rx="15" ry="4" fill="#eadbd5"/><path d="M16 44h30l-6-20H22Z" fill="#f5d5a6" stroke="#68483b" stroke-width="2.8" stroke-linejoin="round"/><path d="M20 24c4 4 8-2 12 2s8-2 12 2" stroke="#f3b9d0" stroke-width="4" stroke-linecap="round"/><path d="M18 44h28" stroke="#68483b" stroke-width="2.8" stroke-linecap="round"/><circle cx="34" cy="20" r="3.5" fill="#f6c96f" stroke="#68483b" stroke-width="2"/></svg>`,
-    onigiri:`<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><ellipse cx="32" cy="53" rx="14" ry="4" fill="#e6d8d1"/><path d="M32 14 48 42a4 4 0 0 1-3.4 6H19.4A4 4 0 0 1 16 42Z" fill="#fff" stroke="#68483b" stroke-width="2.8" stroke-linejoin="round"/><rect x="24" y="34" width="16" height="10" rx="2.5" fill="#1f2321"/></svg>`,
-    salad:`<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><ellipse cx="32" cy="53" rx="14" ry="4" fill="#e4d5ce"/><path d="M16 27h32c0 11-7.4 18-16 18s-16-7-16-18Z" fill="#d8b2aa" stroke="#68483b" stroke-width="2.8"/><path d="M22 27c2-6 7-9 10-9s8 3 10 9" fill="#d4e7c0" stroke="#6f936a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="25" cy="27" r="3.2" fill="#f4c07f"/><circle cx="36" cy="24" r="3" fill="#f4a5a5"/><circle cx="41" cy="29" r="3" fill="#f7e58f"/></svg>`,
-    milk:`<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><ellipse cx="32" cy="53" rx="14" ry="4" fill="#e7d8d1"/><path d="M23 14h18l-2.5 8.2V46a4 4 0 0 1-4 4h-5a4 4 0 0 1-4-4V22.2Z" fill="#ffffff" stroke="#68483b" stroke-width="2.8" stroke-linejoin="round"/><path d="M24 22h14" stroke="#d5ebff" stroke-width="3"/><rect x="28" y="29" width="8" height="10" rx="2" fill="#cfe8ff"/></svg>`
+  const map={
+    ramen: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M11 30h42c-.6 14-7.7 22-21 22S11.6 44 11 30Z" fill="#efd3cc"/><path d="M13 30q19-7 38 0" stroke="#c18e69"/><path d="M18 17 43 10M20 21l25-7" stroke="#665044"/><path d="M24 21c-2 8 3 8 2 13m5-14c-2 6 4 10 2 14m6-16c-3 9 3 9 1 15" stroke="#d4ac54" stroke-width="3.5"/><circle cx="42" cy="29" r="6.5" fill="#fff8e7"/><circle cx="42" cy="29" r="3" fill="#e6c367" stroke="none"/><path d="m21 29 6-5 5 3" stroke="#7a9c75"/></svg>`,
+    bento: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><rect x="9" y="15" width="46" height="36" rx="7" fill="#f3dad1"/><path d="M32 17v32M11 34h42"/><rect x="13" y="19" width="16" height="12" rx="3" fill="#f4d77b" stroke="#ceaa66" stroke-width="1.5"/><rect x="35" y="19" width="16" height="12" rx="3" fill="#f1aaa0" stroke="#ca8b83" stroke-width="1.5"/><path d="M17 40c3-3 6-3 9 0m-9 5c3-3 6-3 9 0" stroke="#769f77" stroke-width="3"/><path d="M36 41q7-5 13 0v6H36Z" fill="#fffefa" stroke-width="1.7"/><circle cx="43" cy="43" r="1.5" fill="#b4a0a0" stroke="none"/></svg>`,
+    milk: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M24 11h16v7l3 6v23c0 4-3 6-7 6h-8c-4 0-7-2-7-6V24l3-6Z" fill="#fffefa"/><path d="M23 11h18v6H23Z" fill="#c9dfeb"/><rect x="24" y="27" width="16" height="19" rx="3" fill="#e8f2f6" stroke="none"/><text x="32" y="36.8" font-size="8" font-family="Arial, sans-serif" font-weight="700" fill="#577f92" stroke="none" text-anchor="middle">MILK</text><path d="M30 41q2-3 4 0" stroke="#719bab" stroke-width="1.5"/></svg>`,
+    onigiri: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M25 15q7-8 14 0l14 25q5 10-7 11H18Q6 50 11 40Z" fill="#fffefa"/><path d="M25 37h14v14H25Z" fill="#46524a" stroke="#46524a"/><path d="M21 26q3-5 6-7" stroke="#e9e7de" stroke-width="2"/></svg>`,
+    pizza: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M12 18q19-11 40 0L32 52Z" fill="#f3dfaf"/><path d="M12 18q19-11 40 0" stroke="#bd8960" stroke-width="6"/><circle cx="29" cy="29" r="4" fill="#df9b90" stroke="none"/><circle cx="40" cy="27" r="3.5" fill="#df9b90" stroke="none"/><path d="m28 40 4 2m8-6 4-2" stroke="#7a9c75"/></svg>`,
+    curry: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="32" cy="44" rx="24" ry="9" fill="#fffdfa"/><path d="M10 39q18-11 44 0" stroke="#b8a28f"/><path d="M15 39q12-15 23-8 9 1 12 9-11 8-35-1Z" fill="#c69b70" stroke="#b98b64"/><path d="M17 39q10 6 21 0l-2-8q-12-6-19 8Z" fill="#f3e6c6" stroke="none"/><path d="M22 26l2-6 8 1-2 5" stroke="#799b74"/></svg>`,
+    cake: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M16 48h32L40 22H24Z" fill="#f7dec7"/><path d="M19 37h26" stroke="#cda58b"/><path d="M23 22q4 5 8 1 4-4 9 1" stroke="#df9abc" stroke-width="4"/><path d="M15 48h34"/><circle cx="32" cy="17" r="4" fill="#dc9398"/><path d="m32 13 2-4" stroke="#739d79"/></svg>`,
+    sandwich: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M13 15h38L32 49Z" fill="#f6e8be"/><path d="M17 22h30L32 43Z" fill="#e6c9b7"/><path d="M20 26h24L32 39Z" fill="#c4dda8"/><path d="M13 15 32 49l19-34" stroke="#8a6850"/></svg>`,
+    pudding: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="32" cy="47" rx="21" ry="7" fill="#fffaf2"/><path d="M21 22h22l4 20q-15 9-30 0Z" fill="#f4d58b"/><ellipse cx="32" cy="22" rx="11" ry="4" fill="#bb8c65"/><path d="M17 42q15 9 30 0" stroke="#bd9c6a"/></svg>`,
+    apple: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M32 19c-9-7-21-3-21 11 0 15 9 23 17 21 3-.8 5-.8 8 0 8 2 17-6 17-21 0-14-12-18-21-11Z" fill="#eeaaa6"/><path d="M32 18q0-9 5-12" stroke="#6a5148"/><path d="M33 14q9-10 15-5-4 9-15 5Z" fill="#b2d6ae"/></svg>`,
+    salad: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M13 31h38q-1 16-19 19-18-3-19-19Z" fill="#e7d3cd"/><path d="M18 31q-10-10 2-13 5-11 13-3 9-8 14 5 9 3 0 11" fill="#dceacb"/><path d="M23 22q3 3 3 9m11-12q-2 5-1 11m8-5-6 6" stroke="#7a9e77"/><circle cx="28" cy="31" r="4" fill="#e4ac92"/><circle cx="41" cy="30" r="3.5" fill="#edca80"/></svg>`,
+    berry: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#665044" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M25 20q-12 0-10 13 2 15 17 22 15-7 17-22 2-13-10-13Z" fill="#e99b9e"/><path d="m22 19 10-7 10 7-10 6Z" fill="#a3c89f"/><path d="M32 18V9" stroke="#789c77"/><path d="M24 32h.1m10 3h.1m8-6h.1m-16 13h.1m13 1h.1" stroke="#f9ead7" stroke-width="3.5"/></svg>`
   };
-  return map[key] || map.ramen;
+  return map[key] || map.onigiri;
 }
 function htmlToElement(svg) { const t=document.createElement('template'); t.innerHTML=svg.trim(); return t.content.firstChild; }
 function today() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
@@ -628,10 +647,19 @@ function netCalories() { return Math.max(0, fedCalories() - exerciseCalories());
 function bodyStage() { const t=state.targets, n=netCalories(); if(!t) return 'normal'; if(n===0) return 'normal'; if(n<t.lose[0]) return 'thin2'; if(n<t.lose[1]) return 'thin1'; if(n<=t.maintain[1]) return 'normal'; if(n<t.gain[0] + (t.gain[1]-t.gain[0])/3) return 'chubby1'; if(n<t.gain[0] + (t.gain[1]-t.gain[0])*2/3) return 'chubby2'; return 'chubby3'; }
 function stageTransform(stage) { return {thin2:'scale(.92,1.02)',thin1:'scale(.97,1.01)',normal:'scale(1)',chubby1:'scale(1.06,.99)',chubby2:'scale(1.12,.98)',chubby3:'scale(1.18,.97)'}[stage] || 'scale(1)'; }
 function chooseFoods(kcal) {
-  let remaining=kcal; const out=[]; const sorted=[...FOODS].sort((a,b)=>b.kcal-a.kcal);
-  while(remaining>0 && out.length<6) { let pick=sorted.find(x=>x.kcal<=remaining+30); if(!pick) pick=sorted[sorted.length-1]; out.push({key:pick.key,kcal:Math.min(pick.kcal,remaining)}); remaining -= pick.kcal; if(remaining<60) break; }
-  if(remaining>0 && out.length<7) { const pick=remaining<=110 ? FOODS.find(x=>x.key==='salad') : remaining<=150 ? FOODS.find(x=>x.key==='milk') : FOODS.find(x=>x.key==='onigiri'); out.push({key:pick.key,kcal:remaining}); }
-  return out;
+  // Convert the exact logged calories to varied representative foods.
+  // Each generated piece retains its allocated amount; no calories are lost.
+  let remaining=Math.max(0,Math.round(Number(kcal)||0));
+  const pieces=[];
+  const sorted=[...FOODS].sort((a,b)=>b.kcal-a.kcal);
+  while(remaining>0 && pieces.length<23){
+    const last=pieces.length===22;
+    const food=last?sorted[0]:(sorted.find(item=>item.kcal<=remaining)||sorted[sorted.length-1]);
+    const amount=last?remaining:Math.min(remaining,food.kcal);
+    pieces.push({key:food.key,kcal:amount});
+    remaining-=amount;
+  }
+  return pieces;
 }
 function petSay(custom) { const pet=PETS[state.petIndex]; state.bubble = custom || pet.sayings[Math.floor(Math.random()*pet.sayings.length)]; save(); renderSpeech(); }
 function renderSpeech() { q('#speech').textContent=state.bubble || 'タップしておしゃべり'; }
