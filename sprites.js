@@ -612,10 +612,10 @@ function renderStablePetSprite(ctx,name,desiredWidth,desiredHeight){
  * All external accessories are part of the immutable base artwork.
  */
 const CHARACTER_ACCENTS={
- rabbit: { cheeks:[[6,31],[28,31]],waist:[[6,45],[27,45]],skin:'D',light:'L' },
- squirrel:{ cheeks:[[5,32],[17,32]],waist:[[5,43],[19,43]],skin:'J',light:'B' },
- hedgehog:{ cheeks:[[12,24],[29,24]],waist:[[13,39],[27,39]],skin:'A',light:'B' },
- otter:{ cheeks:[[13,15],[32,15]],waist:[[14,26],[31,26]],skin:'L',light:'F' }
+ rabbit: { cheeks:[[1,31],[32,31]],waist:[[1,44],[31,44]],skin:'D',light:'L' },
+ squirrel:{ cheeks:[[1,32],[20,32]],waist:[[1,43],[23,43]],skin:'J',light:'B' },
+ hedgehog:{ cheeks:[[11,24],[30,24]],waist:[[12,40],[29,40]],skin:'A',light:'B' },
+ otter:{ cheeks:[[10,15],[35,15]],waist:[[12,27],[31,27]],skin:'L',light:'F' }
 };
 // These seven fixed masks were selected to show distinct stages without resizing any pixel row.
 const BODY_STAGE_MARKS={
@@ -651,8 +651,15 @@ function renderApprovedPetStage(ctx,name,stage,width,height){
     for(const pos of accents.waist)apply(pos,selected.tummy,SPRITE_PALETTE[accents.skin]);
   }
  }
- // The original silhouette always wins, preserving eyes, outline and accessories.
+ // Original art remains untouched: expressions, eyes and accessories are always intact.
  off.drawImage(base,12,6);
+ // A few fixed cheek/tummy highlight marks distinguish adjacent stages without stretching.
+ if(accents&&selected.size>0){
+   off.fillStyle=SPRITE_PALETTE[accents.light];
+   for(const [cx,cy] of accents.cheeks){
+     for(let n=0;n<selected.size;n++)off.fillRect(12+cx+(cx<20?2:-2),6+cy+2+n,2,1);
+   }
+ }
  if(accents&&stage.startsWith('thin')){
   // Slim stages are intentionally subtle: several crisp contour marks on the body,
   // not a geometric pinch that would damage the reference sprite.
