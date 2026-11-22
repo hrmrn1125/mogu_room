@@ -476,10 +476,20 @@ function renderFinePetSprite(ctx,name,stage,face,desiredWidth,desiredHeight){
   }
  }
  // Exact original sprite matrix; no row displacement, no distorted outlines.
+ // Scale2x: refine diagonal steps with one extra pixel without introducing colors.
+ const codeAt=(x,y)=>rows[y]?.[x]||'.';
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-  const col=SPRITE_PALETTE[rows[y][x]];
-  if(!col)continue;
-  g.fillStyle=col;g.fillRect((x+pad)*d,(y+5)*d,d,d);
+  const E=codeAt(x,y);if(E==='.')continue;
+  const B=codeAt(x,y-1),D=codeAt(x-1,y),F=codeAt(x+1,y),H=codeAt(x,y+1);
+  let cells=[E,E,E,E];
+  if(D===B&&D!==H&&B!==F)cells[0]=D;
+  if(B===F&&B!==D&&F!==H)cells[1]=F;
+  if(D===H&&D!==B&&H!==F)cells[2]=D;
+  if(H===F&&D!==H&&B!==F)cells[3]=F;
+  for(let i=0;i<4;i++){
+   const cc=SPRITE_PALETTE[cells[i]];if(!cc)continue;
+   g.fillStyle=cc;g.fillRect((x+pad)*d+(i%2),(y+5)*d+Math.floor(i/2),1,1);
+  }
  }
  // Smaller-body stages use localized inward waist marks, not erasure of body pixels.
  if(level<0){
