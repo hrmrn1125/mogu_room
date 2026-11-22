@@ -924,10 +924,39 @@ function makeMascotCutout(src,preserveSquirrelShadow=false){
   original.src=src;
  });
 }
+// Crop exterior transparency only, keeping the approved shadow under the paws.
+function cropTransparentPadding(src){
+ return new Promise(resolve=>{
+  const img=new Image();
+  img.onload=()=>{
+   try{
+    const w=img.naturalWidth,h=img.naturalHeight;
+    const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+    const cx=cv.getContext('2d',{willReadFrequently:true});
+    cx.drawImage(img,0,0);
+    const pixels=cx.getImageData(0,0,w,h).data;
+    let left=w,top=h,right=-1,bottom=-1;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+     if(pixels[(y*w+x)*4+3]<3)continue;
+     if(x<left)left=x;if(x>right)right=x;
+     if(y<top)top=y;if(y>bottom)bottom=y;
+    }
+    if(right<left){resolve(src);return;}
+    const pad=Math.max(4,Math.round(Math.min(w,h)*.006));
+    left=Math.max(0,left-pad);top=Math.max(0,top-pad);
+    right=Math.min(w,right+pad+1);bottom=Math.min(h,bottom+pad+1);
+    const out=document.createElement('canvas');out.width=right-left;out.height=bottom-top;
+    out.getContext('2d').drawImage(cv,left,top,out.width,out.height,0,0,out.width,out.height);
+    resolve(out.toDataURL('image/png'));
+   }catch(e){resolve(src)}
+  };
+  img.onerror=()=>resolve(src);img.src=src;
+ });
+}
 function prepareMascotImages(){
  Promise.all(PETS.map(async pet=>{
   CUTOUT_ASSETS[pet.key]=pet.key==='squirrel'
-   ? (window.MOGU_SQUIRREL_STANDARD||ASSETS.squirrel)
+   ? await cropTransparentPadding(window.MOGU_SQUIRREL_STANDARD||ASSETS.squirrel)
    : (ASSETS[pet.key].startsWith('data:image/webp;base64,') ? ASSETS[pet.key] : await makeMascotCutout(ASSETS[pet.key]));
  })).then(()=>{
   cutoutsReady=true;
@@ -940,7 +969,7 @@ function renderPet() {
  const variantSrc=typeof BODY_VARIANT_IMAGES!=='undefined' && BODY_VARIANT_IMAGES[pet.key] && BODY_VARIANT_IMAGES[pet.key][stage];
  const useVariant=stage!=='normal' && typeof variantSrc==='string' && variantSrc.startsWith('data:image/webp;base64,');
  // Use the transparent standard cutout, including the original squirrel's ground shadow.
- img.src=pet.key==='squirrel'?(window.MOGU_SQUIRREL_STANDARD||ASSETS.squirrel):(CUTOUT_ASSETS[pet.key]||ASSETS[pet.key]);
+ img.src=CUTOUT_ASSETS[pet.key]||(pet.key==='squirrel'?(window.MOGU_SQUIRREL_STANDARD||ASSETS.squirrel):ASSETS[pet.key]);
  img.style.visibility='visible';
  img.alt=pet.name;
  // Normal-stage positioning is now controlled in CSS.
@@ -1138,7 +1167,7 @@ function renderPetPicker() {
   btn.type='button';
   btn.className='pet-option'+(idx===state.petIndex?' selected':'');
   // Keep the settings preview identical to the transparent standard home artwork.
-  const asset=pet.key==='squirrel'?(window.MOGU_SQUIRREL_STANDARD||ASSETS.squirrel):(CUTOUT_ASSETS[pet.key]||ASSETS[pet.key]);
+  const asset=CUTOUT_ASSETS[pet.key]||(pet.key==='squirrel'?(window.MOGU_SQUIRREL_STANDARD||ASSETS.squirrel):ASSETS[pet.key]);
   const frame=document.createElement('span');
   frame.className='pet-thumb-frame';
   const img=document.createElement('img');
