@@ -469,3 +469,83 @@ function renderBodySprite(ctx,name,stage,face,desiredWidth,desiredHeight){
  ctx.clearRect(0,0,desiredWidth,desiredHeight);ctx.imageSmoothingEnabled=false;
  ctx.drawImage(mini,minX,minY,cropW,cropH,dx,dy,dw,dh);
 }
+
+
+/* Higher-resolution non-destructive sprite compositor.
+   Do not warp the original pixel map or re-shape the accessories. */
+function renderFinePetSprite(ctx,name,stage,face,desiredWidth,desiredHeight){
+ const rows=cleanedSpriteRows(name),w=rows[0].length,h=rows.length;
+ const d=2,pad=18,mini=document.createElement('canvas');
+ mini.width=(w+pad*2)*d;mini.height=(h+10)*d;
+ const g=mini.getContext('2d');g.imageSmoothingEnabled=false;
+ const baseColor={hamster:'E',rabbit:'D',squirrel:'J',hedgehog:'A',otter:'L'}[name];
+ const fill=SPRITE_PALETTE[baseColor],outline=SPRITE_PALETTE.K,level=PET_BODY_STAGES[stage]||0;
+ const at=(x,y,color)=>{g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),1,1)};
+ const blob=(cx,cy,rx,ry,base)=>{
+   for(let y=Math.floor(cy-ry)-1;y<=Math.ceil(cy+ry)+1;y++)
+    for(let x=Math.floor(cx-rx)-1;x<=Math.ceil(cx+rx)+1;x++){
+     const v=Math.pow((x-cx)/rx,2)+Math.pow((y-cy)/ry,2);
+     if(v<=1.16)at(x,y,v<=.83?base:outline);
+    }
+ };
+ const zone=BODY_AREAS[name];
+ // Each fullness stage adds discrete cheek and tummy contours. The source silhouette
+ // and its face, hat, balloon, star, spine and tail pixels are drawn unchanged on top.
+ if(level>0){
+  for(const [kind,mult] of [['cheek',1],['belly',1.3]]){
+   const part=zone[kind], [y0,y1]=part.rows,[x0,x1]=part.cols;
+   const y=Math.round((y0+y1)/2);
+   const sampled=[];
+   for(let yy=Math.max(y0,y-2);yy<=Math.min(y1,y+2,h-1);yy++)
+    for(let x=x0;x<=Math.min(x1,w-1);x++)if(rows[yy][x]===baseColor)sampled.push(x);
+   if(sampled.length<8)continue;
+   const left=Math.min(...sampled),right=Math.max(...sampled);
+   const outerX=Math.max(2,level*(kind==='cheek'?2.3:2.9));
+   const outerY=Math.max(3,level*(kind==='cheek'?2:2.7));
+   // Attach the new pixels to the body, without scaling the existing art.
+   const cy=(y+5)*d;
+   const sideLimit=name==='squirrel'&&kind==='belly'?1:2;
+   blob((left+pad)*d-1,cy,outerX*d,outerY*d,fill);
+   if(sideLimit===2)blob((right+pad)*d+1,cy,outerX*d,outerY*d,fill);
+  }
+ }
+ // Exact original sprite matrix; no row displacement, no distorted outlines.
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+  const col=SPRITE_PALETTE[rows[y][x]];
+  if(!col)continue;
+  g.fillStyle=col;g.fillRect((x+pad)*d,(y+5)*d,d,d);
+ }
+ // Smaller-body stages use localized inward waist marks, not erasure of body pixels.
+ if(level<0){
+  const zonePart=zone.belly,[y0,y1]=zonePart.rows,y=Math.round((y0+y1)*.5);
+  const xs=[];
+  for(let x=zonePart.cols[0];x<=Math.min(w-1,zonePart.cols[1]);x++)
+   if(rows[y]?.[x]===baseColor)xs.push(x);
+  if(xs.length>9){
+   const left=Math.min(...xs),right=Math.max(...xs),n=Math.abs(level);
+   g.fillStyle=outline;
+   for(let i=0;i<n;i++){
+    const xx=(left+pad+2+i)*d,rx=(right+pad-2-i)*d,yy=(y+3+i)*d;
+    g.fillRect(xx,yy,1,2);g.fillRect(rx,yy,1,2);
+   }
+  }
+ }
+ if(face&&face!=='neutral'){
+  const p={hamster:[24,17],rabbit:[22,32],squirrel:[17,31],hedgehog:[20,24],otter:[21,16]}[name];
+  const x=(p[0]+pad)*d,y=(p[1]+5)*d;
+  g.fillStyle=face==='surprised'?outline:SPRITE_PALETTE.I;
+  if(face==='surprised')g.fillRect(x,y+5,3,3);
+  else if(face==='happy'||face==='smile'){g.fillRect(x-16,y+8,5,2);g.fillRect(x+13,y+8,5,2)}
+  else g.fillRect(x-9,y+3,5,1);
+ }
+ // All characters occupy the same drawing area, with no individual CSS scaling.
+ const bounds={x:0,y:0,w:mini.width,h:mini.height};
+ const originalMinH=Math.max(...Object.values(SPRITES).map(r=>r.length));
+ const displayW=Math.floor(desiredWidth*.84);
+ const displayH=Math.floor(desiredHeight*.84);
+ const dw=displayW,dh=Math.round(displayW*(h+10)/(w+pad*2));
+ const finalH=Math.min(displayH,dh),finalW=Math.round(dw*finalH/dh);
+ ctx.clearRect(0,0,desiredWidth,desiredHeight);ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(mini,0,0,mini.width,mini.height,
+  Math.floor((desiredWidth-finalW)/2),Math.floor((desiredHeight-finalH)/2),finalW,finalH);
+}
